@@ -4,16 +4,20 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.L2.Dot do
-  require EEx
   require Logger
 
   import Giraphe.Utility
 
-  EEx.function_from_file(
-    :defp, :generate_l2_dot,
-      "templates/dot/l2_graph.dot.eex",
-      [:switches, :edges]
-  )
+  defp get_dot_template do
+    Application.get_env :giraphe, :l2_dot_template
+  end
+
+  defp generate_dot(switches, edges) do
+    EEx.eval_file(
+      get_dot_template,
+      [switches: switches, edges: edges]
+    )
+  end
 
   defp get_switchport_by_physaddr(switch, physaddr) do
     Enum.find_value switch.fdb, fn {p, ^physaddr} -> p; _ -> nil end
@@ -116,6 +120,6 @@ defmodule Giraphe.L2.Dot do
         |> get_l2_edges
         |> sort_l2_edges_by_upstream_polladdr_and_downlink
 
-    generate_l2_dot switches, edges
+    generate_dot switches, edges
   end
 end

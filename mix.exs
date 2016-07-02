@@ -11,11 +11,29 @@ defmodule Giraphe.Mixfile do
     ]
   end
 
+  defp get_env(:test) do
+    [ l2_querier: Giraphe.IO.DummyL2Querier,
+      l3_querier: Giraphe.IO.DummyL3Querier,
+      host_scanner: Giraphe.IO.DummyHostScanner,
+      l2_dot_template: "templates/dot/l2_graph.dot.eex",
+      l3_dot_template: "templates/dot/l3_graph.dot.eex"
+    ]
+  end
+  defp get_env(_) do
+    [ l2_querier: Giraphe.IO.SNMPL2Querier,
+      l3_querier: Giraphe.IO.SNMPL3Querier,
+      host_scanner: Giraphe.IO.NmapHostScanner,
+      l2_dot_template: "templates/dot/l2_graph.dot.eex",
+      l3_dot_template: "templates/dot/l3_graph.dot.eex"
+    ]
+  end
+
   def application do
     [ applications: [
         :logger,
         :netaddr_ex
-      ]
+      ],
+      env: get_env(Mix.env)
     ]
   end
 

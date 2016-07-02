@@ -6,12 +6,17 @@
 defmodule Giraphe.IO do
   require Logger
 
-  alias Giraphe.Router
-  alias Giraphe.Switch
+  defp l2_querier do
+    Application.get_env :giraphe, :l2_querier
+  end
 
-  @l2_querier Application.get_env(:giraphe, :l2_querier)
-  @l3_querier Application.get_env(:giraphe, :l3_querier)
-  @host_scanner Application.get_env(:giraphe, :host_scanner)
+  defp l3_querier do
+    Application.get_env :giraphe, :l3_querier
+  end
+
+  defp host_scanner do
+    Application.get_env :giraphe, :host_scanner
+  end
 
   defp get_query_output(query_result, default_fun) do
     case query_result do
@@ -27,32 +32,32 @@ defmodule Giraphe.IO do
 
   defp query(:addresses, target) do
     target
-      |> @l3_querier.query_addresses
+      |> l3_querier.query_addresses
       |> get_query_output(fn(target, _) -> [target] end)
   end
   defp query(:arp_cache, target) do
     target
-      |> @l3_querier.query_arp
+      |> l3_querier.query_arp
       |> get_query_output(fn(_, _) -> [] end)
   end
   defp query(:fdb, target) do
     target
-      |> @l2_querier.query_fdb
+      |> l2_querier.query_fdb
       |> get_query_output(fn(_, _) -> nil end)
   end
   defp query(:physaddr, target) do
     target
-      |> @l3_querier.query_physaddr
+      |> l3_querier.query_physaddr
       |> get_query_output(fn(_, _) -> nil end)
   end
   defp query(:routes, target) do
     target
-      |> @l3_querier.query_routes
+      |> l3_querier.query_routes
       |> get_query_output(fn(_, _) -> [] end)
   end
   defp query(:sysname, target) do
     target
-      |> @l3_querier.query_sysname
+      |> l3_querier.query_sysname
       |> get_query_output(fn(target, _) -> target end)
   end
 
@@ -65,7 +70,7 @@ defmodule Giraphe.IO do
   end
 
   def get_router(target) do
-    %Router{
+    %Giraphe.Router{
        polladdr: target,
       addresses: query(:addresses, target),
          routes: query(   :routes, target),
@@ -74,7 +79,7 @@ defmodule Giraphe.IO do
   end
 
   def get_switch(target) do
-    %Switch{
+    %Giraphe.Switch{
       polladdr: target,
       physaddr: query(:physaddr, target),
           name: query( :sysname, target),
@@ -83,6 +88,6 @@ defmodule Giraphe.IO do
   end
 
   def ping_subnet(subnet) do
-    @host_scanner.scan subnet
+    host_scanner.scan subnet
   end
 end

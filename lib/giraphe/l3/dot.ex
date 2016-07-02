@@ -4,16 +4,20 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.L3.Dot do
-  require EEx
   require Logger
 
   import Giraphe.Utility
 
-  EEx.function_from_file(
-    :defp, :generate_l3_dot,
-      "templates/dot/l3_graph.dot.eex",
-      [:routers, :subnets, :edges]
-  )
+  defp get_dot_template do
+    Application.get_env :giraphe, :l3_dot_template
+  end
+
+  defp generate_dot(routers, subnets, edges) do
+    EEx.eval_file(
+      get_dot_template,
+      [routers: routers, subnets: subnets, edges: edges]
+    )
+  end
 
   defp records_to_l3_edges(records) do
     Stream.map records, fn [router, subnet | _] -> {router, subnet} end
@@ -64,7 +68,7 @@ defmodule Giraphe.L3.Dot do
 
     subnets = sort_prefixes_ascending subnets
 
-    generate_l3_dot routers, subnets, edges
+    generate_dot routers, subnets, edges
   end
 
   def graph_from_routers(routers) do
