@@ -6,68 +6,80 @@
 defmodule Giraphe.IO do
   require Logger
 
+  alias Giraphe.Router
+  alias Giraphe.Switch
+
   @l2_querier Application.get_env(:giraphe, :l2_querier)
   @l3_querier Application.get_env(:giraphe, :l3_querier)
   @host_scanner Application.get_env(:giraphe, :host_scanner)
 
-  def get_target_addresses(target) do
-    case @l3_querier.query_addresses target do
-      {:ok, target_addresses} ->
-        target_addresses
+  defp get_query_output(query_result, default_fun) do
+    case query_result do
+      {:ok, _, _, output} ->
+        output
 
-      {:error, reason} ->
-        :ok = Logger.warn "Unable to query target '#{target}': #{inspect reason}"
+      {:error, target, object, reason} ->
+        Logger.warn "Unable to query target '#{target}' for object '#{object}': #{inspect reason}"
 
-        [target]
+        default_fun.(target, reason)
     end
+  end
+
+  defp query(:addresses, target) do
+    target
+      |> @l3_querier.query_addresses
+      |> get_query_output(fn(target, _) -> [target] end)
+  end
+  defp query(:arp_cache, target) do
+    target
+      |> @l3_querier.query_arp
+      |> get_query_output(fn(_, _) -> [] end)
+  end
+  defp query(:fdb, target) do
+    target
+      |> @l2_querier.query_fdb
+      |> get_query_output(fn(_, _) -> nil end)
+  end
+  defp query(:physaddr, target) do
+    target
+      |> @l3_querier.query_physaddr
+      |> get_query_output(fn(_, _) -> nil end)
+  end
+  defp query(:routes, target) do
+    target
+      |> @l3_querier.query_routes
+      |> get_query_output(fn(_, _) -> [] end)
+  end
+  defp query(:sysname, target) do
+    target
+      |> @l3_querier.query_sysname
+      |> get_query_output(fn(target, _) -> target end)
   end
 
   def get_target_arp_cache(target) do
-    case @l3_querier.query_arp target do
-      {:ok, target_arp} ->
-        target_arp
-
-      {:error, reason} ->
-        :ok = Logger.warn "Unable to query target '#{target}': #{inspect reason}"
-
-        []
-    end
-  end
-
-  def get_target_fdb(target) do
-    case @l2_querier.query_fdb target do
-      {:ok, target_fdb} ->
-        target_fdb
-
-      {:error, reason} ->
-        :ok = Logger.warn "Unable to query target '#{target}': #{inspect reason}"
-
-        nil
-    end
+    query :arp_cache, target
   end
 
   def get_target_routes(target) do
-    case @l3_querier.query_routes target do
-      {:ok, target_routes} ->
-        target_routes
-
-      {:error, reason} ->
-        :ok = Logger.warn "Unable to query target '#{target}': #{inspect reason}"
-
-        []
-    end
+    query :routes, target
   end
 
-  def get_target_sysname(target) do
-    case @l3_querier.query_sysname target do
-      {:ok, target_sysname} ->
-        target_sysname
+  def get_router(target) do
+    %Router{
+       polladdr: target,
+      addresses: query(:addresses, target),
+         routes: query(   :routes, target),
+           name: query(  :sysname, target)
+    }
+  end
 
-      {:error, reason} ->
-        :ok = Logger.warn "Unable to query target '#{target}': #{inspect reason}"
-
-        target
-    end
+  def get_switch(target) do
+    %Switch{
+      polladdr: target,
+      physaddr: query(:physaddr, target),
+          name: query( :sysname, target),
+           fdb: query(     :fdb, target)
+    }
   end
 
   def ping_subnet(subnet) do

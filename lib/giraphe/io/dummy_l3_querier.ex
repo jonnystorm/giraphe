@@ -16,9 +16,9 @@ defmodule Giraphe.IO.DummyL3Querier do
         "198.51.100.17/29"
       ]
 
-    {:ok, addresses}
+    {:ok, target, :addresses, addresses}
   end
-  def query_addresses("192.0.2.7") do
+  def query_addresses("192.0.2.7" = target) do
     addresses =
       [ "192.0.2.7/31",
         "192.0.2.10/31",
@@ -26,7 +26,7 @@ defmodule Giraphe.IO.DummyL3Querier do
         "198.51.100.33/29"
       ]
 
-    {:ok, addresses}
+    {:ok, target, :addresses, addresses}
   end
   def query_addresses(target) when target in ["192.0.2.3", "192.0.2.8"] do
     addresses =
@@ -34,9 +34,9 @@ defmodule Giraphe.IO.DummyL3Querier do
         "192.0.2.8/31"
       ]
 
-    {:ok, addresses}
+    {:ok, target, :addresses, addresses}
   end
-  def query_addresses("192.0.2.9") do
+  def query_addresses("192.0.2.9" = target) do
     addresses =
       [ "192.0.2.13/30",
         "192.0.2.9/31",
@@ -44,21 +44,21 @@ defmodule Giraphe.IO.DummyL3Querier do
         "192.0.2.5/31"
       ]
 
-    {:ok, addresses}
+    {:ok, target, :addresses, addresses}
   end
-  def query_addresses("192.0.2.1") do
+  def query_addresses("192.0.2.1" = target) do
     addresses = [
       "192.0.2.1/31",
       "198.51.100.1/29"
     ]
 
-    {:ok, addresses}
+    {:ok, target, :addresses, addresses}
   end
-  def query_addresses(_target) do
-    {:error, :etimedout}
+  def query_addresses(target) do
+    {:error, target, :addresses, :etimedout}
   end
 
-  def query_arp("192.0.2.1") do
+  def query_arp("192.0.2.1" = target) do
     arp_cache =
       [ {  "192.0.2.1", "00:00:00:00:00:01"},
         {  "192.0.2.3", "00:00:00:00:00:03"},
@@ -103,10 +103,19 @@ defmodule Giraphe.IO.DummyL3Querier do
         {"192.0.2.200", "00:00:00:00:02:00"}
       ]
 
-    {:ok, arp_cache}
+    {:ok, target, :arp_cache, arp_cache}
   end
 
-  def query_routes("198.51.100.1") do
+  def query_physaddr(<<"192.0.2.", last :: binary>> = target) do
+    last_two_bytes =
+      last
+        |> String.rjust(4, ?0)
+        |> String.replace(~r/../, ":\\0")
+
+    {:ok, target, :physaddr, "00:00:00:00" <> last_two_bytes}
+  end
+
+  def query_routes("198.51.100.1" = target) do
     routes =
       [ {    "192.0.2.2/31", "0.0.0.0"},
         {    "192.0.2.4/31", "0.0.0.0"},
@@ -122,9 +131,9 @@ defmodule Giraphe.IO.DummyL3Querier do
         {"198.51.100.40/29", "192.0.2.3"}
       ]
 
-    {:ok, routes}
+    {:ok, target, :routes, routes}
   end
-  def query_routes("192.0.2.7") do
+  def query_routes("192.0.2.7" = target) do
     routes =
       [ {    "192.0.2.2/31", "192.0.2.6"},
         {    "192.0.2.4/31", "192.0.2.6"},
@@ -140,9 +149,9 @@ defmodule Giraphe.IO.DummyL3Querier do
         {"198.51.100.40/29", "192.0.2.6"}
       ]
 
-    {:ok, routes}
+    {:ok, target, :routes, routes}
   end
-  def query_routes("192.0.2.3") do
+  def query_routes("192.0.2.3" = target) do
     routes =
       [ {    "192.0.2.2/31", "0.0.0.0"},
         {    "192.0.2.4/31", "192.0.2.2"},
@@ -158,9 +167,9 @@ defmodule Giraphe.IO.DummyL3Querier do
         {"198.51.100.40/29", "192.0.2.9"}
       ]
 
-    {:ok, routes}
+    {:ok, target, :routes, routes}
   end
-  def query_routes("192.0.2.9") do
+  def query_routes("192.0.2.9" = target) do
     routes =
       [ {    "192.0.2.2/31", "192.0.2.8"},
         {    "192.0.2.4/31", "0.0.0.0"},
@@ -176,13 +185,13 @@ defmodule Giraphe.IO.DummyL3Querier do
         {"198.51.100.40/29", "192.0.2.14"}
       ]
 
-    {:ok, routes}
+    {:ok, target, :routes, routes}
   end
-  def query_routes(_target) do
-    {:error, :etimedout}
+  def query_routes(target) do
+    {:error, target, :routes, :etimedout}
   end
 
-  def query_sysname(_target) do
-    {:error, :etimedout}
+  def query_sysname(target) do
+    {:error, target, :sysname, :etimedout}
   end
 end

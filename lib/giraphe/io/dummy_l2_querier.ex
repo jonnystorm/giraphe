@@ -4,7 +4,7 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.IO.DummyL2Querier do
-  def query_fdb("192.0.2.3") do
+  def query_fdb("192.0.2.3" = target) do
     fdb =
       [ {"Gi1/24", "00:00:00:00:00:01"},
         {"Gi1/1",  "00:00:00:00:00:07"},
@@ -48,9 +48,9 @@ defmodule Giraphe.IO.DummyL2Querier do
         {"Gi1/1",  "00:00:00:00:02:00"}
       ]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.7") do
+  def query_fdb("192.0.2.7" = target) do
     fdb =
       [ {"Gi1/24", "00:00:00:00:00:01"},
         {"Gi1/1",  "00:00:00:00:00:10"},
@@ -93,29 +93,29 @@ defmodule Giraphe.IO.DummyL2Querier do
         {"Gi1/20", "00:00:00:00:02:00"}
       ]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.10") do
+  def query_fdb("192.0.2.10" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.20") do
+  def query_fdb("192.0.2.20" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.30") do
+  def query_fdb("192.0.2.30" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.40") do
+  def query_fdb("192.0.2.40" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.50") do
+  def query_fdb("192.0.2.50" = target) do
     fdb =
       [ {"Gi1/24", "00:00:00:00:00:01"},
         {"Gi1/1",  "00:00:00:00:00:51"},
@@ -129,29 +129,29 @@ defmodule Giraphe.IO.DummyL2Querier do
         {"Gi1/5",  "00:00:00:00:00:59"}
       ]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.51") do
+  def query_fdb("192.0.2.51" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.52") do
+  def query_fdb("192.0.2.52" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.53") do
+  def query_fdb("192.0.2.53" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.54") do
+  def query_fdb("192.0.2.54" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.55") do
+  def query_fdb("192.0.2.55" = target) do
     fdb =
       [ {"Gi1/24", "00:00:00:00:00:01"},
         {"Gi1/1",  "00:00:00:00:00:56"},
@@ -160,49 +160,49 @@ defmodule Giraphe.IO.DummyL2Querier do
         {"Gi1/4",  "00:00:00:00:00:59"}
       ]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.56") do
+  def query_fdb("192.0.2.56" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.57") do
+  def query_fdb("192.0.2.57" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.58") do
+  def query_fdb("192.0.2.58" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.59") do
+  def query_fdb("192.0.2.59" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.60") do
+  def query_fdb("192.0.2.60" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.70") do
+  def query_fdb("192.0.2.70" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.80") do
+  def query_fdb("192.0.2.80" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.90") do
+  def query_fdb("192.0.2.90" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.100") do
+  def query_fdb("192.0.2.100" = target) do
     fdb =
       [ {"Gi1/24", "00:00:00:00:00:01"},
         {"Gi1/1",  "00:00:00:00:01:01"},
@@ -216,104 +216,104 @@ defmodule Giraphe.IO.DummyL2Querier do
         {"Gi1/9",  "00:00:00:00:01:09"}
       ]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.101") do
+  def query_fdb("192.0.2.101" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.102") do
+  def query_fdb("192.0.2.102" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.103") do
+  def query_fdb("192.0.2.103" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.104") do
+  def query_fdb("192.0.2.104" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.105") do
+  def query_fdb("192.0.2.105" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.106") do
+  def query_fdb("192.0.2.106" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.107") do
+  def query_fdb("192.0.2.107" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.108") do
+  def query_fdb("192.0.2.108" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.109") do
+  def query_fdb("192.0.2.109" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.110") do
+  def query_fdb("192.0.2.110" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.120") do
+  def query_fdb("192.0.2.120" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.130") do
+  def query_fdb("192.0.2.130" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.140") do
+  def query_fdb("192.0.2.140" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.150") do
+  def query_fdb("192.0.2.150" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.160") do
+  def query_fdb("192.0.2.160" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.170") do
+  def query_fdb("192.0.2.170" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.180") do
+  def query_fdb("192.0.2.180" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.190") do
+  def query_fdb("192.0.2.190" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb("192.0.2.200") do
+  def query_fdb("192.0.2.200" = target) do
     fdb = [{"Gi1/24", "00:00:00:00:00:01"}]
 
-    {:ok, fdb}
+    {:ok, target, :fdb, fdb}
   end
-  def query_fdb(_target) do
-    {:error, :etimedout}
+  def query_fdb(target) do
+    {:error, target, :fdb, :etimedout}
   end
 end
