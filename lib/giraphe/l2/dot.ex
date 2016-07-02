@@ -35,19 +35,17 @@ defmodule Giraphe.L2.Dot do
         |> Stream.map(&({&1, get_downlink_from_edge(&1)}))
         |> Enum.into(%{})
 
-    ipv6_string      = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128"
-
+    ipv6_string = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128"
     max_polladdr_len = String.length ipv6_string
     max_downlink_len = max_string_length Map.values(downlinks)
 
-    sort_key_lengths = [max_polladdr_len, max_downlink_len]
+    lengths = [max_polladdr_len, max_downlink_len]
 
-    Enum.sort edges, fn ({_, u} = e1, {_, v} = e2) ->
-      sort_key1 = rjust_and_concat [u.polladdr, downlinks[e1]], sort_key_lengths
-      sort_key2 = rjust_and_concat [v.polladdr, downlinks[e2]], sort_key_lengths
-
-      sort_key1 < sort_key2
-    end
+    Enum.sort_by(
+      edges,
+      fn({_, u} = e) -> rjust_and_concat([u.polladdr, downlinks[e]], lengths) end,
+      &(&1 < &2)
+    )
   end
 
   defp physaddr_in_switch_fdb?(switch, physaddr) do

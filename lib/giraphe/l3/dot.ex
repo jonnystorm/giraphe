@@ -43,26 +43,20 @@ defmodule Giraphe.L3.Dot do
 
   defp sort_prefixes_ascending(prefixes) do
     ipv6_string = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128"
-    max_length  = String.length ipv6_string
+    lengths = [String.length ipv6_string]
 
-    Enum.sort prefixes, fn(p1, p2) ->
-      sort_key1 = String.rjust p1, max_length
-      sort_key2 = String.rjust p2, max_length
-
-      sort_key1 < sort_key2
-    end
+    Enum.sort_by prefixes, &rjust_and_concat([&1], lengths), &(&1 < &2)
   end
 
   defp sort_l3_edges_by_router_id_and_subnet(edges) do
     ipv6_string = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128"
-    max_lengths = List.duplicate String.length(ipv6_string), 2
+    lengths = List.duplicate String.length(ipv6_string), 2
 
-    Enum.sort edges, fn({r1, s1}, {r2, s2}) ->
-      sort_key1 = rjust_and_concat [r1[:id], s1], max_lengths
-      sort_key2 = rjust_and_concat [r2[:id], s2], max_lengths
-
-      sort_key1 < sort_key2
-    end
+    Enum.sort_by(
+      edges,
+      fn {r, s} -> rjust_and_concat [r[:id], s], lengths end,
+      &(&1 < &2)
+    )
   end
 
   defp graph_from_edges(edges) do

@@ -43,14 +43,9 @@ defmodule Giraphe.Utility do
 
   def sort_devices_by_polladdr_ascending(devices) do
     ipv6_string = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
-    sort_key_length = String.length ipv6_string
+    key_length = String.length ipv6_string
 
-    Enum.sort devices, fn(device1, device2) ->
-      sort_key1 = String.rjust device1.polladdr, sort_key_length
-      sort_key2 = String.rjust device2.polladdr, sort_key_length
-
-      sort_key1 < sort_key2
-    end
+    Enum.sort_by devices, &String.rjust(&1.polladdr, key_length), &(&1 < &2)
   end
 
   def rjust_and_concat(strings, lengths) do
@@ -68,20 +63,14 @@ defmodule Giraphe.Utility do
 
   def sort_prefixes_by_length_descending(prefixes) do
     ipv6_string = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128"
-
-    sort_key_lengths =
+    lengths =
       ipv6_string
         |> String.split("/")
         |> Enum.reverse
         |> Enum.map(&String.length/1)
 
     prefixes
-      |> Enum.sort(fn(prefix1, prefix2) ->
-        sort_key1 = make_sort_key_from_prefix prefix1, sort_key_lengths
-        sort_key2 = make_sort_key_from_prefix prefix2, sort_key_lengths
-
-        sort_key1 < sort_key2
-      end)
+      |> Enum.sort_by(&make_sort_key_from_prefix(&1, lengths), &(&1 < &2))
       |> Enum.reverse
   end
 end
