@@ -6,7 +6,7 @@
 defmodule Giraphe.L2.Dot do
   require Logger
 
-  import Giraphe.Utility
+  alias Giraphe.Utility
 
   defp get_dot_template do
     Application.get_env :giraphe, :l2_dot_template
@@ -47,7 +47,9 @@ defmodule Giraphe.L2.Dot do
 
     Enum.sort_by(
       edges,
-      fn({_, u} = e) -> rjust_and_concat([u.polladdr, downlinks[e]], lengths) end,
+      fn({_, u} = e) ->
+        Utility.rjust_and_concat [u.polladdr, downlinks[e]], lengths
+      end,
       &(&1 < &2)
     )
   end
@@ -58,8 +60,7 @@ defmodule Giraphe.L2.Dot do
 
   defp fdb_to_mapset(fdb) do
     fdb
-      |> Enum.unzip
-      |> elem(1)
+      |> Utility.unzip_and_get_elem(1)
       |> MapSet.new
   end
 

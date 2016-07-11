@@ -17,20 +17,24 @@ defmodule Giraphe.Utility do
     end
   end
 
-  defp unzip_and_get_elem_uniq(zipped, e) do
+  def unzip_and_get_elem(zipped, e) do
     zipped
       |> Enum.unzip
       |> elem(e)
+  end
+
+  def get_destinations_from_routes(routes) do
+    routes
+      |> unzip_and_get_elem(0)
       |> Enum.sort
       |> Enum.dedup
   end
 
-  def get_destinations_from_routes(routes) do
-    unzip_and_get_elem_uniq routes, 0
-  end
-
   def get_next_hops_from_routes(routes) do
-    unzip_and_get_elem_uniq routes, 1
+    routes
+      |> unzip_and_get_elem(1)
+      |> Enum.sort
+      |> Enum.dedup
   end
 
   def get_prefix_from_address(address) do

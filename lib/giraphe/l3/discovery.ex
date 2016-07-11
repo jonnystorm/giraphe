@@ -4,21 +4,19 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.L3.Discovery do
-  import Giraphe.Utility
-
   require Logger
 
-  alias Giraphe.IO
+  alias Giraphe.Utility
 
   def fetch_routers(targets) do
-    Enum.map targets, &IO.get_router(&1)
+    Enum.map targets, &Giraphe.IO.get_router/1
   end
 
   defp gather_names_addresses_and_next_hops_from_routers(routers) do
     [names, address_lists, next_hop_lists] =
       routers
         |> Enum.map(fn r ->
-          next_hops = get_next_hops_from_routes r.routes
+          next_hops = Utility.get_next_hops_from_routes r.routes
 
           [r.name, r.addresses, next_hops]
 
@@ -54,7 +52,7 @@ defmodule Giraphe.L3.Discovery do
         |> Enum.filter(&(not Map.has_key? addresses_seen, &1.addresses))
 
     {new_names, new_addresses, new_next_hops} =
-      gather_names_addresses_and_next_hops_from_routers  new_routers
+      gather_names_addresses_and_next_hops_from_routers new_routers
 
     next_targets =
       new_next_hops
@@ -74,8 +72,8 @@ defmodule Giraphe.L3.Discovery do
   defp append_length_to_address(address, sorted_prefixes) do
     len =
       sorted_prefixes
-        |> find_prefix_containing_address(address)
-        |> get_prefix_length
+        |> Utility.find_prefix_containing_address(address)
+        |> Utility.get_prefix_length
 
     "#{address}/#{len}"
   end
@@ -84,8 +82,8 @@ defmodule Giraphe.L3.Discovery do
     prefixes =
       routers
         |> Enum.flat_map(&(&1.routes))
-        |> get_destinations_from_routes
-        |> sort_prefixes_by_length_descending
+        |> Utility.get_destinations_from_routes
+        |> Utility.sort_prefixes_by_length_descending
 
     Enum.map routers, fn %{addresses: [head | _]} = r ->
       case String.split head, "/" do
@@ -121,6 +119,6 @@ defmodule Giraphe.L3.Discovery do
     targets
       |> _discover({%{}, %{}, []})
       |> patch_missing_lengths_in_router_addresses
-      |> sort_devices_by_polladdr_ascending
+      |> Utility.sort_devices_by_polladdr_ascending
   end
 end

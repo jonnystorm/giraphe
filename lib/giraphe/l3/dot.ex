@@ -6,7 +6,7 @@
 defmodule Giraphe.L3.Dot do
   require Logger
 
-  import Giraphe.Utility
+  alias Giraphe.Utility
 
   defp get_dot_template do
     Application.get_env :giraphe, :l3_dot_template
@@ -39,7 +39,7 @@ defmodule Giraphe.L3.Dot do
           |> Enum.zip(r.addresses)
       end)
       |> Enum.map(fn {router, address} ->
-        subnet = get_prefix_from_address address
+        subnet = Utility.get_prefix_from_address address
 
         {router, subnet}
       end)
@@ -49,7 +49,7 @@ defmodule Giraphe.L3.Dot do
     ipv6_string = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128"
     lengths = [String.length ipv6_string]
 
-    Enum.sort_by prefixes, &rjust_and_concat([&1], lengths), &(&1 < &2)
+    Enum.sort_by prefixes, &Utility.rjust_and_concat([&1], lengths), &(&1 < &2)
   end
 
   defp sort_l3_edges_by_router_id_and_subnet(edges) do
@@ -58,7 +58,7 @@ defmodule Giraphe.L3.Dot do
 
     Enum.sort_by(
       edges,
-      fn {r, s} -> rjust_and_concat [r[:id], s], lengths end,
+      fn {r, s} -> Utility.rjust_and_concat [r[:id], s], lengths end,
       &(&1 < &2)
     )
   end
