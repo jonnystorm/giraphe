@@ -2,6 +2,8 @@
 
 Discover and visualize L2/L3 network topology.
 
+See the [API documentation](http://jonnystorm.github.io/giraphe).
+
 ## Installation
 
   1. Add giraphe to your list of dependencies in `mix.exs`:
