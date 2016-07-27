@@ -2,4 +2,4 @@
   "ex_doc": {:hex, :ex_doc, "0.13.0", "aa2f8fe4c6136a2f7cfc0a7e06805f82530e91df00e2bff4b4362002b43ada65", [:mix], [{:earmark, "~> 1.0", [hex: :earmark, optional: false]}]},
   "jds_math_ex": {:git, "https://github.com/jonnystorm/jds-math-elixir", "10d5cdf175b6a12b5ca9d97e4cb998e3324d6561", []},
   "linear_ex": {:git, "https://github.com/jonnystorm/linear-elixir", "a6a3dd8889d921878e8c01268fbad7714c599bd0", []},
-  "netaddr_ex": {:git, "https://github.com/jonnystorm/netaddr-elixir.git", "dbbef2b36b8a09be97abccfac6333bc0cbdb4ae7", []}}
+  "netaddr_ex": {:git, "https://github.com/jonnystorm/netaddr-elixir.git", "8b2a8447fc2d5d5d41f3d93a32336ff88a8e0fa3", []}}
