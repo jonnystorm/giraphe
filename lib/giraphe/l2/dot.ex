@@ -118,6 +118,7 @@ defmodule Giraphe.L2.Dot do
           switch
             |> remove_switch_fdb_entries_by_port(uplink)
             |> intersect_switch_fdb_entries_with_physaddrs(switch_physaddrs)
+
         %{switch | polladdr: NetAddr.address(switch.polladdr)}
       end
 
