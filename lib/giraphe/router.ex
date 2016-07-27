@@ -4,6 +4,10 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.Router do
+  @moduledoc """
+  Defines a struct for storing routes and router addresses.
+  """
+
   defstruct name: nil, polladdr: nil, addresses: nil, routes: nil
 
   @type name        :: String.t

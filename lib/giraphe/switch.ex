@@ -4,6 +4,11 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.Switch do
+  @moduledoc """
+  Defines a struct for storing forwarding database entries and other
+  switch information.
+  """
+
   defstruct name: nil, physaddr: nil, fdb: nil, polladdr: nil, uplink: nil
 
   @type name     :: String.t
