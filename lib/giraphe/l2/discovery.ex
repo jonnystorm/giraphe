@@ -18,7 +18,7 @@ defmodule Giraphe.L2.Discovery do
     Enum.find_value switch.fdb, fn {p, ^mac} -> p; _ -> nil end
   end
 
-  def fetch_switches(targets, gateway_mac) do
+  defp fetch_switches(targets, gateway_mac) do
     targets
       |> Enum.map(&Giraphe.IO.get_switch/1)
       |> find_switches_with_non_nil_fdbs
