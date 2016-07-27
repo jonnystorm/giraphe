@@ -4,8 +4,17 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.IO.NmapHostScanner do
+  @moduledoc """
+  An `nmap` implementation of the `Giraphe.IO.HostScanner` behaviour.
+  """
+
+  @behaviour Giraphe.IO.HostScanner
+
+  @doc """
+  Scans all hosts in `subnet`.
+  """
   def scan(subnet) do
-    case System.cmd "nmap", ~w(-n -sn -PE -T4 #{subnet}) do
+    case System.cmd("nmap", ~w(-n -sn -PE -T4 #{subnet})) do
       {_, 0} ->
         :ok
 

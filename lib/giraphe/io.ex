@@ -4,6 +4,8 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.IO do
+  @moduledoc false
+
   require Logger
 
   defp l2_querier do
@@ -24,7 +26,7 @@ defmodule Giraphe.IO do
         output
 
       {:error, target, object, reason} ->
-        Logger.warn "Unable to query target '#{target}' for object '#{object}': #{inspect reason}"
+        :ok = Logger.warn "Unable to query target '#{target}' for object '#{object}': #{inspect reason}"
 
         default_fun.(target, reason)
     end
@@ -58,7 +60,7 @@ defmodule Giraphe.IO do
   defp query(:sysname, target) do
     target
       |> l3_querier.query_sysname
-      |> get_query_output(fn(target, _) -> target end)
+      |> get_query_output(fn(target, _) -> NetAddr.address(target) end)
   end
 
   def get_target_arp_cache(target) do

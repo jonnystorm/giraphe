@@ -4,7 +4,9 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.L2.Dot do
-  require Logger
+  @moduledoc """
+  Functions for generating switch diagrams with GraphViz dot.
+  """
 
   alias Giraphe.Utility
 
@@ -39,7 +41,7 @@ defmodule Giraphe.L2.Dot do
         |> Stream.map(&({&1, get_downlink_from_edge(&1)}))
         |> Enum.into(%{})
 
-    ipv6_string = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128"
+    ipv6_string = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
     max_polladdr_len = String.length ipv6_string
     max_downlink_len = max_string_length Map.values(downlinks)
 
@@ -49,8 +51,7 @@ defmodule Giraphe.L2.Dot do
       edges,
       fn({_, u} = e) ->
         Utility.rjust_and_concat [u.polladdr, downlinks[e]], lengths
-      end,
-      &(&1 < &2)
+      end
     )
   end
 
@@ -104,16 +105,20 @@ defmodule Giraphe.L2.Dot do
     filter_switch_fdb switch, fn {_, pa} -> pa in physaddrs end
   end
 
-  def digraph_from_switches(switches) do
+  @doc """
+  Generate GraphViz dot from `switches`.
+  """
+  def generate_digraph_from_switches(switches) do
     switch_physaddrs = Enum.map switches, &(&1.physaddr)
 
     switches =
       Enum.map switches, fn switch ->
         uplink = switch.uplink
-
-        switch
-          |> remove_switch_fdb_entries_by_port(uplink)
-          |> intersect_switch_fdb_entries_with_physaddrs(switch_physaddrs)
+        switch =
+          switch
+            |> remove_switch_fdb_entries_by_port(uplink)
+            |> intersect_switch_fdb_entries_with_physaddrs(switch_physaddrs)
+        %{switch | polladdr: NetAddr.address(switch.polladdr)}
       end
 
     edges =

@@ -4,11 +4,15 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.L3.Discovery do
+  @moduledoc """
+  Discovery functions for routers.
+  """
+
   require Logger
 
   alias Giraphe.Utility
 
-  def fetch_routers(targets) do
+  defp fetch_routers(targets) do
     Enum.map targets, &Giraphe.IO.get_router/1
   end
 
@@ -32,7 +36,7 @@ defmodule Giraphe.L3.Discovery do
       |> List.flatten
       |> Enum.sort
       |> Enum.dedup
-      |> Enum.filter(&(&1 != "0.0.0.0"))
+      |> Enum.filter(&Utility.next_hop_is_not_self/1)
   end
 
   defp merge_list_with_map(list, map) do
@@ -69,13 +73,15 @@ defmodule Giraphe.L3.Discovery do
     _discover next_targets, {targets_seen, addresses_seen, routers}
   end
 
-  defp append_length_to_address(address, sorted_prefixes) do
-    len =
-      sorted_prefixes
-        |> Utility.find_prefix_containing_address(address)
-        |> Utility.get_prefix_length
+  defp refine_address_length(address, sorted_prefixes) do
+    prefix = Utility.find_prefix_containing_address sorted_prefixes, address
 
-    "#{address}/#{len}"
+    if prefix do
+      NetAddr.address_length address, NetAddr.address_length(prefix)
+
+    else
+      address
+    end
   end
 
   defp patch_missing_lengths_in_router_addresses(routers) do
@@ -83,21 +89,24 @@ defmodule Giraphe.L3.Discovery do
       routers
         |> Enum.flat_map(&(&1.routes))
         |> Utility.get_destinations_from_routes
-        |> Utility.sort_prefixes_by_length_descending
+        |> Enum.sort
 
-    Enum.map routers, fn %{addresses: [head | _]} = r ->
-      case String.split head, "/" do
-        [address] ->
-          %{r | addresses: [append_length_to_address(address, prefixes)]}
+    Enum.map routers, fn
+      %{addresses: [head]} = r ->
+        if Utility.is_host_address(head) do
+          %{r | addresses: [refine_address_length(head, prefixes)]}
 
-        _ ->
+        else
           r
-      end
+        end
+
+      r ->
+        r
     end
   end
 
   defp get_default_gateway do
-    {output, 0} = System.cmd "ip", ["route"]
+    {output, 0} = System.cmd "ip", ~w(route)
 
     ["default", "via", default_gateway | _] =
       output
@@ -109,16 +118,29 @@ defmodule Giraphe.L3.Discovery do
     default_gateway
   end
 
+  @doc """
+  Discovers routers by polling this machine's default gateway.
+
+  Additional routers are discovered by polling next-hops found in routing tables.
+  """
   @spec discover :: [Giraphe.Router.t]
+
   def discover do
     discover [get_default_gateway]
   end
 
+  @doc """
+  Discovers routers by polling `targets`.
+
+  Additional routers are discovered by polling next-hops found in routing tables.
+  """
   @spec discover([String.t]) :: [Giraphe.Router.t]
+
   def discover(targets) do
     targets
+      |> Enum.map(&NetAddr.ip/1)
       |> _discover({%{}, %{}, []})
       |> patch_missing_lengths_in_router_addresses
-      |> Utility.sort_devices_by_polladdr_ascending
+      |> Enum.sort_by(&(&1.polladdr))
   end
 end

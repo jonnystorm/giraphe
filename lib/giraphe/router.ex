@@ -7,9 +7,9 @@ defmodule Giraphe.Router do
   defstruct name: nil, polladdr: nil, addresses: nil, routes: nil
 
   @type name        :: String.t
-  @type netaddr     :: String.t
-  @type destination :: String.t
-  @type next_hop    :: String.t
+  @type netaddr     :: NetAddr.t
+  @type destination :: netaddr
+  @type next_hop    :: netaddr
   @type route       :: {destination, next_hop}
 
   @type t :: %Giraphe.Router{

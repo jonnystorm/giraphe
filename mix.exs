@@ -3,7 +3,7 @@ defmodule Giraphe.Mixfile do
 
   def project do
     [ app: :giraphe,
-      version: "0.0.3",
+      version: "0.0.4",
       elixir: "~> 1.2",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -38,7 +38,8 @@ defmodule Giraphe.Mixfile do
   end
 
   defp deps do
-    [ {:netaddr_ex, git: "https://github.com/jonnystorm/netaddr-elixir.git"}
+    [ {:netaddr_ex, git: "https://github.com/jonnystorm/netaddr-elixir.git"},
+      {:ex_doc, "~> 0.13", only: :dev}
     ]
   end
 end

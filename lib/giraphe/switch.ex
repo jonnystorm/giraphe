@@ -7,8 +7,8 @@ defmodule Giraphe.Switch do
   defstruct name: nil, physaddr: nil, fdb: nil, polladdr: nil, uplink: nil
 
   @type name     :: String.t
-  @type netaddr  :: String.t
-  @type physaddr :: String.t
+  @type netaddr  :: NetAddr.t
+  @type physaddr :: netaddr
   @type portname :: String.t
 
   @type t :: %Giraphe.Switch{

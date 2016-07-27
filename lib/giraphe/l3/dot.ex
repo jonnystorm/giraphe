@@ -4,9 +4,9 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.L3.Dot do
-  require Logger
-
-  alias Giraphe.Utility
+  @moduledoc """
+  Functions for generating router diagrams with GraphViz dot.
+  """
 
   defp get_dot_template do
     Application.get_env :giraphe, :l3_dot_template
@@ -19,8 +19,24 @@ defmodule Giraphe.L3.Dot do
     )
   end
 
-  defp records_to_l3_edges(records) do
-    Stream.map records, fn [router, subnet | _] -> {router, subnet} end
+  defp get_l3_edges(routers) do
+    routers
+      |> Enum.flat_map(fn r ->
+        addresses = Enum.sort r.addresses
+        %{name: r.name, id: NetAddr.address(r.polladdr)}
+          |> List.duplicate(length addresses)
+          |> Enum.zip(addresses)
+      end)
+  end
+
+  @doc """
+  Generate GraphViz dot from `routers`.
+  """
+  def generate_graph_from_routers(routers) do
+    routers
+      |> Enum.sort_by(&(&1.polladdr))
+      |> get_l3_edges
+      |> generate_graph_from_edges
   end
 
   defp l3_edges_to_nodes(edges) do
@@ -31,51 +47,23 @@ defmodule Giraphe.L3.Dot do
       |> List.to_tuple
   end
 
-  defp get_l3_edges(routers) do
-    routers
-      |> Enum.flat_map(fn r ->
-        %{name: r.name, id: r.polladdr}
-          |> List.duplicate(length r.addresses)
-          |> Enum.zip(r.addresses)
-      end)
-      |> Enum.map(fn {router, address} ->
-        subnet = Utility.get_prefix_from_address address
-
-        {router, subnet}
-      end)
-  end
-
-  defp sort_prefixes_ascending(prefixes) do
-    ipv6_string = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128"
-    lengths = [String.length ipv6_string]
-
-    Enum.sort_by prefixes, &Utility.rjust_and_concat([&1], lengths), &(&1 < &2)
-  end
-
-  defp sort_l3_edges_by_router_id_and_subnet(edges) do
-    ipv6_string = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128"
-    lengths = List.duplicate String.length(ipv6_string), 2
-
-    Enum.sort_by(
-      edges,
-      fn {r, s} -> Utility.rjust_and_concat [r[:id], s], lengths end,
-      &(&1 < &2)
-    )
-  end
-
-  defp graph_from_edges(edges) do
+  defp generate_graph_from_edges(edges) do
     {routers, subnets} = l3_edges_to_nodes edges
 
-    subnets = sort_prefixes_ascending subnets
+    subnets =
+      subnets
+        |> Enum.sort
+        |> Enum.map(&NetAddr.prefix/1)
+        |> Enum.dedup
+
+    edges =
+      Enum.map edges, fn {r, s} -> {r, NetAddr.prefix(s)} end
 
     generate_dot routers, subnets, edges
   end
 
-  def graph_from_routers(routers) do
-    routers
-      |> get_l3_edges
-      |> sort_l3_edges_by_router_id_and_subnet
-      |> graph_from_edges
+  defp records_to_l3_edges(records) do
+    Stream.map records, fn [router, subnet | _] -> {router, subnet} end
   end
 
   defp get_record_stream(path) do
@@ -86,10 +74,13 @@ defmodule Giraphe.L3.Dot do
       |> Stream.map(&String.split/1)
   end
 
-  def graph_from_file(path) do
+  @doc """
+  Generate GraphViz dot from the file at `path`.
+  """
+  def generate_graph_from_file(path) do
     path
       |> get_record_stream
       |> records_to_l3_edges
-      |> graph_from_edges
+      |> generate_graph_from_edges
   end
 end

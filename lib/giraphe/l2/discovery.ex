@@ -4,7 +4,9 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.L2.Discovery do
-  require Logger
+  @moduledoc """
+  Discovery functions for switches.
+  """
 
   alias Giraphe.Utility
 
@@ -12,44 +14,62 @@ defmodule Giraphe.L2.Discovery do
     Stream.filter switches, fn %{fdb: nil} -> false; _ -> true end
   end
 
-  defp get_switchport_by_physaddr(switch, physaddr) do
-    Enum.find_value switch.fdb, fn {p, ^physaddr} -> p; _ -> nil end
+  defp get_switchport_by_mac(switch, mac) do
+    Enum.find_value switch.fdb, fn {p, ^mac} -> p; _ -> nil end
   end
 
-  def fetch_switches(targets, gateway_physaddr) do
+  def fetch_switches(targets, gateway_mac) do
     targets
-      |> Enum.map(&Giraphe.IO.get_switch(&1))
+      |> Enum.map(&Giraphe.IO.get_switch/1)
       |> find_switches_with_non_nil_fdbs
       |> Enum.map(fn s ->
-        uplink = get_switchport_by_physaddr s, gateway_physaddr
+        uplink = get_switchport_by_mac s, gateway_mac
 
         %{s | uplink: uplink}
       end)
   end
 
-  defp find_connected_routes(routes) do
-    Enum.filter routes, fn {_, "0.0.0.0"} -> true; _ -> false end
-  end
+  defp get_subnet_by_gateway_address(gateway_address_string) do
+    gateway_address = NetAddr.ip gateway_address_string
 
-  defp get_subnet_by_gateway_address(gateway_address) do
     gateway_address
       |> Giraphe.IO.get_target_routes
-      |> find_connected_routes
+      |> Enum.filter(fn {_, next_hop} -> Utility.next_hop_is_self next_hop end)
       |> Utility.get_destinations_from_routes
-      |> Utility.sort_prefixes_by_length_descending
+      |> Enum.sort
+      |> Enum.reverse
       |> Utility.find_prefix_containing_address(gateway_address)
   end
 
+  @doc """
+  Discover switches with a default gateway of `gateway_address`.
+
+  Ping scans the corresponding subnet to induce ARP entries, then polls each IP
+  for forwarding information.
+  """
   @spec discover(String.t) :: [Giraphe.Switch.t]
-  def discover(gateway_address) do
+
+  def discover(gateway_address) when is_binary gateway_address do
     subnet = get_subnet_by_gateway_address gateway_address
 
-    discover subnet, gateway_address
+    discover "#{subnet}", gateway_address
   end
 
+  @doc """
+  Discover switches in subnet `subnet` by polling `gateway_address` ARP entries.
+
+  Ping scans the corresponding subnet to induce ARP entries, then polls each IP
+  for forwarding information.
+  """
   @spec discover(String.t, String.t) :: [Giraphe.Switch.t]
-  def discover(subnet, gateway_address) do
-    :ok = Giraphe.IO.ping_subnet subnet
+
+  def discover(subnet, gateway_address)
+      when is_binary(subnet)
+       and is_binary(gateway_address)
+  do
+    :ok = Giraphe.IO.ping_subnet NetAddr.ip(subnet)
+
+    gateway_address = NetAddr.ip gateway_address
 
     arp_entries =
       gateway_address
@@ -60,6 +80,6 @@ defmodule Giraphe.L2.Discovery do
       |> Utility.unzip_and_get_elem(0)
       |> Enum.filter(&(&1 != gateway_address))
       |> fetch_switches(arp_entries[gateway_address])
-      |> Utility.sort_devices_by_polladdr_ascending
+      |> Enum.sort_by(&(&1.polladdr))
   end
 end

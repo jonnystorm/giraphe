@@ -4,6 +4,8 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.IO.DummyHostScanner do
+  @moduledoc false
+
   def scan(_subnet) do
     :ok
   end
