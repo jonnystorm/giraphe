@@ -4,10 +4,13 @@ defmodule Giraphe.Mixfile do
   def project do
     [ app: :giraphe,
       version: "0.0.4",
+      name: "Giraphe",
+      source_url: "https://github.com/jonnystorm/giraphe",
       elixir: "~> 1.2",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      deps: deps
+      deps: deps,
+      docs: [extras: ["README.md"]]
     ]
   end
 
