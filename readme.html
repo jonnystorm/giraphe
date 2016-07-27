@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>404 – Giraphe v0.0.4</title>
+    <title>Giraphe – Giraphe v0.0.4</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -58,12 +58,23 @@
     <div id="content" class="content-inner">
 
 
-<h2>Page not found</h2>
-
-<p>Sorry, but the page you were trying to get to, does not exist. You
-may want to try searching this site using the sidebar or using our
-<a href="api-reference.html" title="API Reference">API Reference</a> page to find what
-you were looking for.</p>
+<h1>Giraphe</h1>
+<p>Discover and visualize L2/L3 network topology.</p>
+<h2 id="installation" class="section-heading">
+  <a href="#installation" class="hover-link"><i class="icon-link"></i></a>
+   Installation
+</h2><ol>
+<li><p>Add giraphe to your list of dependencies in <code class="inline">mix.exs</code>:</p>
+<pre><code class="elixir">def deps do
+  [{:giraphe, git: &quot;https://github.com/jonnystorm/giraphe.git&quot;}]
+end</code></pre>
+</li>
+<li><p>Ensure giraphe is started before your application:</p>
+<pre><code class="elixir">def application do
+  [applications: [:giraphe]]
+end</code></pre>
+</li>
+</ol>
 
       <footer class="footer">
         <p>
