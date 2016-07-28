@@ -21,9 +21,10 @@ defmodule Giraphe.L3.Dot do
 
   defp get_l3_edges(routers) do
     routers
-      |> Enum.flat_map(fn r ->
-        addresses = Enum.sort r.addresses
-        %{name: r.name, id: NetAddr.address(r.polladdr)}
+      |> Enum.flat_map(fn router ->
+        addresses = Enum.sort router.addresses
+
+        %{name: router.name, id: NetAddr.address(router.polladdr)}
           |> List.duplicate(length addresses)
           |> Enum.zip(addresses)
       end)
@@ -56,8 +57,9 @@ defmodule Giraphe.L3.Dot do
         |> Enum.map(&NetAddr.prefix/1)
         |> Enum.dedup
 
-    edges =
-      Enum.map edges, fn {r, s} -> {r, NetAddr.prefix(s)} end
+    edges = Enum.map edges, fn {router, subnet} ->
+      {router, NetAddr.prefix(subnet)}
+    end
 
     generate_dot routers, subnets, edges
   end

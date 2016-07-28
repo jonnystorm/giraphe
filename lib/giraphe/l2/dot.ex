@@ -21,17 +21,9 @@ defmodule Giraphe.L2.Dot do
     )
   end
 
-  defp get_switchport_by_physaddr(switch, physaddr) do
-    Enum.find_value switch.fdb, fn {p, ^physaddr} -> p; _ -> nil end
-  end
-
-  defp get_downlink_from_edge({x, y}) do
-    get_switchport_by_physaddr y, x.physaddr
-  end
-
   defp max_string_length(strings) do
     strings
-      |> Stream.map(&String.length(&1))
+      |> Stream.map(&String.length/1)
       |> Enum.max
   end
 
@@ -47,16 +39,23 @@ defmodule Giraphe.L2.Dot do
 
     lengths = [max_polladdr_len, max_downlink_len]
 
-    Enum.sort_by(
-      edges,
-      fn({_, u} = e) ->
-        Utility.rjust_and_concat [u.polladdr, downlinks[e]], lengths
-      end
-    )
+    Enum.sort_by edges, fn({_, upstream_switch} = edge) ->
+      downlink = downlinks[edge]
+
+      Utility.rjust_and_concat [upstream_switch.polladdr, downlink], lengths
+    end
   end
 
-  defp physaddr_in_switch_fdb?(switch, physaddr) do
-    get_switchport_by_physaddr(switch, physaddr) != nil
+  defp get_downlink_from_edge({downstream_switch, upstream_switch}) do
+    get_fdb_port_by_physaddr upstream_switch.fdb, downstream_switch.physaddr
+  end
+
+  defp get_fdb_port_by_physaddr(fdb, physaddr) do
+    Enum.find_value fdb, fn {port, ^physaddr} -> port; _ -> nil end
+  end
+
+  defp physaddr_in_fdb?(fdb, physaddr) do
+    get_fdb_port_by_physaddr(fdb, physaddr) != nil
   end
 
   defp fdb_to_mapset(fdb) do
@@ -65,36 +64,40 @@ defmodule Giraphe.L2.Dot do
       |> MapSet.new
   end
 
-  defp fdb_proper_subset?(fdb1, fdb2) do
-    set1 = fdb_to_mapset fdb1
-    set2 = fdb_to_mapset fdb2
+  defp proper_subset?(mapset1, mapset2) do
+    MapSet.subset?(mapset1, mapset2) and not MapSet.equal?(mapset1, mapset2)
+  end
 
-    MapSet.subset?(set1, set2) and not MapSet.equal?(set1, set2)
+  defp fdb_proper_subset?(fdb1, fdb2) do
+    mapset1 = fdb_to_mapset fdb1
+    mapset2 = fdb_to_mapset fdb2
+
+    proper_subset? mapset1, mapset2
   end
 
   defp uniq_edges_by_min_of_fdb_entries_in_upstream_switches(edges) do
     edges
-      |> Enum.group_by(fn {x, _} -> x end)
-      |> Enum.map(fn {_, edges} ->
-        Enum.min_by edges, fn {_, y} -> length(y.fdb) end
+      |> Enum.group_by(fn {downstream_switch, _} -> downstream_switch end)
+      |> Enum.map(fn {_, grouped_edges} ->
+        Enum.min_by grouped_edges, fn {_, upstream_switch} ->
+          length upstream_switch.fdb
+        end
       end)
   end
 
   defp get_l2_edges(switches) do
-    for x <- switches,
-        y <- switches,
-        fdb_proper_subset?(x.fdb, y.fdb),
-        physaddr_in_switch_fdb?(y, x.physaddr)
+    for downstream_switch <- switches,
+        upstream_switch <- switches,
+        fdb_proper_subset?(downstream_switch.fdb, upstream_switch.fdb),
+        physaddr_in_fdb?(upstream_switch.fdb, downstream_switch.physaddr)
     do
-      {x, y}
+      {downstream_switch, upstream_switch}
 
     end |> uniq_edges_by_min_of_fdb_entries_in_upstream_switches
   end
 
   defp filter_switch_fdb(switch, fun) do
-    filtered_fdb = Enum.filter switch.fdb, &fun.(&1)
-
-    %{switch | fdb: filtered_fdb}
+    Map.put switch, :fdb, Enum.filter(switch.fdb, &fun.(&1))
   end
 
   defp remove_switch_fdb_entries_by_port(switch, portname) do
@@ -102,7 +105,7 @@ defmodule Giraphe.L2.Dot do
   end
 
   defp intersect_switch_fdb_entries_with_physaddrs(switch, physaddrs) do
-    filter_switch_fdb switch, fn {_, pa} -> pa in physaddrs end
+    filter_switch_fdb switch, fn {_, physaddr} -> physaddr in physaddrs end
   end
 
   @doc """
@@ -113,13 +116,10 @@ defmodule Giraphe.L2.Dot do
 
     switches =
       Enum.map switches, fn switch ->
-        uplink = switch.uplink
-        switch =
-          switch
-            |> remove_switch_fdb_entries_by_port(uplink)
-            |> intersect_switch_fdb_entries_with_physaddrs(switch_physaddrs)
-
-        %{switch | polladdr: NetAddr.address(switch.polladdr)}
+        switch
+          |> remove_switch_fdb_entries_by_port(switch.uplink)
+          |> intersect_switch_fdb_entries_with_physaddrs(switch_physaddrs)
+          |> Map.put(:polladdr, NetAddr.address(switch.polladdr))
       end
 
     edges =
