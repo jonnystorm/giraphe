@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/jonnystorm/giraphe/master/giraphe-title.png" height="300px" />
+<a href="https://github.com/jonnystorm/giraphe"><img src="https://raw.githubusercontent.com/jonnystorm/giraphe/master/giraphe-title.png" height="300px" /></a>
 
 Discover and visualize layer-2 and layer-3 network topology.
 
