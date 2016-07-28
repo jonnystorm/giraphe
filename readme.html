@@ -67,14 +67,16 @@
    Installation
 </h2><ol>
 <li><p>Add giraphe to your list of dependencies in <code class="inline">mix.exs</code>:</p>
-<pre><code class="elixir">def deps do
-  [{:giraphe, git: &quot;https://github.com/jonnystorm/giraphe.git&quot;}]
-end</code></pre>
+<pre><code class="elixir">    def deps do
+      [{:giraphe, git: &quot;https://github.com/jonnystorm/giraphe.git&quot;}]
+    end
+    ```</code></pre>
 </li>
 <li><p>Ensure giraphe is started before your application:</p>
-<pre><code class="elixir">def application do
-  [applications: [:giraphe]]
-end</code></pre>
+<pre><code class="elixir">    def application do
+      [applications: [:giraphe]]
+    end
+    ```</code></pre>
 </li>
 </ol>
 
