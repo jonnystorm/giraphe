@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Giraphe.Switch – giraphe v0.0.6</title>
+    <title>Giraphe.IO.Querier – giraphe v0.0.6</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -62,10 +62,12 @@
 
       <h1>
         <small class="visible-xs">giraphe v0.0.6</small>
-        Giraphe.Switch
+        Giraphe.IO.Querier
+        
+          <small>behaviour</small>
         
         
-          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/switch.ex#L6" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/querier.ex#L6" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -73,8 +75,7 @@
 
       
         <section id="moduledoc" class="docstring">
-          <p>Defines a struct for storing forwarding database entries and other
-switch information.</p>
+          <p>A behaviour for querier implementations.</p>
 
         </section>
       
@@ -94,31 +95,7 @@ switch information.</p>
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#t:name/0">name()</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#t:netaddr/0">netaddr()</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#t:physaddr/0">physaddr()</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#t:portname/0">portname()</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#t:t/0">t()</a>
+    <a href="#t:query_object/0">query_object()</a>
   </div>
   
 </div>
@@ -131,6 +108,19 @@ switch information.</p>
           
 
           
+  <div class="summary-callbacks summary">
+    <h2>
+      <a href="#callbacks">Callbacks</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#c:query/2">query(object, target)</a>
+  </div>
+  
+</div>
+
+  </div>
+
 
         </section>
       
@@ -144,24 +134,13 @@ switch information.</p>
             Types
           </h1>
           <div class="types-list">
-            <div id="t:name/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:name/0">name</a> :: <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a></code></pre>
-  
-</div>
-<div id="t:netaddr/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:netaddr/0">netaddr</a> :: NetAddr.t</code></pre>
-  
-</div>
-<div id="t:physaddr/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:physaddr/0">physaddr</a> :: <a href="#t:netaddr/0">netaddr</a></code></pre>
-  
-</div>
-<div id="t:portname/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:portname/0">portname</a> :: <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a></code></pre>
-  
-</div>
-<div id="t:t/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:t/0">t</a> :: %Giraphe.Switch{fdb: [{<a href="#t:portname/0">portname</a>, <a href="#t:physaddr/0">physaddr</a>}], name: <a href="#t:name/0">name</a>, physaddr: <a href="#t:physaddr/0">physaddr</a>, polladdr: <a href="#t:netaddr/0">netaddr</a>, uplink: <a href="#t:portname/0">portname</a>}</code></pre>
+            <div id="t:query_object/0" class="type-detail">
+  <pre><code class="elixir"><a href="#t:query_object/0">query_object</a> ::
+  :addresses |
+  :arp_cache |
+  :fdb |
+  :routes |
+  :sysname</code></pre>
   
 </div>
 
@@ -173,6 +152,43 @@ switch information.</p>
 
       
 
+      
+        <section id="callbacks" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#callbacks">
+              <i class="icon-link"></i>
+            </a>
+            Callbacks
+          </h1>
+          <div class="detail" id="c:query/2">
+  <div class="detail-header">
+    <a href="#c:query/2" class="detail-link" title="Link to this callback">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">query(object, target)</span>
+    
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/querier.ex#L12" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+  </div>
+  
+    <div class="specs">
+      <h4 class="specs-title">Specs</h4>
+      <div class="specs-list">
+        
+          <pre><code class="elixir">query(object :: <a href="#t:query_object/0">query_object</a>, target :: NetAddr.t) :: [NetAddr.t]</code></pre>
+        
+      </div>
+    </div>
+  
+  <section class="docstring">
+    
+  </section>
+</div>
+
+        </section>
       
           <footer class="footer">
         <p>

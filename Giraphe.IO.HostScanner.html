@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Giraphe.IO.HostScanner – giraphe v0.0.5</title>
+    <title>Giraphe.IO.HostScanner – giraphe v0.0.6</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -26,7 +26,7 @@
         giraphe
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.5
+        v0.0.6
       </h2>
     </div>
     
@@ -61,13 +61,13 @@
 
 
       <h1>
-        <small class="visible-xs">giraphe v0.0.5</small>
+        <small class="visible-xs">giraphe v0.0.6</small>
         Giraphe.IO.HostScanner
         
           <small>behaviour</small>
         
         
-          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/host_scanner.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/host_scanner.ex#L6" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -108,6 +108,15 @@
 </div>
   
 </div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#c:udp_161_open?/1">udp_161_open?(target)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Tests whether 161/udp is open on <code class="inline">target</code></p>
+</div>
+  
+</div>
 
   </div>
 
@@ -136,7 +145,7 @@
     </a>
     <span class="signature">scan(subnet)</span>
     
-      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/host_scanner.ex#L7" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/host_scanner.ex#L12" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -147,15 +156,41 @@
       <h4 class="specs-title">Specs</h4>
       <div class="specs-list">
         
-          <pre><code class="elixir">scan(subnet :: <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>) ::
-  :ok |
-  {:error, reason :: any}</code></pre>
+          <pre><code class="elixir">scan(subnet :: NetAddr.t) :: :ok</code></pre>
         
       </div>
     </div>
   
   <section class="docstring">
     <p>Scans all hosts in <code class="inline">subnet</code>.</p>
+
+  </section>
+</div>
+<div class="detail" id="c:udp_161_open?/1">
+  <div class="detail-header">
+    <a href="#c:udp_161_open?/1" class="detail-link" title="Link to this callback">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">udp_161_open?(target)</span>
+    
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/host_scanner.ex#L15" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+  </div>
+  
+    <div class="specs">
+      <h4 class="specs-title">Specs</h4>
+      <div class="specs-list">
+        
+          <pre><code class="elixir">udp_161_open?(target :: NetAddr.t) :: boolean</code></pre>
+        
+      </div>
+    </div>
+  
+  <section class="docstring">
+    <p>Tests whether 161/udp is open on <code class="inline">target</code>.</p>
 
   </section>
 </div>

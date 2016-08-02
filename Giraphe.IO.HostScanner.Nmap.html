@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Giraphe.Switch – giraphe v0.0.6</title>
+    <title>Giraphe.IO.HostScanner.Nmap – giraphe v0.0.6</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -62,10 +62,10 @@
 
       <h1>
         <small class="visible-xs">giraphe v0.0.6</small>
-        Giraphe.Switch
+        Giraphe.IO.HostScanner.Nmap
         
         
-          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/switch.ex#L6" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/host_scanner/nmap.ex#L6" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -73,8 +73,7 @@
 
       
         <section id="moduledoc" class="docstring">
-          <p>Defines a struct for storing forwarding database entries and other
-switch information.</p>
+          <p>An <code class="inline">nmap</code> implementation of the <a href="Giraphe.IO.HostScanner.html"><code class="inline">Giraphe.IO.HostScanner</code></a> behaviour.</p>
 
         </section>
       
@@ -88,45 +87,33 @@ switch information.</p>
             Summary
           </h1>
           
-  <div class="summary-types summary">
+
+          
+  <div class="summary-functions summary">
     <h2>
-      <a href="#types">Types</a>
+      <a href="#functions">Functions</a>
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#t:name/0">name()</a>
+    <a href="#scan/1">scan(subnet)</a>
   </div>
+  
+    <div class="summary-synopsis"><p>Scans all hosts in <code class="inline">subnet</code></p>
+</div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#t:netaddr/0">netaddr()</a>
+    <a href="#udp_161_open?/1">udp_161_open?(target)</a>
   </div>
   
+    <div class="summary-synopsis"><p>Tests whether 161/udp is open on <code class="inline">target</code></p>
 </div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#t:physaddr/0">physaddr()</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#t:portname/0">portname()</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#t:t/0">t()</a>
-  </div>
   
 </div>
 
   </div>
 
-
-          
 
           
 
@@ -136,39 +123,55 @@ switch information.</p>
       
 
       
-        <section id="types" class="types details-list">
+
+      
+        <section id="functions" class="details-list">
           <h1 class="section-heading">
-            <a class="hover-link" href="#types">
+            <a class="hover-link" href="#functions">
               <i class="icon-link"></i>
             </a>
-            Types
+            Functions
           </h1>
-          <div class="types-list">
-            <div id="t:name/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:name/0">name</a> :: <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a></code></pre>
+          <div class="detail" id="scan/1">
+  <div class="detail-header">
+    <a href="#scan/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">scan(subnet)</span>
+    
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/host_scanner/nmap.ex#L18" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+  </div>
   
+  <section class="docstring">
+    <p>Scans all hosts in <code class="inline">subnet</code>.</p>
+
+  </section>
 </div>
-<div id="t:netaddr/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:netaddr/0">netaddr</a> :: NetAddr.t</code></pre>
+<div class="detail" id="udp_161_open?/1">
+  <div class="detail-header">
+    <a href="#udp_161_open?/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">udp_161_open?(target)</span>
+    
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/host_scanner/nmap.ex#L33" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+  </div>
   
-</div>
-<div id="t:physaddr/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:physaddr/0">physaddr</a> :: <a href="#t:netaddr/0">netaddr</a></code></pre>
-  
-</div>
-<div id="t:portname/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:portname/0">portname</a> :: <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a></code></pre>
-  
-</div>
-<div id="t:t/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:t/0">t</a> :: %Giraphe.Switch{fdb: [{<a href="#t:portname/0">portname</a>, <a href="#t:physaddr/0">physaddr</a>}], name: <a href="#t:name/0">name</a>, physaddr: <a href="#t:physaddr/0">physaddr</a>, polladdr: <a href="#t:netaddr/0">netaddr</a>, uplink: <a href="#t:portname/0">portname</a>}</code></pre>
-  
+  <section class="docstring">
+    <p>Tests whether 161/udp is open on <code class="inline">target</code>.</p>
+
+  </section>
 </div>
 
-          </div>
         </section>
-      
-
       
 
       
