@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Giraphe.L3.Discovery – giraphe v0.0.6</title>
+    <title>Giraphe.L3.Discovery – giraphe v0.0.7</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -26,7 +26,7 @@
         giraphe
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.6
+        v0.0.7
       </h2>
     </div>
     
@@ -61,7 +61,7 @@
 
 
       <h1>
-        <small class="visible-xs">giraphe v0.0.6</small>
+        <small class="visible-xs">giraphe v0.0.7</small>
         Giraphe.L3.Discovery
         
         
@@ -95,15 +95,6 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#discover/0">discover()</a>
-  </div>
-  
-    <div class="summary-synopsis"><p>Discovers routers by polling this machine’s default gateway</p>
-</div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
     <a href="#discover/1">discover(targets)</a>
   </div>
   
@@ -132,43 +123,14 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="discover/0">
-  <div class="detail-header">
-    <a href="#discover/0" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">discover()</span>
-    
-      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/l3/discovery.ex#L136" class="view-source" rel="help" title="View Source">
-       <i class="icon-code"></i>
-     </a>
-    
-    
-  </div>
-  
-    <div class="specs">
-      <h4 class="specs-title">Specs</h4>
-      <div class="specs-list">
-        
-          <pre><code class="elixir">discover :: [<a href="Giraphe.Router.html#t:t/0">Giraphe.Router.t</a>]</code></pre>
-        
-      </div>
-    </div>
-  
-  <section class="docstring">
-    <p>Discovers routers by polling this machine’s default gateway.</p>
-<p>Additional routers are discovered by polling next-hops found in routing tables.</p>
-
-  </section>
-</div>
-<div class="detail" id="discover/1">
+          <div class="detail" id="discover/1">
   <div class="detail-header">
     <a href="#discover/1" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
     <span class="signature">discover(targets)</span>
     
-      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/l3/discovery.ex#L147" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/l3/discovery.ex#L137" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -179,7 +141,7 @@
       <h4 class="specs-title">Specs</h4>
       <div class="specs-list">
         
-          <pre><code class="elixir">discover([<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>]) :: [<a href="Giraphe.Router.html#t:t/0">Giraphe.Router.t</a>]</code></pre>
+          <pre><code class="elixir">discover([NetAddr.t]) :: [<a href="Giraphe.Router.html#t:t/0">Giraphe.Router.t</a>]</code></pre>
         
       </div>
     </div>

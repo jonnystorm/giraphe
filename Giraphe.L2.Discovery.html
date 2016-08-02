@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Giraphe.L2.Discovery – giraphe v0.0.6</title>
+    <title>Giraphe.L2.Discovery – giraphe v0.0.7</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -26,7 +26,7 @@
         giraphe
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.6
+        v0.0.7
       </h2>
     </div>
     
@@ -61,7 +61,7 @@
 
 
       <h1>
-        <small class="visible-xs">giraphe v0.0.6</small>
+        <small class="visible-xs">giraphe v0.0.7</small>
         Giraphe.L2.Discovery
         
         
@@ -95,16 +95,7 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#discover/1">discover(gateway_address)</a>
-  </div>
-  
-    <div class="summary-synopsis"><p>Discover switches with a default gateway of <code class="inline">gateway_address</code></p>
-</div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#discover/2">discover(subnet, gateway_address)</a>
+    <a href="#discover/2">discover(gateway_address, subnet)</a>
   </div>
   
     <div class="summary-synopsis"><p>Discover switches in subnet <code class="inline">subnet</code> by polling <code class="inline">gateway_address</code> ARP entries</p>
@@ -132,44 +123,14 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="discover/1">
-  <div class="detail-header">
-    <a href="#discover/1" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">discover(gateway_address)</span>
-    
-      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/l2/discovery.ex#L68" class="view-source" rel="help" title="View Source">
-       <i class="icon-code"></i>
-     </a>
-    
-    
-  </div>
-  
-    <div class="specs">
-      <h4 class="specs-title">Specs</h4>
-      <div class="specs-list">
-        
-          <pre><code class="elixir">discover(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>) :: [<a href="Giraphe.Switch.html#t:t/0">Giraphe.Switch.t</a>]</code></pre>
-        
-      </div>
-    </div>
-  
-  <section class="docstring">
-    <p>Discover switches with a default gateway of <code class="inline">gateway_address</code>.</p>
-<p>Ping scans the corresponding subnet to induce ARP entries, then polls each IP
-for forwarding information.</p>
-
-  </section>
-</div>
-<div class="detail" id="discover/2">
+          <div class="detail" id="discover/2">
   <div class="detail-header">
     <a href="#discover/2" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">discover(subnet, gateway_address)</span>
+    <span class="signature">discover(gateway_address, subnet)</span>
     
-      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/l2/discovery.ex#L84" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/l2/discovery.ex#L66" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -180,7 +141,7 @@ for forwarding information.</p>
       <h4 class="specs-title">Specs</h4>
       <div class="specs-list">
         
-          <pre><code class="elixir">discover(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>) :: [<a href="Giraphe.Switch.html#t:t/0">Giraphe.Switch.t</a>]</code></pre>
+          <pre><code class="elixir">discover(NetAddr.t, NetAddr.t | nil) :: [<a href="Giraphe.Switch.html#t:t/0">Giraphe.Switch.t</a>]</code></pre>
         
       </div>
     </div>
