@@ -23,3 +23,23 @@ defmodule Giraphe.Router do
        routes: [route]
   }
 end
+
+defimpl String.Chars, for: Giraphe.Router do
+  import Kernel, except: [to_string: 1]
+
+  def to_string(router) do
+    addresses =
+      router.addresses
+        |> Enum.join(", ")
+
+    routes =
+      router.routes
+        |> Enum.map(fn {destination, next_hop} ->
+          "#{destination} => #{next_hop}"
+        end)
+        |> Enum.join(",\n    ")
+
+    "#{router.name}: #{router.polladdr} (#{addresses})
+    #{routes}\n"
+  end
+end

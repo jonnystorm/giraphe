@@ -4,3 +4,8 @@ use Mix.Config
 
 config :logger, level: :warn
 
+config :net_snmp_ex,
+  max_repetitions: 100
+
+import_config "#{Mix.env}.exs"
+

@@ -16,93 +16,119 @@ defmodule Giraphe.L3.Discovery do
     Enum.map targets, &Giraphe.IO.get_router/1
   end
 
-  defp gather_names_addresses_and_next_hops_from_routers(routers) do
-    [names, address_lists, next_hop_lists] =
-      routers
-        |> Enum.map(fn r ->
-          next_hops = Utility.get_next_hops_from_routes r.routes
-
-          [r.name, r.addresses, next_hops]
-
-      end)
-      |> List.zip
-      |> Enum.map(&Tuple.to_list/1)
-
-    {names, address_lists, next_hop_lists}
+  defp any_similar_address?(addresses, address) do
+    Enum.any? addresses, &(NetAddr.address(&1) == NetAddr.address(address))
   end
 
-  defp get_targets_from_next_hop_lists(next_hop_lists) do
-    next_hop_lists
-      |> List.flatten
+  defp find_old_router(routers, router) do
+    case router do
+      %{addresses: [address], routes: [_]} ->
+        old_router =
+          Enum.find routers, fn %{addresses: addresses} ->
+            any_similar_address?(addresses, address)
+          end
+
+        old_router
+
+      _ ->
+        Enum.find routers, fn
+          %{addresses: [address]} ->
+            any_similar_address? router.addresses, address
+
+          %{addresses: addresses} ->
+            addresses == router.addresses
+        end
+    end
+  end
+
+  defp get_best_router(routers, new_router) do
+    if old_router = find_old_router routers, new_router do
+      best_router =
+        Enum.max_by [old_router, new_router], fn r ->
+          length(r.addresses) + length(r.routes)
+        end
+
+      case best_router do
+        ^old_router ->
+          {old_router, new_router}
+
+        ^new_router ->
+          {new_router, old_router}
+      end
+
+    else
+      {new_router, nil}
+    end
+  end
+
+  defp _filter_new_routers([], routers) do
+    Enum.reverse routers
+  end
+  defp _filter_new_routers([new_router | tail], routers) do
+    case get_best_router routers, new_router do
+      {^new_router, nil} ->
+        Logger.debug "No loop detected: '#{new_router.name}'."
+
+        _filter_new_routers tail, [new_router | routers]
+
+      {^new_router, old_router} ->
+        Logger.info "Loop: new '#{new_router.name}' usurps '#{old_router.name}'."
+
+        routers = [new_router | Enum.filter(routers, &(&1 != old_router))]
+
+        _filter_new_routers tail, routers
+
+      {old_router, new_router} ->
+        Logger.info "Loop: incumbent '#{old_router.name}' defeats '#{new_router.name}'."
+
+        _filter_new_routers tail, routers
+    end
+  end
+  defp filter_new_routers(new_routers) do
+    _filter_new_routers new_routers, []
+  end
+
+  defp _get_next_targets_from_routers(routers) do
+    for router <- routers,
+        next_hop <- Utility.get_next_hops_from_routes(router.routes),
+        Utility.next_hop_is_not_self(next_hop)
+    do
+      Utility.refine_address_length next_hop, router.addresses, router.routes
+    end
+  end
+
+  defp get_next_targets_from_routers(routers) do
+    routers
+      |> _get_next_targets_from_routers
+      |> Enum.filter(&(&1))
       |> Enum.sort
       |> Enum.dedup
-      |> Enum.filter(&Utility.next_hop_is_not_self/1)
   end
 
-  defp merge_list_with_map(list, map) do
-    list
-      |> Enum.map(&({&1, nil}))
-      |> Enum.into(%{})
-      |> Map.merge(map)
-  end
-
-  defp _discover([], {_, _, routers}) do
+  defp _discover([], routers) do
     routers
   end
-  defp _discover(targets, {targets_seen, addresses_seen, routers}) do
+  defp _discover(targets, routers) do
     new_routers =
       targets
         |> fetch_routers
-        |> Enum.filter(&(not Map.has_key? addresses_seen, &1.addresses))
+        |> filter_new_routers
 
-    {new_names, new_addresses, new_next_hops} =
-      gather_names_addresses_and_next_hops_from_routers new_routers
+    new_names = Enum.map new_routers, &(&1.name)
 
     next_targets =
-      new_next_hops
-        |> get_targets_from_next_hop_lists
-        |> Enum.filter(&(not Map.has_key? targets_seen, &1))
+      new_routers
+        |> get_next_targets_from_routers
+        |> Enum.filter(fn next_target ->
+          not Enum.any? Enum.concat(new_routers, routers), fn r ->
+            any_similar_address?(r.addresses, next_target)
+          end
+        end)
 
-    addresses_seen = merge_list_with_map new_addresses, addresses_seen
-    targets_seen   = merge_list_with_map targets, targets_seen
-    routers        = Enum.concat routers, new_routers
+    Utility.status "New routers discovered: " <> Enum.join(new_names, ", ")
+    Utility.status "Next targets: " <> Enum.join(next_targets, ", ")
 
-    :ok = Logger.info "New routers discovered: #{inspect new_names}"
-    :ok = Logger.info "Next targets: #{inspect next_targets}"
-
-    _discover next_targets, {targets_seen, addresses_seen, routers}
-  end
-
-  defp refine_address_length(address, sorted_prefixes) do
-    prefix = Utility.find_prefix_containing_address sorted_prefixes, address
-
-    if prefix do
-      NetAddr.address_length address, NetAddr.address_length(prefix)
-
-    else
-      address
-    end
-  end
-
-  defp patch_missing_lengths_in_router_addresses(routers) do
-    prefixes =
-      routers
-        |> Enum.flat_map(&(&1.routes))
-        |> Utility.get_destinations_from_routes
-        |> Enum.sort
-
-    Enum.map routers, fn
-      %{addresses: [head]} = r ->
-        if Utility.is_host_address(head) do
-          %{r | addresses: [refine_address_length(head, prefixes)]}
-
-        else
-          r
-        end
-
-      r ->
-        r
-    end
+    _discover next_targets, Enum.concat(routers, new_routers)
   end
 
   defp get_default_gateway do
@@ -115,18 +141,7 @@ defmodule Giraphe.L3.Discovery do
         |> List.first
         |> String.split
 
-    default_gateway
-  end
-
-  @doc """
-  Discovers routers by polling this machine's default gateway.
-
-  Additional routers are discovered by polling next-hops found in routing tables.
-  """
-  @spec discover :: [Giraphe.Router.t]
-
-  def discover do
-    discover [get_default_gateway]
+    NetAddr.ip default_gateway
   end
 
   @doc """
@@ -134,13 +149,16 @@ defmodule Giraphe.L3.Discovery do
 
   Additional routers are discovered by polling next-hops found in routing tables.
   """
-  @spec discover([String.t]) :: [Giraphe.Router.t]
+  @spec discover([NetAddr.t]) :: [Giraphe.Router.t]
 
+  def discover([]) do
+    discover [get_default_gateway]
+  end
   def discover(targets) do
+    Utility.status "Seeding targets " <> Enum.join(targets, ", ")
+
     targets
-      |> Enum.map(&NetAddr.ip/1)
-      |> _discover({%{}, %{}, []})
-      |> patch_missing_lengths_in_router_addresses
+      |> _discover([])
       |> Enum.sort_by(&(&1.polladdr))
   end
 end

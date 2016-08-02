@@ -3,14 +3,11 @@
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.IO.HostScanner do
+defmodule Giraphe.IO.Querier do
   @moduledoc """
-  A behaviour for host-scanning implementations.
+  A behaviour for querier implementations.
   """
+  @type query_object :: :addresses | :arp_cache | :fdb | :routes | :sysname
 
-  @doc "Scans all hosts in `subnet`."
-  @callback scan(subnet :: NetAddr.t) :: :ok
-
-  @doc "Tests whether 161/udp is open on `target`."
-  @callback udp_161_open?(target :: NetAddr.t) :: boolean
+  @callback query(object :: query_object, target :: NetAddr.t) :: [NetAddr.t]
 end

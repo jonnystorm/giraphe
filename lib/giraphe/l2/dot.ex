@@ -14,10 +14,10 @@ defmodule Giraphe.L2.Dot do
     Application.get_env :giraphe, :l2_dot_template
   end
 
-  defp generate_dot(switches, edges) do
+  defp generate_dot(switches, edges, timestamp) do
     EEx.eval_file(
       get_dot_template,
-      [switches: switches, edges: edges]
+      [switches: switches, edges: edges, timestamp: timestamp]
     )
   end
 
@@ -25,6 +25,12 @@ defmodule Giraphe.L2.Dot do
     strings
       |> Stream.map(&String.length/1)
       |> Enum.max
+  end
+
+  defp pad_and_concat(strings, lengths) do
+    strings
+      |> Enum.zip(lengths)
+      |> Enum.map_join(fn {string, len} -> String.pad_leading(string, len) end)
   end
 
   defp sort_l2_edges_by_upstream_polladdr_and_downlink(edges) do
@@ -41,8 +47,9 @@ defmodule Giraphe.L2.Dot do
 
     Enum.sort_by edges, fn({_, upstream_switch} = edge) ->
       downlink = downlinks[edge]
+      upstream_polladdr = NetAddr.address upstream_switch.polladdr
 
-      Utility.rjust_and_concat [upstream_switch.polladdr, downlink], lengths
+      pad_and_concat [upstream_polladdr, downlink], lengths
     end
   end
 
@@ -51,31 +58,15 @@ defmodule Giraphe.L2.Dot do
   end
 
   defp get_fdb_port_by_physaddr(fdb, physaddr) do
-    Enum.find_value fdb, fn {port, ^physaddr} -> port; _ -> nil end
+    Enum.find_value fdb, fn {port, ^physaddr, _} -> port; _ -> nil end
   end
 
-  defp physaddr_in_fdb?(fdb, physaddr) do
-    get_fdb_port_by_physaddr(fdb, physaddr) != nil
-  end
-
-  defp fdb_to_mapset(fdb) do
-    fdb
-      |> Utility.unzip_and_get_elem(1)
-      |> MapSet.new
-  end
-
-  defp proper_subset?(mapset1, mapset2) do
-    MapSet.subset?(mapset1, mapset2) and not MapSet.equal?(mapset1, mapset2)
-  end
-
-  defp fdb_proper_subset?(fdb1, fdb2) do
-    mapset1 = fdb_to_mapset fdb1
-    mapset2 = fdb_to_mapset fdb2
-
-    proper_subset? mapset1, mapset2
-  end
-
-  defp uniq_edges_by_min_of_fdb_entries_in_upstream_switches(edges) do
+  defp uniq_edges_by_topologically_closest_switches(edges) do
+    # Downstream switches often have many switches upstream of them. For each
+    #   downstream switch, we only want the directly connected upstream switch.
+    #
+    # Finding the edge with the fewest FDB entries in the upstream switch yields
+    #   the topologically closest pair of switches.
     edges
       |> Enum.group_by(fn {downstream_switch, _} -> downstream_switch end)
       |> Enum.map(fn {_, grouped_edges} ->
@@ -85,41 +76,52 @@ defmodule Giraphe.L2.Dot do
       end)
   end
 
+  defp physaddr_in_fdb?(fdb, physaddr) do
+    get_fdb_port_by_physaddr(fdb, physaddr) != nil
+  end
+
   defp get_l2_edges(switches) do
     for downstream_switch <- switches,
         upstream_switch <- switches,
-        fdb_proper_subset?(downstream_switch.fdb, upstream_switch.fdb),
+        #fdb_proper_subset?(downstream_switch.fdb, upstream_switch.fdb),
         physaddr_in_fdb?(upstream_switch.fdb, downstream_switch.physaddr)
     do
       {downstream_switch, upstream_switch}
 
-    end |> uniq_edges_by_min_of_fdb_entries_in_upstream_switches
+    end |> uniq_edges_by_topologically_closest_switches
   end
 
   defp filter_switch_fdb(switch, fun) do
-    Map.put switch, :fdb, Enum.filter(switch.fdb, &fun.(&1))
+    %{switch | fdb: Enum.filter(switch.fdb, &fun.(&1))}
   end
 
   defp remove_switch_fdb_entries_by_port(switch, portname) do
-    filter_switch_fdb switch, fn {^portname, _} -> false; _ -> true end
+    filter_switch_fdb switch, fn {^portname, _, _} -> false; _ -> true end
   end
 
   defp intersect_switch_fdb_entries_with_physaddrs(switch, physaddrs) do
-    filter_switch_fdb switch, fn {_, physaddr} -> physaddr in physaddrs end
+    filter_switch_fdb switch, fn {_, physaddr, _} -> physaddr in physaddrs end
   end
 
   @doc """
   Generate GraphViz dot from `switches`.
   """
   def generate_digraph_from_switches(switches) do
+    generate_digraph_from_switches switches, "#{DateTime.utc_now}"
+  end
+
+  @doc """
+  Generate GraphViz dot from `switches` with timestamp.
+  """
+  def generate_digraph_from_switches(switches, timestamp) do
     switch_physaddrs = Enum.map switches, &(&1.physaddr)
 
     switches =
-      Enum.map switches, fn switch ->
+      for switch <- switches do
         switch
           |> remove_switch_fdb_entries_by_port(switch.uplink)
           |> intersect_switch_fdb_entries_with_physaddrs(switch_physaddrs)
-          |> Map.put(:polladdr, NetAddr.address(switch.polladdr))
+          |> Utility.trim_domain_from_device_sysname
       end
 
     edges =
@@ -127,6 +129,6 @@ defmodule Giraphe.L2.Dot do
         |> get_l2_edges
         |> sort_l2_edges_by_upstream_polladdr_and_downlink
 
-    generate_dot switches, edges
+    generate_dot switches, edges, timestamp
   end
 end

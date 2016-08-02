@@ -3,10 +3,11 @@ defmodule Giraphe.Mixfile do
 
   def project do
     [ app: :giraphe,
-      version: "0.0.5",
+      version: "0.0.7",
       name: "giraphe",
       source_url: "https://github.com/jonnystorm/giraphe",
-      elixir: "~> 1.2",
+      elixir: "~> 1.3",
+      escript: [main_module: Giraphe],
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps,
@@ -18,33 +19,40 @@ defmodule Giraphe.Mixfile do
   end
 
   defp get_env(:test) do
-    [ l2_querier: Giraphe.IO.DummyL2Querier,
-      l3_querier: Giraphe.IO.DummyL3Querier,
-      host_scanner: Giraphe.IO.DummyHostScanner,
-      l2_dot_template: "templates/dot/l2_graph.dot.eex",
-      l3_dot_template: "templates/dot/l3_graph.dot.eex"
+    [ quiet: true,
+      querier: Giraphe.IO.Querier.Dummy,
+      host_scanner: Giraphe.IO.HostScanner.Dummy,
     ]
   end
-  defp get_env(_) do
-    [ l2_querier: Giraphe.IO.SNMPL2Querier,
-      l3_querier: Giraphe.IO.SNMPL3Querier,
-      host_scanner: Giraphe.IO.NmapHostScanner,
-      l2_dot_template: "templates/dot/l2_graph.dot.eex",
-      l3_dot_template: "templates/dot/l3_graph.dot.eex"
-    ]
+  defp get_env(:dev) do
+    [credentials: [snmp: [:v2c, "public"]]]
+  end
+  defp get_env(:prod) do
+    []
   end
 
   def application do
     [ applications: [
         :logger,
-        :netaddr_ex
+        :eex,
+        :netaddr_ex,
+        :net_snmp_ex
       ],
-      env: get_env(Mix.env)
+      env: [
+        quiet: false,
+        querier: Giraphe.IO.Querier.NetSNMP,
+        host_scanner: Giraphe.IO.HostScanner.Nmap,
+        l2_dot_template: "templates/dot/l2_graph.dot.eex",
+        l3_dot_template: "templates/dot/l3_graph.dot.eex",
+        credentials: []
+
+      ] |> Keyword.merge(get_env(Mix.env))
     ]
   end
 
   defp deps do
     [ {:netaddr_ex, git: "https://github.com/jonnystorm/netaddr-elixir.git"},
+      {:net_snmp_ex, git: "https://github.com/jonnystorm/net-snmp-elixir.git"},
       {:ex_doc, "~> 0.13", only: :dev}
     ]
   end

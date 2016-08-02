@@ -24,3 +24,19 @@ defmodule Giraphe.Switch do
       uplink: portname
   }
 end
+
+defimpl String.Chars, for: Giraphe.Switch do
+  import Kernel, except: [to_string: 1]
+
+  def to_string(switch) do
+    fdb =
+      switch.fdb
+        |> Enum.map(fn {port, address, vlan} ->
+          "#{port}, V#{vlan} => #{address}"
+        end)
+        |> Enum.join(",\n    ")
+
+    "#{switch.uplink} <- #{switch.name}: #{switch.polladdr} (#{switch.physaddr})
+    #{fdb}\n"
+  end
+end

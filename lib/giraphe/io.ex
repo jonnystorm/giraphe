@@ -6,14 +6,12 @@
 defmodule Giraphe.IO do
   @moduledoc false
 
+  alias Giraphe.Utility
+
   require Logger
 
-  defp l2_querier do
-    Application.get_env :giraphe, :l2_querier
-  end
-
-  defp l3_querier do
-    Application.get_env :giraphe, :l3_querier
+  defp querier do
+    Application.get_env :giraphe, :querier
   end
 
   defp host_scanner do
@@ -32,64 +30,119 @@ defmodule Giraphe.IO do
     end
   end
 
-  defp query(:addresses, target) do
-    target
-      |> l3_querier.query_addresses
-      |> get_query_output(fn(target, _) -> [target] end)
-  end
-  defp query(:arp_cache, target) do
-    target
-      |> l3_querier.query_arp
-      |> get_query_output(fn(_, _) -> [] end)
-  end
-  defp query(:fdb, target) do
-    target
-      |> l2_querier.query_fdb
-      |> get_query_output(fn(_, _) -> nil end)
-  end
-  defp query(:physaddr, target) do
-    target
-      |> l3_querier.query_physaddr
-      |> get_query_output(fn(_, _) -> nil end)
-  end
-  defp query(:routes, target) do
-    target
-      |> l3_querier.query_routes
-      |> get_query_output(fn(_, _) -> [] end)
-  end
-  defp query(:sysname, target) do
-    target
-      |> l3_querier.query_sysname
-      |> get_query_output(fn(target, _) -> NetAddr.address(target) end)
+  defp query(object, target, default_fun) do
+    object
+      |> querier.query(target)
+      |> get_query_output(default_fun)
   end
 
-  def get_target_arp_cache(target) do
-    query :arp_cache, target
+  def credentials do
+    Application.get_env :giraphe, :credentials
   end
 
-  def get_target_routes(target) do
-    query :routes, target
+  defp find_connected_route_containing_address(routes, address) do
+    Enum.find routes, fn {destination, next_hop} ->
+      NetAddr.contains?(destination, address)
+        && Utility.next_hop_is_self(next_hop)
+    end
+  end
+
+  defp find_addresses_with_matching_connected_routes(addresses, []) do
+    addresses
+  end
+  defp find_addresses_with_matching_connected_routes(addresses, routes) do
+    Enum.filter addresses, &find_connected_route_containing_address(routes, &1)
   end
 
   def get_router(target) do
-    %Giraphe.Router{
-       polladdr: target,
-      addresses: query(:addresses, target),
-         routes: query(   :routes, target),
-           name: query(  :sysname, target)
-    }
+    if is_snmp_agent(target) do
+      routes    = get_target_routes target
+      addresses =
+        target
+          |> get_target_addresses
+          |> find_addresses_with_matching_connected_routes(routes)
+
+      polladdr = Utility.refine_address_length target, addresses, routes
+
+      %Giraphe.Router{
+         polladdr: polladdr,
+        addresses: addresses,
+           routes: routes,
+             name: get_target_sysname(target)
+      }
+
+    else
+      %Giraphe.Router{
+         polladdr: target,
+        addresses: [target],
+           routes: [{target, address_to_next_hop_self(target)}],
+             name: NetAddr.address(target)
+      }
+    end
   end
 
-  def get_switch(target) do
-    %Giraphe.Switch{
-      polladdr: target,
-      physaddr: query(:physaddr, target),
-          name: query( :sysname, target),
-           fdb: query(     :fdb, target)
-    }
+  defp get_switchport_by_mac(switch, mac) do
+    fdb = Enum.filter switch.fdb, fn {_, a, _} -> a != switch.physaddr end
+
+    Enum.find_value fdb, fn {p, ^mac, _} -> p; _ -> nil end
+  end
+
+  def get_switch(target, physaddr, gateway_mac) do
+    switch = %Giraphe.Switch{polladdr: target, physaddr: physaddr}
+
+    if is_snmp_agent(target) do
+      switch =
+        %{switch |
+          name: get_target_sysname(target),
+           fdb: get_target_fdb(target)
+        }
+
+      %{switch | uplink: get_switchport_by_mac(switch, gateway_mac)}
+
+    else
+      %{switch |
+        name: NetAddr.address(target),
+        fdb: []
+      }
+    end
+  end
+
+  def get_target_addresses(target) do
+    Enum.sort query(:addresses, target, fn(t, _) -> [t] end)
+  end
+
+  def get_target_arp_cache(target) do
+    Enum.sort query(:arp_cache, target, fn(_, _) -> [] end)
+  end
+
+  def get_target_fdb(target) do
+    query :fdb, target, fn(_, _) -> [] end
+  end
+
+  defp address_to_next_hop_self(address) do
+    List.duplicate(0, NetAddr.address_size address)
+      |> :binary.list_to_bin
+      |> NetAddr.netaddr
+  end
+
+  def get_target_routes(target) do
+    Enum.sort query(:routes, target,
+      fn(t, _) ->
+        [{NetAddr.first_address(t), address_to_next_hop_self(t)}]
+      end
+    )
+  end
+
+  def get_target_sysname(target) do
+    query :sysname, target, fn(t, _) -> NetAddr.address(t) end
   end
 
   def ping_subnet(subnet) do
     host_scanner.scan subnet
   end
+
+  def is_snmp_agent(%{} = target) do
+    host_scanner.udp_161_open? target
+  end
+  def is_snmp_agent(_), do: false
 end

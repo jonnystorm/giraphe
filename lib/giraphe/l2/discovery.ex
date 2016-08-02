@@ -10,49 +10,41 @@ defmodule Giraphe.L2.Discovery do
 
   alias Giraphe.Utility
 
-  defp find_switches_with_non_nil_fdbs(switches) do
-    Stream.filter switches, fn %{fdb: nil} -> false; _ -> true end
-  end
+  require Logger
 
-  defp get_switchport_by_mac(switch, mac) do
-    Enum.find_value switch.fdb, fn {p, ^mac} -> p; _ -> nil end
+  defp find_switches_with_non_empty_fdbs(switches) do
+    Stream.filter switches, fn %{fdb: [{_, _, _} | _]} -> true; _ -> false end
   end
 
   defp fetch_switches(targets, gateway_mac) do
-    targets
-      |> Enum.map(&Giraphe.IO.get_switch/1)
-      |> find_switches_with_non_nil_fdbs
-      |> Enum.map(fn s ->
-        uplink = get_switchport_by_mac s, gateway_mac
+    :ok = Logger.debug "Fetching switches..."
 
-        %{s | uplink: uplink}
+    targets
+      |> Stream.map(fn {target, physaddr} ->
+        Giraphe.IO.get_switch target, physaddr, gateway_mac
       end)
+      |> find_switches_with_non_empty_fdbs
+      |> Enum.sort_by(&(&1.polladdr))
   end
 
-  defp get_subnet_by_gateway_address(gateway_address_string) do
-    gateway_address = NetAddr.ip gateway_address_string
-
+  defp get_subnet_by_gateway_address(gateway_address) do
     gateway_address
       |> Giraphe.IO.get_target_routes
       |> Enum.filter(fn {_, next_hop} -> Utility.next_hop_is_self next_hop end)
       |> Utility.get_destinations_from_routes
+      |> Enum.filter(&(&1 != gateway_address))
+      |> Enum.filter(&Utility.is_not_default_address/1)
       |> Enum.sort
       |> Enum.reverse
       |> Utility.find_prefix_containing_address(gateway_address)
   end
 
-  @doc """
-  Discover switches with a default gateway of `gateway_address`.
+  defp retrieve_arp_entries(subnet, gateway_address) do
+    Utility.status "Retrieving ARP entries for '#{subnet}'..."
 
-  Ping scans the corresponding subnet to induce ARP entries, then polls each IP
-  for forwarding information.
-  """
-  @spec discover(String.t) :: [Giraphe.Switch.t]
-
-  def discover(gateway_address) when is_binary gateway_address do
-    subnet = get_subnet_by_gateway_address gateway_address
-
-    discover "#{subnet}", gateway_address
+    gateway_address
+      |> Giraphe.IO.get_target_arp_cache
+      |> Enum.filter(fn {netaddr, _} -> NetAddr.contains?(subnet, netaddr) end)
   end
 
   @doc """
@@ -61,25 +53,46 @@ defmodule Giraphe.L2.Discovery do
   Ping scans the corresponding subnet to induce ARP entries, then polls each IP
   for forwarding information.
   """
-  @spec discover(String.t, String.t) :: [Giraphe.Switch.t]
+  @spec discover(NetAddr.t, NetAddr.t | nil) :: [Giraphe.Switch.t]
 
-  def discover(subnet, gateway_address)
-      when is_binary(subnet)
-       and is_binary(gateway_address)
-  do
-    :ok = Giraphe.IO.ping_subnet NetAddr.ip(subnet)
+  def discover(gateway_address, nil) do
+    if subnet = get_subnet_by_gateway_address gateway_address do
+      Utility.status "Found subnet '#{subnet}' for gateway '#{gateway_address}'."
 
-    gateway_address = NetAddr.ip gateway_address
+      discover gateway_address, subnet
 
-    arp_entries =
-      gateway_address
-        |> Giraphe.IO.get_target_arp_cache
-        |> Enum.into(%{})
+    else
+      :ok = Logger.error "Unable to find subnet for gateway '#{gateway_address}'."
 
-    arp_entries
-      |> Utility.unzip_and_get_elem(0)
-      |> Enum.filter(&(&1 != gateway_address))
-      |> fetch_switches(arp_entries[gateway_address])
-      |> Enum.sort_by(&(&1.polladdr))
+      exit {:shutdown, 1}
+    end
+  end
+  def discover(gateway_address, subnet) do
+    Utility.status "Inducing ARP entries on '#{subnet}'..."
+    :ok = Giraphe.IO.ping_subnet subnet
+
+    arp_entries = retrieve_arp_entries subnet, gateway_address
+
+    hosts = Enum.map_join arp_entries, ", ", &NetAddr.address(elem(&1, 0))
+
+    Utility.status "Found the following hosts: #{hosts}."
+
+    ip_to_mac = Enum.into arp_entries, %{}
+
+    fetch_switches arp_entries, ip_to_mac[gateway_address]
+  end
+end
+
+defimpl String.Chars, for: Tuple do
+  import Kernel, except: [to_string: 1]
+
+  def to_string(tuple) do
+    string =
+      tuple
+        |> Tuple.to_list
+        |> Enum.map(&String.Chars.to_string/1)
+        |> Enum.join(", ")
+
+    "{#{string}}"
   end
 end

@@ -1,38 +1,60 @@
 graph G {
   graph [
-    outputorder=edgesfirst
     overlap=false
+    label="<%= timestamp %>"
+    fontname="sans bold"
+    labelloc=t
+    labeljust=left
+    size=15
   ];
 
   node [
     style=filled
-    fontname="sans bold"
-    fontsize=12
-    fontcolor=7
     penwidth=2
-    colorscheme=blues7
+    colorscheme=purples7
     color=7
+    fontname="sans bold"
+    fontsize=10
+    fontcolor=7
   ];
 
   edge [
     len=1
     penwidth=2
-    colorscheme=blues7
+    colorscheme=purples7
     color=7
+    labelfontname="sans bold"
+    labelfontsize=8
+    labelfontcolor=7
   ];
 
   // Routers
-<%= for r <- routers do %>
-  "<%= r[:id] %>" [label="<%= r[:name] %>" shape=circle fillcolor=2 fixedsize=true width=1.5];
-<% end %>
+
+<%=
+for r <- routers do
+  """
+    "#{r.id}" [label="#{r.name}" shape=circle fillcolor=2 width=3.5];
+  """
+end
+%>
 
   // Subnets
-<%= for s <- subnets do %>
-  "<%= s %>" [fillcolor=1];
-<% end %>
+
+<%=
+for s <- subnets do
+  """
+    "#{s}" [fillcolor=1 shape=rect style="filled, rounded" width=4];
+  """
+end
+%>
 
   // Edges
-<%= for {r, s} <- edges do %>
-  "<%= r[:id] %>" -- "<%= s %>";
-<% end %>
+
+<%=
+for {r, s} <- edges do
+  """
+    "#{r.id}" -- "#{s}";
+  """
+end
+%>
 }
