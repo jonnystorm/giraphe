@@ -15,7 +15,7 @@ digraph G {
     style="filled, rounded"
     penwidth=2
     colorscheme=purples7
-    color=7
+    color=6
     fillcolor=2
     width=2.5
     height=0.25

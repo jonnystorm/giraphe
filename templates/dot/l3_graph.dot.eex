@@ -5,14 +5,13 @@ graph G {
     fontname="sans bold"
     labelloc=t
     labeljust=left
-    size=15
   ];
 
   node [
     style=filled
     penwidth=2
     colorscheme=purples7
-    color=7
+    color=6
     fontname="sans bold"
     fontsize=10
     fontcolor=7
@@ -20,9 +19,9 @@ graph G {
 
   edge [
     len=1
-    penwidth=2
+    penwidth=4
     colorscheme=purples7
-    color=7
+    color=6
     labelfontname="sans bold"
     labelfontsize=8
     labelfontcolor=7
@@ -33,7 +32,7 @@ graph G {
 <%=
 for r <- routers do
   """
-    "#{r.id}" [label="#{r.name}" shape=circle fillcolor=2 width=3.5];
+    "#{r.id}" [label="#{r.name}" shape=circle fillcolor=2 width=1.5];
   """
 end
 %>
@@ -43,7 +42,7 @@ end
 <%=
 for s <- subnets do
   """
-    "#{s}" [fillcolor=1 shape=rect style="filled, rounded" width=4];
+    "#{s}" [fillcolor=1 shape=rect style="filled, rounded" width=2];
   """
 end
 %>

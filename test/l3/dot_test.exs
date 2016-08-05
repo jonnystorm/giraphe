@@ -57,14 +57,13 @@ graph G {
     fontname="sans bold"
     labelloc=t
     labeljust=left
-    size=15
   ];
 
   node [
     style=filled
     penwidth=2
     colorscheme=purples7
-    color=7
+    color=6
     fontname="sans bold"
     fontsize=10
     fontcolor=7
@@ -72,9 +71,9 @@ graph G {
 
   edge [
     len=1
-    penwidth=2
+    penwidth=4
     colorscheme=purples7
-    color=7
+    color=6
     labelfontname="sans bold"
     labelfontsize=8
     labelfontcolor=7
@@ -82,21 +81,21 @@ graph G {
 
   // Routers
 
-  "192.0.2.14" [label="192.0.2.14" shape=circle fillcolor=2 width=3.5];
-  "192.0.2.3" [label="192.0.2.3" shape=circle fillcolor=2 width=3.5];
-  "192.0.2.7" [label="192.0.2.7" shape=circle fillcolor=2 width=3.5];
-  "192.0.2.9" [label="192.0.2.9" shape=circle fillcolor=2 width=3.5];
-  "198.51.100.1" [label="198.51.100.1" shape=circle fillcolor=2 width=3.5];
+  "192.0.2.14" [label="192.0.2.14" shape=circle fillcolor=2 width=1.5];
+  "192.0.2.3" [label="192.0.2.3" shape=circle fillcolor=2 width=1.5];
+  "192.0.2.7" [label="192.0.2.7" shape=circle fillcolor=2 width=1.5];
+  "192.0.2.9" [label="192.0.2.9" shape=circle fillcolor=2 width=1.5];
+  "198.51.100.1" [label="198.51.100.1" shape=circle fillcolor=2 width=1.5];
 
 
   // Subnets
 
-  "192.0.2.2/31" [fillcolor=1 shape=rect style="filled, rounded" width=4];
-  "192.0.2.4/31" [fillcolor=1 shape=rect style="filled, rounded" width=4];
-  "192.0.2.6/31" [fillcolor=1 shape=rect style="filled, rounded" width=4];
-  "192.0.2.8/31" [fillcolor=1 shape=rect style="filled, rounded" width=4];
-  "192.0.2.10/31" [fillcolor=1 shape=rect style="filled, rounded" width=4];
-  "192.0.2.12/30" [fillcolor=1 shape=rect style="filled, rounded" width=4];
+  "192.0.2.2/31" [fillcolor=1 shape=rect style="filled, rounded" width=2];
+  "192.0.2.4/31" [fillcolor=1 shape=rect style="filled, rounded" width=2];
+  "192.0.2.6/31" [fillcolor=1 shape=rect style="filled, rounded" width=2];
+  "192.0.2.8/31" [fillcolor=1 shape=rect style="filled, rounded" width=2];
+  "192.0.2.10/31" [fillcolor=1 shape=rect style="filled, rounded" width=2];
+  "192.0.2.12/30" [fillcolor=1 shape=rect style="filled, rounded" width=2];
 
 
   // Edges
