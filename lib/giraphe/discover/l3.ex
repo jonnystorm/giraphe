@@ -67,19 +67,19 @@ defmodule Giraphe.Discover.L3 do
   defp _filter_new_routers([new_router | tail], routers) do
     case get_best_router routers, new_router do
       {^new_router, nil} ->
-        Logger.debug "No loop detected: '#{new_router.name}'."
+        :ok = Logger.debug "No loop detected: '#{new_router.name}'."
 
         _filter_new_routers tail, [new_router | routers]
 
       {^new_router, old_router} ->
-        Logger.info "Loop: new '#{new_router.name}' usurps '#{old_router.name}'."
+        :ok = Logger.info "Loop: new '#{new_router.name}' usurps '#{old_router.name}'."
 
         routers = [new_router | Enum.filter(routers, &(&1 != old_router))]
 
         _filter_new_routers tail, routers
 
       {old_router, new_router} ->
-        Logger.info "Loop: incumbent '#{old_router.name}' defeats '#{new_router.name}'."
+        :ok = Logger.info "Loop: incumbent '#{old_router.name}' defeats '#{new_router.name}'."
 
         _filter_new_routers tail, routers
     end

@@ -9,6 +9,8 @@ defmodule Giraphe.Render.GraphVizTest do
 
   import Giraphe.Render.GraphViz
 
+  @moduletag :integrated
+
   test "Renders layer-3 dot graphs with GraphViz" do
     output_files =
       for format <- ["png", "svg"], suffix <- ["l2", "l3"] do

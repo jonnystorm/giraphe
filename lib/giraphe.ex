@@ -4,6 +4,13 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe do
+  @moduledoc """
+  Giraphe escript module.
+  """
+
+  alias Giraphe.Discover
+  alias Giraphe.Graph
+  alias Giraphe.Render
   alias Giraphe.Utility
 
   require Logger
@@ -50,20 +57,18 @@ defmodule Giraphe do
   end
 
   defp handle_switches(switches) do
-    if path = switches[:credentials] do
-      with {:ok, text} <- File.read(Path.expand path),
-           [_ | _] = credentials <- parse_credentials(text)
+    credentials_result =
+      with     path when not is_nil(path) <- switches[:credentials],
+                              {:ok, text} <- File.read(Path.expand path),
+           credentials = [{:snmp, _} | _] <- parse_credentials(text)
       do
-        case credentials do
-          [{:snmp, _} | _] ->
-            :ok = Application.put_env :giraphe, :credentials, credentials
+        :ok = Application.put_env :giraphe, :credentials, credentials
 
-          _ ->
-            usage "Invalid credentials: '#{inspect credentials}'"
-        end
+        :ok
       end
-    else
-      usage
+
+    if credentials_result != :ok do
+      usage "Unable to parse credentials file: '#{switches[:credentials]}'"
     end
 
     if path = switches[:output_file] do
@@ -169,9 +174,9 @@ defmodule Giraphe do
           output_file = get_session_parameter :output_file
 
           gateway_address
-            |> Giraphe.Discover.discover_l2(subnet)
-            |> Giraphe.Graph.graph_switches
-            |> Giraphe.Render.render_l2_graph(output_file)
+            |> Discover.discover_l2(subnet)
+            |> Graph.graph_switches
+            |> Render.render_l2_graph(output_file)
 
           Utility.status "Done!"
 
@@ -185,9 +190,9 @@ defmodule Giraphe do
         target_strings
           |> parse_ip_args
           |> Enum.filter(&Utility.is_host_address/1)
-          |> Giraphe.Discover.discover_l3
-          |> Giraphe.Graph.graph_routers
-          |> Giraphe.Render.render_l3_graph(output_file)
+          |> Discover.discover_l3
+          |> Graph.graph_routers
+          |> Render.render_l3_graph(output_file)
 
         Utility.status "Done!"
       _ ->

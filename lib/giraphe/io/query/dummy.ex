@@ -421,7 +421,9 @@ defmodule Giraphe.IO.Query.Dummy do
       target
         |> NetAddr.address
         |> _query_fdb
-        |> Enum.map(fn {port, mac, vlan} -> {port, NetAddr.mac_48(mac), vlan} end)
+        |> Enum.map(fn {port, mac, vlan} ->
+          {port, NetAddr.mac_48(mac), vlan}
+        end)
 
     case fdb do
       [] ->
@@ -435,7 +437,7 @@ defmodule Giraphe.IO.Query.Dummy do
     routes =
       target
         |> NetAddr.address
-        |> _query_routes 
+        |> _query_routes
         |> Enum.map(fn {destination, next_hop} ->
           {NetAddr.ip(destination), NetAddr.ip(next_hop)}
         end)

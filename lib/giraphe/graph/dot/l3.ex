@@ -5,8 +5,10 @@
 
 defmodule Giraphe.Graph.Dot.L3 do
   @moduledoc """
-  Functions for generating router diagrams with GraphViz dot.
+  A grapher implementation for GraphViz dot.
   """
+
+  @behaviour Giraphe.Graph
 
   alias Giraphe.Utility
 
@@ -44,14 +46,14 @@ defmodule Giraphe.Graph.Dot.L3 do
   @doc """
   Generate GraphViz dot from `routers`.
   """
-  def graph_routers(routers, template) do
-    graph_routers routers, "#{DateTime.utc_now}", template
+  def graph_devices(routers, template) do
+    graph_devices routers, "#{DateTime.utc_now}", template
   end
 
   @doc """
   Generate GraphViz dot from `routers` with timestamp.
   """
-  def graph_routers(routers, timestamp, template) do
+  def graph_devices(routers, timestamp, template) do
     routers
       |> Enum.sort_by(&(&1.polladdr))
       |> get_l3_edges

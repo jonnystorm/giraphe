@@ -244,7 +244,7 @@ defmodule Giraphe.Graph.Dot.L2Test do
         }
       ]
 
-    assert graph_switches(switches, "1970-01-01 00:00:00Z", @template)
+    assert graph_devices(switches, "1970-01-01 00:00:00Z", @template)
       == File.read!("test/graph/dot/l2_graph1.dot")
   end
 
@@ -310,7 +310,7 @@ defmodule Giraphe.Graph.Dot.L2Test do
         }
       ]
 
-    assert graph_switches(switches, "1970-01-01 00:00:00Z", @template)
+    assert graph_devices(switches, "1970-01-01 00:00:00Z", @template)
       == File.read!("test/graph/dot/l2_graph2.dot")
   end
 end

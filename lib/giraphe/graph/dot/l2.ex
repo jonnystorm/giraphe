@@ -5,8 +5,10 @@
 
 defmodule Giraphe.Graph.Dot.L2 do
   @moduledoc """
-  Functions for generating switch diagrams with GraphViz dot.
+  A grapher implementation for GraphViz dot.
   """
+
+  @behaviour Giraphe.Graph
 
   alias Giraphe.Utility
 
@@ -102,14 +104,14 @@ defmodule Giraphe.Graph.Dot.L2 do
   @doc """
   Generate GraphViz dot from `switches`.
   """
-  def graph_switches(switches, template) do
-    graph_switches switches, "#{DateTime.utc_now}", template
+  def graph_devices(switches, template) do
+    graph_devices switches, "#{DateTime.utc_now}", template
   end
 
   @doc """
   Generate GraphViz dot from `switches` with timestamp.
   """
-  def graph_switches(switches, timestamp, template) do
+  def graph_devices(switches, timestamp, template) do
     switch_physaddrs = Enum.map switches, &(&1.physaddr)
 
     switches =

@@ -50,7 +50,7 @@ defmodule Giraphe.Graph.Dot.L3Test do
         }
       ]
 
-    assert graph_routers(routers, "1970-01-01 00:00:00Z", @template)
+    assert graph_devices(routers, "1970-01-01 00:00:00Z", @template)
       == File.read!("test/graph/dot/l3_graph.dot")
   end
 end

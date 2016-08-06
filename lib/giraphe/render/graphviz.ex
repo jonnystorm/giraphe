@@ -4,9 +4,26 @@
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
 defmodule Giraphe.Render.GraphViz do
+  @moduledoc """
+  A renderer implementation for GraphViz
+  """
+
   @behaviour Giraphe.Render
 
   require Logger
+
+  defp execute_shell_command(cmd) do
+    [status_char | reverse_output] =
+      cmd
+        |> String.to_charlist
+        |> :os.cmd
+        |> Enum.reverse
+
+    output = List.to_string Enum.reverse(reverse_output)
+    status = String.to_integer List.to_string([status_char])
+
+    {output, status}
+  end
 
   defp execute_graphviz_command(command, format, output_file, dot) do
     dot = String.replace dot, "'", "\""
@@ -14,19 +31,11 @@ defmodule Giraphe.Render.GraphViz do
     args = "-T#{format} -o #{output_file}"
     cmd  = "(echo '#{dot}' | #{command} #{args} 2>&1); echo -n $?"
 
-    [status_char | reverse_output] =
-      cmd
-        |> String.to_charlist
-        |> :os.cmd
-        |> Enum.reverse
-
-    case String.to_integer List.to_string([status_char]) do
-      0 ->
+    case execute_shell_command(cmd) do
+      {_, 0} ->
         :ok
 
-      _ ->
-        error = List.to_string Enum.reverse(reverse_output)
-
+      {error, _} ->
         :ok = Logger.error "GraphViz failure: '#{error}'"
         :ok = Logger.error "Failed to render graph: '#{dot}'"
 
