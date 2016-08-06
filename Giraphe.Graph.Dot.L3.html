@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Giraphe.Router – giraphe v0.0.10</title>
+    <title>Giraphe.Graph.Dot.L3 – giraphe v0.0.10</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -62,10 +62,10 @@
 
       <h1>
         <small class="visible-xs">giraphe v0.0.10</small>
-        Giraphe.Router
+        Giraphe.Graph.Dot.L3
         
         
-          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/router.ex#L6" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/graph/dot/l3.ex#L6" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -73,7 +73,7 @@
 
       
         <section id="moduledoc" class="docstring">
-          <p>Defines a struct for storing routes and router addresses.</p>
+          <p>A grapher implementation for GraphViz dot.</p>
 
         </section>
       
@@ -87,51 +87,42 @@
             Summary
           </h1>
           
-  <div class="summary-types summary">
+
+          
+  <div class="summary-functions summary">
     <h2>
-      <a href="#types">Types</a>
+      <a href="#functions">Functions</a>
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#t:destination/0">destination()</a>
+    <a href="#generate_graph_from_file/2">generate_graph_from_file(path, template)</a>
   </div>
+  
+    <div class="summary-synopsis"><p>Generate GraphViz dot from the file at <code class="inline">path</code></p>
+</div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#t:name/0">name()</a>
+    <a href="#graph_devices/2">graph_devices(routers, template)</a>
   </div>
+  
+    <div class="summary-synopsis"><p>Generate GraphViz dot from <code class="inline">routers</code></p>
+</div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#t:netaddr/0">netaddr()</a>
+    <a href="#graph_devices/3">graph_devices(routers, timestamp, template)</a>
   </div>
   
+    <div class="summary-synopsis"><p>Generate GraphViz dot from <code class="inline">routers</code> with timestamp</p>
 </div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#t:next_hop/0">next_hop()</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#t:route/0">route()</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#t:t/0">t()</a>
-  </div>
   
 </div>
 
   </div>
 
-
-          
 
           
 
@@ -141,43 +132,74 @@
       
 
       
-        <section id="types" class="types details-list">
+
+      
+        <section id="functions" class="details-list">
           <h1 class="section-heading">
-            <a class="hover-link" href="#types">
+            <a class="hover-link" href="#functions">
               <i class="icon-link"></i>
             </a>
-            Types
+            Functions
           </h1>
-          <div class="types-list">
-            <div id="t:destination/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:destination/0">destination</a> :: <a href="#t:netaddr/0">netaddr</a></code></pre>
+          <div class="detail" id="generate_graph_from_file/2">
+  <div class="detail-header">
+    <a href="#generate_graph_from_file/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">generate_graph_from_file(path, template)</span>
+    
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/graph/dot/l3.ex#L102" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+  </div>
   
+  <section class="docstring">
+    <p>Generate GraphViz dot from the file at <code class="inline">path</code>.</p>
+
+  </section>
 </div>
-<div id="t:name/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:name/0">name</a> :: <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a></code></pre>
+<div class="detail" id="graph_devices/2">
+  <div class="detail-header">
+    <a href="#graph_devices/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">graph_devices(routers, template)</span>
+    
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/graph/dot/l3.ex#L49" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+  </div>
   
+  <section class="docstring">
+    <p>Generate GraphViz dot from <code class="inline">routers</code>.</p>
+
+  </section>
 </div>
-<div id="t:netaddr/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:netaddr/0">netaddr</a> :: NetAddr.t</code></pre>
+<div class="detail" id="graph_devices/3">
+  <div class="detail-header">
+    <a href="#graph_devices/3" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">graph_devices(routers, timestamp, template)</span>
+    
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/graph/dot/l3.ex#L56" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+  </div>
   
-</div>
-<div id="t:next_hop/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:next_hop/0">next_hop</a> :: <a href="#t:netaddr/0">netaddr</a></code></pre>
-  
-</div>
-<div id="t:route/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:route/0">route</a> :: {<a href="#t:destination/0">destination</a>, <a href="#t:next_hop/0">next_hop</a>}</code></pre>
-  
-</div>
-<div id="t:t/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:t/0">t</a> :: %Giraphe.Router{addresses: [<a href="#t:netaddr/0">netaddr</a>], name: <a href="#t:name/0">name</a>, polladdr: <a href="#t:netaddr/0">netaddr</a>, routes: [<a href="#t:route/0">route</a>]}</code></pre>
-  
+  <section class="docstring">
+    <p>Generate GraphViz dot from <code class="inline">routers</code> with timestamp.</p>
+
+  </section>
 </div>
 
-          </div>
         </section>
-      
-
       
 
       

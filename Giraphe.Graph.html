@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Giraphe.IO.Querier – giraphe v0.0.8</title>
+    <title>Giraphe.Graph – giraphe v0.0.10</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -26,7 +26,7 @@
         giraphe
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.8
+        v0.0.10
       </h2>
     </div>
     
@@ -61,13 +61,13 @@
 
 
       <h1>
-        <small class="visible-xs">giraphe v0.0.8</small>
-        Giraphe.IO.Querier
+        <small class="visible-xs">giraphe v0.0.10</small>
+        Giraphe.Graph
         
           <small>behaviour</small>
         
         
-          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/querier.ex#L6" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/graph.ex#L6" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -75,7 +75,7 @@
 
       
         <section id="moduledoc" class="docstring">
-          <p>A behaviour for querier implementations.</p>
+          <p>A behaviour for grapher implementations.</p>
 
         </section>
       
@@ -95,7 +95,13 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#t:query_object/0">query_object()</a>
+    <a href="#t:device/0">device()</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:reason/0">reason()</a>
   </div>
   
 </div>
@@ -104,6 +110,31 @@
 
 
           
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#graph_routers/1">graph_routers(routers)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Delegates to L3 grapher module</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#graph_switches/1">graph_switches(switches)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Delegates to L2 grapher module</p>
+</div>
+  
+</div>
+
+  </div>
+
 
           
 
@@ -114,8 +145,11 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#c:query/2">query(object, target)</a>
+    <a href="#c:graph_devices/2">graph_devices(devices, template_path)</a>
   </div>
+  
+    <div class="summary-synopsis"><p>Generate graph from devices</p>
+</div>
   
 </div>
 
@@ -134,13 +168,12 @@
             Types
           </h1>
           <div class="types-list">
-            <div id="t:query_object/0" class="type-detail">
-  <pre><code class="elixir"><a href="#t:query_object/0">query_object</a> ::
-  :addresses |
-  :arp_cache |
-  :fdb |
-  :routes |
-  :sysname</code></pre>
+            <div id="t:device/0" class="type-detail">
+  <pre><code class="elixir"><a href="#t:device/0">device</a> :: <a href="Giraphe.Router.html#t:t/0">Giraphe.Router.t</a> | <a href="Giraphe.Switch.html#t:t/0">Giraphe.Switch.t</a></code></pre>
+  
+</div>
+<div id="t:reason/0" class="type-detail">
+  <pre><code class="elixir"><a href="#t:reason/0">reason</a> :: atom</code></pre>
   
 </div>
 
@@ -148,6 +181,54 @@
         </section>
       
 
+      
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <i class="icon-link"></i>
+            </a>
+            Functions
+          </h1>
+          <div class="detail" id="graph_routers/1">
+  <div class="detail-header">
+    <a href="#graph_routers/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">graph_routers(routers)</span>
+    
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/graph.ex#L38" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    <p>Delegates to L3 grapher module.</p>
+
+  </section>
+</div>
+<div class="detail" id="graph_switches/1">
+  <div class="detail-header">
+    <a href="#graph_switches/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">graph_switches(switches)</span>
+    
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/graph.ex#L45" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    <p>Delegates to L2 grapher module.</p>
+
+  </section>
+</div>
+
+        </section>
       
 
       
@@ -160,14 +241,14 @@
             </a>
             Callbacks
           </h1>
-          <div class="detail" id="c:query/2">
+          <div class="detail" id="c:graph_devices/2">
   <div class="detail-header">
-    <a href="#c:query/2" class="detail-link" title="Link to this callback">
+    <a href="#c:graph_devices/2" class="detail-link" title="Link to this callback">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">query(object, target)</span>
+    <span class="signature">graph_devices(devices, template_path)</span>
     
-      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/querier.ex#L12" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/graph.ex#L14" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -178,13 +259,16 @@
       <h4 class="specs-title">Specs</h4>
       <div class="specs-list">
         
-          <pre><code class="elixir">query(object :: <a href="#t:query_object/0">query_object</a>, target :: NetAddr.t) :: [NetAddr.t]</code></pre>
+          <pre><code class="elixir">graph_devices(devices :: [<a href="#t:device/0">device</a>], template_path :: <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>) ::
+  :ok |
+  {:error, <a href="#t:reason/0">reason</a>}</code></pre>
         
       </div>
     </div>
   
   <section class="docstring">
-    
+    <p>Generate graph from devices</p>
+
   </section>
 </div>
 

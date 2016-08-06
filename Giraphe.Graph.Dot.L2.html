@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Giraphe.IO.HostScanner.Nmap – giraphe v0.0.8</title>
+    <title>Giraphe.Graph.Dot.L2 – giraphe v0.0.10</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -26,7 +26,7 @@
         giraphe
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.8
+        v0.0.10
       </h2>
     </div>
     
@@ -61,11 +61,11 @@
 
 
       <h1>
-        <small class="visible-xs">giraphe v0.0.8</small>
-        Giraphe.IO.HostScanner.Nmap
+        <small class="visible-xs">giraphe v0.0.10</small>
+        Giraphe.Graph.Dot.L2
         
         
-          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/host_scanner/nmap.ex#L6" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/graph/dot/l2.ex#L6" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -73,7 +73,7 @@
 
       
         <section id="moduledoc" class="docstring">
-          <p>An <code class="inline">nmap</code> implementation of the <a href="Giraphe.IO.HostScanner.html"><code class="inline">Giraphe.IO.HostScanner</code></a> behaviour.</p>
+          <p>A grapher implementation for GraphViz dot.</p>
 
         </section>
       
@@ -95,19 +95,19 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#scan/1">scan(subnet)</a>
+    <a href="#graph_devices/2">graph_devices(switches, template)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Scans all hosts in <code class="inline">subnet</code></p>
+    <div class="summary-synopsis"><p>Generate GraphViz dot from <code class="inline">switches</code></p>
 </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#udp_161_open?/1">udp_161_open?(target)</a>
+    <a href="#graph_devices/3">graph_devices(switches, timestamp, template)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Tests whether 161/udp is open on <code class="inline">target</code></p>
+    <div class="summary-synopsis"><p>Generate GraphViz dot from <code class="inline">switches</code> with timestamp</p>
 </div>
   
 </div>
@@ -132,14 +132,14 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="scan/1">
+          <div class="detail" id="graph_devices/2">
   <div class="detail-header">
-    <a href="#scan/1" class="detail-link" title="Link to this function">
+    <a href="#graph_devices/2" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">scan(subnet)</span>
+    <span class="signature">graph_devices(switches, template)</span>
     
-      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/host_scanner/nmap.ex#L18" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/graph/dot/l2.ex#L107" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -147,18 +147,18 @@
   </div>
   
   <section class="docstring">
-    <p>Scans all hosts in <code class="inline">subnet</code>.</p>
+    <p>Generate GraphViz dot from <code class="inline">switches</code>.</p>
 
   </section>
 </div>
-<div class="detail" id="udp_161_open?/1">
+<div class="detail" id="graph_devices/3">
   <div class="detail-header">
-    <a href="#udp_161_open?/1" class="detail-link" title="Link to this function">
+    <a href="#graph_devices/3" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">udp_161_open?(target)</span>
+    <span class="signature">graph_devices(switches, timestamp, template)</span>
     
-      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/host_scanner/nmap.ex#L33" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/graph/dot/l2.ex#L114" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -166,7 +166,7 @@
   </div>
   
   <section class="docstring">
-    <p>Tests whether 161/udp is open on <code class="inline">target</code>.</p>
+    <p>Generate GraphViz dot from <code class="inline">switches</code> with timestamp.</p>
 
   </section>
 </div>

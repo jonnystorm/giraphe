@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Giraphe.IO.Querier.NetSNMP – giraphe v0.0.8</title>
+    <title>Giraphe.Discover.L3 – giraphe v0.0.10</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -26,7 +26,7 @@
         giraphe
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.8
+        v0.0.10
       </h2>
     </div>
     
@@ -61,11 +61,11 @@
 
 
       <h1>
-        <small class="visible-xs">giraphe v0.0.8</small>
-        Giraphe.IO.Querier.NetSNMP
+        <small class="visible-xs">giraphe v0.0.10</small>
+        Giraphe.Discover.L3
         
         
-          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/querier/net_snmp.ex#L6" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/discover/l3.ex#L6" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -73,7 +73,7 @@
 
       
         <section id="moduledoc" class="docstring">
-          <p>A net_snmp_ex implementation of the <a href="Giraphe.IO.Querier.html"><code class="inline">Giraphe.IO.Querier</code></a> behaviour.</p>
+          <p>Discovery functions for routers.</p>
 
         </section>
       
@@ -95,10 +95,10 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#query/2">query(object, target)</a>
+    <a href="#discover/1">discover(targets)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Callback implementation for <a href="Giraphe.IO.Querier.html#c:query/2"><code class="inline">Giraphe.IO.Querier.query/2</code></a></p>
+    <div class="summary-synopsis"><p>Discovers routers by polling <code class="inline">targets</code></p>
 </div>
   
 </div>
@@ -123,22 +123,32 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="query/2">
+          <div class="detail" id="discover/1">
   <div class="detail-header">
-    <a href="#query/2" class="detail-link" title="Link to this function">
+    <a href="#discover/1" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">query(object, target)</span>
+    <span class="signature">discover(targets)</span>
     
-      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/querier/net_snmp.ex#L216" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/discover/l3.ex#L154" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
     
   </div>
   
+    <div class="specs">
+      <h4 class="specs-title">Specs</h4>
+      <div class="specs-list">
+        
+          <pre><code class="elixir">discover([NetAddr.t]) :: [<a href="Giraphe.Router.html#t:t/0">Giraphe.Router.t</a>]</code></pre>
+        
+      </div>
+    </div>
+  
   <section class="docstring">
-    <p>Callback implementation for <a href="Giraphe.IO.Querier.html#c:query/2"><code class="inline">Giraphe.IO.Querier.query/2</code></a>.</p>
+    <p>Discovers routers by polling <code class="inline">targets</code>.</p>
+<p>Additional routers are discovered by polling next-hops found in routing tables.</p>
 
   </section>
 </div>

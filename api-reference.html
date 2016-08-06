@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>API Reference – giraphe v0.0.8</title>
+    <title>API Reference – giraphe v0.0.10</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -26,7 +26,7 @@
         giraphe
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.8
+        v0.0.10
       </h2>
     </div>
     
@@ -60,7 +60,7 @@
     <div id="content" class="content-inner">
 
   <h1>
-    <small class="visible-xs">giraphe v0.0.8</small>
+    <small class="visible-xs">giraphe v0.0.10</small>
     API Reference
   </h1>
 
@@ -79,60 +79,91 @@
         <div class="summary-row">
   <div class="summary-signature"><a href="Giraphe.html">Giraphe</a></div>
   
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="Giraphe.IO.HostScanner.html">Giraphe.IO.HostScanner</a></div>
-  
-    <div class="summary-synopsis"><p>A behaviour for host-scanning implementations</p>
+    <div class="summary-synopsis"><p>Giraphe escript module</p>
 </div>
   
 </div>
 <div class="summary-row">
-  <div class="summary-signature"><a href="Giraphe.IO.HostScanner.Nmap.html">Giraphe.IO.HostScanner.Nmap</a></div>
+  <div class="summary-signature"><a href="Giraphe.Discover.html">Giraphe.Discover</a></div>
   
-    <div class="summary-synopsis"><p>An <code class="inline">nmap</code> implementation of the <a href="Giraphe.IO.HostScanner.html"><code class="inline">Giraphe.IO.HostScanner</code></a> behaviour</p>
+    <div class="summary-synopsis"><p>Common interface for discover modules</p>
 </div>
   
 </div>
 <div class="summary-row">
-  <div class="summary-signature"><a href="Giraphe.IO.Querier.html">Giraphe.IO.Querier</a></div>
-  
-    <div class="summary-synopsis"><p>A behaviour for querier implementations</p>
-</div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="Giraphe.IO.Querier.NetSNMP.html">Giraphe.IO.Querier.NetSNMP</a></div>
-  
-    <div class="summary-synopsis"><p>A net_snmp_ex implementation of the <a href="Giraphe.IO.Querier.html"><code class="inline">Giraphe.IO.Querier</code></a> behaviour</p>
-</div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="Giraphe.L2.Discovery.html">Giraphe.L2.Discovery</a></div>
+  <div class="summary-signature"><a href="Giraphe.Discover.L2.html">Giraphe.Discover.L2</a></div>
   
     <div class="summary-synopsis"><p>Discovery functions for switches</p>
 </div>
   
 </div>
 <div class="summary-row">
-  <div class="summary-signature"><a href="Giraphe.L2.Dot.html">Giraphe.L2.Dot</a></div>
-  
-    <div class="summary-synopsis"><p>Functions for generating switch diagrams with GraphViz dot</p>
-</div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="Giraphe.L3.Discovery.html">Giraphe.L3.Discovery</a></div>
+  <div class="summary-signature"><a href="Giraphe.Discover.L3.html">Giraphe.Discover.L3</a></div>
   
     <div class="summary-synopsis"><p>Discovery functions for routers</p>
 </div>
   
 </div>
 <div class="summary-row">
-  <div class="summary-signature"><a href="Giraphe.L3.Dot.html">Giraphe.L3.Dot</a></div>
+  <div class="summary-signature"><a href="Giraphe.Graph.html">Giraphe.Graph</a></div>
   
-    <div class="summary-synopsis"><p>Functions for generating router diagrams with GraphViz dot</p>
+    <div class="summary-synopsis"><p>A behaviour for grapher implementations</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="Giraphe.Graph.Dot.L2.html">Giraphe.Graph.Dot.L2</a></div>
+  
+    <div class="summary-synopsis"><p>A grapher implementation for GraphViz dot</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="Giraphe.Graph.Dot.L3.html">Giraphe.Graph.Dot.L3</a></div>
+  
+    <div class="summary-synopsis"><p>A grapher implementation for GraphViz dot</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="Giraphe.IO.HostScan.html">Giraphe.IO.HostScan</a></div>
+  
+    <div class="summary-synopsis"><p>A behaviour for host-scanning implementations</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="Giraphe.IO.HostScan.Nmap.html">Giraphe.IO.HostScan.Nmap</a></div>
+  
+    <div class="summary-synopsis"><p>An <code class="inline">nmap</code> implementation of the <code class="inline">Giraphe.IO.HostScanner</code> behaviour</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="Giraphe.IO.Query.html">Giraphe.IO.Query</a></div>
+  
+    <div class="summary-synopsis"><p>A behaviour for querier implementations</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="Giraphe.IO.Query.NetSNMP.html">Giraphe.IO.Query.NetSNMP</a></div>
+  
+    <div class="summary-synopsis"><p>A net_snmp_ex implementation of the <code class="inline">Giraphe.IO.Querier</code> behaviour</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="Giraphe.Render.html">Giraphe.Render</a></div>
+  
+    <div class="summary-synopsis"><p>A behaviour for renderer implementations</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="Giraphe.Render.GraphViz.html">Giraphe.Render.GraphViz</a></div>
+  
+    <div class="summary-synopsis"><p>A renderer implementation for GraphViz</p>
 </div>
   
 </div>

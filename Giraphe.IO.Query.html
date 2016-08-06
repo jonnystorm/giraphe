@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Giraphe.L3.Discovery – giraphe v0.0.8</title>
+    <title>Giraphe.IO.Query – giraphe v0.0.10</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -26,7 +26,7 @@
         giraphe
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.8
+        v0.0.10
       </h2>
     </div>
     
@@ -61,11 +61,13 @@
 
 
       <h1>
-        <small class="visible-xs">giraphe v0.0.8</small>
-        Giraphe.L3.Discovery
+        <small class="visible-xs">giraphe v0.0.10</small>
+        Giraphe.IO.Query
+        
+          <small>behaviour</small>
         
         
-          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/l3/discovery.ex#L6" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/query.ex#L6" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -73,7 +75,7 @@
 
       
         <section id="moduledoc" class="docstring">
-          <p>Discovery functions for routers.</p>
+          <p>A behaviour for querier implementations.</p>
 
         </section>
       
@@ -87,6 +89,19 @@
             Summary
           </h1>
           
+  <div class="summary-types summary">
+    <h2>
+      <a href="#types">Types</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:query_object/0">query_object()</a>
+  </div>
+  
+</div>
+
+  </div>
+
 
           
   <div class="summary-functions summary">
@@ -95,11 +110,8 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#discover/1">discover(targets)</a>
+    <a href="#query/2">query(object, target)</a>
   </div>
-  
-    <div class="summary-synopsis"><p>Discovers routers by polling <code class="inline">targets</code></p>
-</div>
   
 </div>
 
@@ -109,10 +121,44 @@
           
 
           
+  <div class="summary-callbacks summary">
+    <h2>
+      <a href="#callbacks">Callbacks</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#c:query/2">query(object, target)</a>
+  </div>
+  
+</div>
+
+  </div>
+
 
         </section>
       
 
+      
+        <section id="types" class="types details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#types">
+              <i class="icon-link"></i>
+            </a>
+            Types
+          </h1>
+          <div class="types-list">
+            <div id="t:query_object/0" class="type-detail">
+  <pre><code class="elixir"><a href="#t:query_object/0">query_object</a> ::
+  :addresses |
+  :arp_cache |
+  :fdb |
+  :routes |
+  :sysname</code></pre>
+  
+</div>
+
+          </div>
+        </section>
       
 
       
@@ -123,14 +169,46 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="discover/1">
+          <div class="detail" id="query/2">
   <div class="detail-header">
-    <a href="#discover/1" class="detail-link" title="Link to this function">
+    <a href="#query/2" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">discover(targets)</span>
+    <span class="signature">query(object, target)</span>
     
-      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/l3/discovery.ex#L154" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/query.ex#L20" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    
+  </section>
+</div>
+
+        </section>
+      
+
+      
+
+      
+        <section id="callbacks" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#callbacks">
+              <i class="icon-link"></i>
+            </a>
+            Callbacks
+          </h1>
+          <div class="detail" id="c:query/2">
+  <div class="detail-header">
+    <a href="#c:query/2" class="detail-link" title="Link to this callback">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">query(object, target)</span>
+    
+      <a href="https://github.com/jonnystorm/giraphe/blob/master/lib/giraphe/io/query.ex#L13" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -141,23 +219,17 @@
       <h4 class="specs-title">Specs</h4>
       <div class="specs-list">
         
-          <pre><code class="elixir">discover([NetAddr.t]) :: [<a href="Giraphe.Router.html#t:t/0">Giraphe.Router.t</a>]</code></pre>
+          <pre><code class="elixir">query(object :: <a href="#t:query_object/0">query_object</a>, target :: NetAddr.t) :: [NetAddr.t]</code></pre>
         
       </div>
     </div>
   
   <section class="docstring">
-    <p>Discovers routers by polling <code class="inline">targets</code>.</p>
-<p>Additional routers are discovered by polling next-hops found in routing tables.</p>
-
+    
   </section>
 </div>
 
         </section>
-      
-
-      
-
       
           <footer class="footer">
         <p>
