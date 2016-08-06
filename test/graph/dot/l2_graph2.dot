@@ -1,0 +1,54 @@
+digraph G {
+  graph [
+    outputorder=edgesfirst
+    rankdir=LR
+    forcelabels=true
+    splines=ortho
+    label="1970-01-01 00:00:00Z"
+    fontname="sans bold"
+    labelloc=t
+    labeljust=left
+  ];
+
+  node [
+    shape=rect
+    style="filled, rounded"
+    penwidth=2
+    colorscheme=purples7
+    color=6
+    fillcolor=2
+    width=2.5
+    height=0.25
+    fontname="sans bold"
+    fontsize=12
+    fontcolor=7
+  ];
+
+  edge [
+    minlen=4
+    penwidth=2
+    colorscheme=purples7
+    color=3
+    labelangle=0
+    labeldistance=2.5
+    labelfontname="sans bold"
+    labelfontsize=10
+    labelfontcolor=7
+    dir=none
+  ];
+
+
+  // Switches
+
+  "192.168.97.1" [label="AnSwitch" height=1.0];
+  "192.168.97.3" [label="AnOtherSwitch" height=0.25];
+  "192.168.97.4" [label="OneMoreSwitch" height=0.5];
+
+
+  // Edges
+
+  "192.168.97.1" -> "192.168.97.3" [taillabel="Po5" headlabel="Po5" headport=w];
+  "192.168.97.1" -> "192.168.97.4" [taillabel="Po69" headlabel="Po3" headport=w];
+  "192.168.97.4" -> "192.168.97.1" [taillabel="Gi2/0/13" headlabel="" headport=w];
+
+}

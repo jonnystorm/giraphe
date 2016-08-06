@@ -3,14 +3,12 @@
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.IO.HostScanner.Dummy do
-  @moduledoc false
-
-  def scan(_subnet) do
-    :ok
+defmodule Giraphe.Discover do
+  def discover_l2(gateway_address, subnet) do
+    Giraphe.Discover.L2.discover gateway_address, subnet
   end
 
-  def udp_161_open?(_target) do
-    true
+  def discover_l3(targets) do
+    Giraphe.Discover.L3.discover targets
   end
 end

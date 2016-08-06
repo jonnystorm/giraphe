@@ -3,10 +3,10 @@
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.IO.Querier.Dummy do
+defmodule Giraphe.IO.Query.Dummy do
   @moduledoc false
 
-  @behaviour Giraphe.IO.Querier
+  @behaviour Giraphe.IO.Query
 
   defp _query_addresses(target)
       when target in ["192.0.2.2", "192.0.2.6", "198.51.100.1"]

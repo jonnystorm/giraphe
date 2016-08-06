@@ -8,6 +8,18 @@ defmodule Giraphe do
 
   require Logger
 
+  defp init_session_parameters do
+    Agent.start_link fn -> [] end, name: __MODULE__
+  end
+
+  defp get_session_parameter(key) do
+    Agent.get __MODULE__, &Keyword.fetch!(&1, key)
+  end
+
+  defp set_session_parameter(key, value) do
+    Agent.update __MODULE__, &Keyword.put(&1, key, value)
+  end
+
   defp arg_to_atom("snmp"),do: :snmp
   defp arg_to_atom("v1"),  do: :v1
   defp arg_to_atom("v2c"), do: :v2c
@@ -22,14 +34,19 @@ defmodule Giraphe do
   defp arg_to_atom(other), do: other
 
   defp args_to_atoms(string) do
-    for arg <- String.split(string) do
+    for arg <- String.split string do
       arg_to_atom arg
     end
   end
+
   defp parse_credentials(text) do
     text
       |> String.split("\n")
       |> Enum.map(&args_to_atoms/1)
+      |> Enum.filter(&(length(&1) >= 1))
+      |> Enum.group_by(fn [type | _] -> type end, fn [t | c] -> {t, c} end)
+      |> Map.values
+      |> Enum.concat
   end
 
   defp handle_switches(switches) do
@@ -37,12 +54,6 @@ defmodule Giraphe do
       with {:ok, text} <- File.read(Path.expand path),
            [_ | _] = credentials <- parse_credentials(text)
       do
-        credentials =
-          (for [_ | _] = credential <- credentials, do: credential)
-            |> Enum.group_by(fn [type | _] -> type end, fn [t | c] -> {t, c} end)
-            |> Map.values
-            |> Enum.concat
-
         case credentials do
           [{:snmp, _} | _] ->
             :ok = Application.put_env :giraphe, :credentials, credentials
@@ -53,6 +64,10 @@ defmodule Giraphe do
       end
     else
       usage
+    end
+
+    if path = switches[:output_file] do
+      set_session_parameter :output_file, Path.expand(path)
     end
 
     if switches[:info] do
@@ -77,13 +92,15 @@ defmodule Giraphe do
           quiet: :boolean,
           info: :boolean,
           debug: :boolean,
+          output_file: :string,
           credentials: :string
         ],
         aliases: [
-          q: :quiet,
-          v: :info,
+           q: :quiet,
+           v: :info,
           vv: :debug,
-          c: :credentials
+           o: :output_file,
+           c: :credentials
         ]
       )
 
@@ -93,19 +110,27 @@ defmodule Giraphe do
   end
 
   defp parse_ip_args(list) do
-    list
-      |> Enum.map(&NetAddr.ip/1)
-      |> Enum.filter(fn {:error, _} -> false; _ -> true end)
+    for ip_string <- list do
+      case NetAddr.ip ip_string do
+        {:error, reason} ->
+          usage "Unable to parse IP address '#{ip_string}': '#{reason}'"
+
+        ip ->
+          ip
+      end
+    end
   end
 
   defp usage do
     IO.puts(:stderr,
     """
-    Usage: giraphe [-qv] -c <credentials_path>
+    Usage: giraphe [-qv] -c <credentials_path> -o <output_file>
                    [-2 <gateway_ip> [<subnet_cidr>]] [-3 [<router_ip> ...]]
 
       -q: quiet
-      -v: verbose (more 'v's is more verbose)
+      -v: verbose ('-vv' is more verbose)
+
+      -o: output file (without extension)
 
       -c: Specify file containing credentials
         <credentials_path>: path to file containing credentials
@@ -129,6 +154,8 @@ defmodule Giraphe do
   end
 
   def main(argv) do
+    init_session_parameters
+
     case parse_args argv do
       [] ->
         usage
@@ -139,26 +166,30 @@ defmodule Giraphe do
         if Utility.is_host_address gateway_address do
           subnet = List.first parse_ip_args(subnet_args)
 
+          output_file = get_session_parameter :output_file
+
           gateway_address
-            |> Giraphe.L2.Discovery.discover(subnet)
-            |> Giraphe.L2.Dot.generate_digraph_from_switches
-            |> IO.puts
+            |> Giraphe.Discover.discover_l2(subnet)
+            |> Giraphe.Graph.graph_switches
+            |> Giraphe.Render.render_l2_graph(output_file)
+
+          Utility.status "Done!"
 
         else
           usage "No valid gateway address found."
         end
 
       ["-3" | target_strings] ->
-        targets =
-          target_strings
-            |> parse_ip_args
-            |> Enum.filter(&Utility.is_host_address/1)
+        output_file = get_session_parameter :output_file
 
-        targets
-          |> Giraphe.L3.Discovery.discover
-          |> Giraphe.L3.Dot.generate_graph_from_routers
-          |> IO.puts
+        target_strings
+          |> parse_ip_args
+          |> Enum.filter(&Utility.is_host_address/1)
+          |> Giraphe.Discover.discover_l3
+          |> Giraphe.Graph.graph_routers
+          |> Giraphe.Render.render_l3_graph(output_file)
 
+        Utility.status "Done!"
       _ ->
         usage
     end

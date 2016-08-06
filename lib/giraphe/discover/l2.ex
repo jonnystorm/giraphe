@@ -3,7 +3,7 @@
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.L2.Discovery do
+defmodule Giraphe.Discover.L2 do
   @moduledoc """
   Discovery functions for switches.
   """

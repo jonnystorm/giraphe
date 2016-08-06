@@ -10,14 +10,6 @@ defmodule Giraphe.IO do
 
   require Logger
 
-  defp querier do
-    Application.get_env :giraphe, :querier
-  end
-
-  defp host_scanner do
-    Application.get_env :giraphe, :host_scanner
-  end
-
   defp get_query_output(query_result, default_fun) do
     case query_result do
       {:ok, _, _, output} ->
@@ -32,7 +24,7 @@ defmodule Giraphe.IO do
 
   defp query(object, target, default_fun) do
     object
-      |> querier.query(target)
+      |> Giraphe.IO.Query.query(target)
       |> get_query_output(default_fun)
   end
 
@@ -56,7 +48,7 @@ defmodule Giraphe.IO do
 
   def get_router(target) do
     if is_snmp_agent(target) do
-      routes    = get_target_routes target
+      routes = get_target_routes target
       addresses =
         target
           |> get_target_addresses
@@ -138,11 +130,11 @@ defmodule Giraphe.IO do
   end
 
   def ping_subnet(subnet) do
-    host_scanner.scan subnet
+    Giraphe.IO.HostScan.scan subnet
   end
 
   def is_snmp_agent(%{} = target) do
-    host_scanner.udp_161_open? target
+    Giraphe.IO.HostScan.udp_161_open? target
   end
   def is_snmp_agent(_), do: false
 end

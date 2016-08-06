@@ -3,14 +3,14 @@
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.IO.HostScanner.Nmap do
+defmodule Giraphe.IO.HostScan.Nmap do
   @moduledoc """
   An `nmap` implementation of the `Giraphe.IO.HostScanner` behaviour.
   """
 
-  require Logger
+  @behaviour Giraphe.IO.HostScan
 
-  @behaviour Giraphe.IO.HostScanner
+  require Logger
 
   @doc """
   Scans all hosts in `subnet`.

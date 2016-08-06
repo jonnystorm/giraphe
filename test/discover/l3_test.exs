@@ -3,11 +3,11 @@
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.L3.DiscoveryTest do
+defmodule Giraphe.Discover.L3Test do
   use ExUnit.Case
-  doctest Giraphe.L3.Discovery
+  doctest Giraphe.Discover.L3
 
-  import Giraphe.L3.Discovery
+  import Giraphe.Discover.L3
 
   test "Returns tuple of routers and routes" do
     expected_routers =

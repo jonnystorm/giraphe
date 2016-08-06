@@ -3,7 +3,7 @@ defmodule Giraphe.Mixfile do
 
   def project do
     [ app: :giraphe,
-      version: "0.0.8",
+      version: "0.0.10",
       name: "giraphe",
       source_url: "https://github.com/jonnystorm/giraphe",
       elixir: "~> 1.3",
@@ -20,8 +20,8 @@ defmodule Giraphe.Mixfile do
 
   defp get_env(:test) do
     [ quiet: true,
-      querier: Giraphe.IO.Querier.Dummy,
-      host_scanner: Giraphe.IO.HostScanner.Dummy,
+      querier: Giraphe.IO.Query.Dummy,
+      host_scanner: Giraphe.IO.HostScan.Dummy,
     ]
   end
   defp get_env(:dev) do
@@ -40,10 +40,13 @@ defmodule Giraphe.Mixfile do
       ],
       env: [
         quiet: false,
-        querier: Giraphe.IO.Querier.NetSNMP,
-        host_scanner: Giraphe.IO.HostScanner.Nmap,
-        l2_dot_template: "templates/dot/l2_graph.dot.eex",
-        l3_dot_template: "templates/dot/l3_graph.dot.eex",
+        l2_grapher: Giraphe.Graph.Dot.L2,
+        l3_grapher: Giraphe.Graph.Dot.L3,
+        l2_graph_template: "templates/dot/l2_graph.dot.eex",
+        l3_graph_template: "templates/dot/l3_graph.dot.eex",
+        renderer: Giraphe.Render.GraphViz,
+        querier: Giraphe.IO.Query.NetSNMP,
+        host_scanner: Giraphe.IO.HostScan.Nmap,
         credentials: []
 
       ] |> Keyword.merge(get_env(Mix.env))

@@ -3,12 +3,12 @@
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.IO.Querier.NetSNMP do
+defmodule Giraphe.IO.Query.NetSNMP do
   @moduledoc """
   A net_snmp_ex implementation of the `Giraphe.IO.Querier` behaviour.
   """
 
-  @behaviour Giraphe.IO.Querier
+  @behaviour Giraphe.IO.Query
 
   require Logger
 

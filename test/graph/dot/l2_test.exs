@@ -3,14 +3,16 @@
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.L2.DiscoveryTest do
+defmodule Giraphe.Graph.Dot.L2Test do
   use ExUnit.Case
-  doctest Giraphe.L2.Discovery
+  doctest Giraphe.Graph.Dot.L2
 
-  import Giraphe.L2.Discovery
+  import Giraphe.Graph.Dot.L2
 
-  test "Returns list of switches" do
-    expected_switches =
+  @template Giraphe.Graph.l2_graph_template
+
+  test "Generates dot from switches" do
+    switches =
       [ %Giraphe.Switch{name: "192.0.2.3", polladdr: NetAddr.ip("192.0.2.3"), physaddr: NetAddr.mac_48("00:00:00:00:00:03"), uplink: "Gi1/24",
           fdb: [
             {"Gi1/24", NetAddr.mac_48("00:00:00:00:00:01"), 1},
@@ -242,8 +244,73 @@ defmodule Giraphe.L2.DiscoveryTest do
         }
       ]
 
-    switches = discover NetAddr.ip("192.0.2.1"), nil
+    assert graph_switches(switches, "1970-01-01 00:00:00Z", @template)
+      == File.read!("test/graph/dot/l2_graph1.dot")
+  end
 
-    assert switches == expected_switches
+  test "Generates dot from different switches" do
+    switches =
+      [ %Giraphe.Switch{
+          name: "AnSwitch.somedomain.corp",
+          polladdr: NetAddr.ip("192.168.97.1"),
+          physaddr: NetAddr.mac_48("00:00:00:00:00:01"),
+          uplink: nil,
+          fdb: [
+            {"Po69", NetAddr.mac_48("00:00:00:00:00:02"), 4},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:03"), 4}
+          ]
+        },
+        %Giraphe.Switch{
+          name: "AnOtherSwitch.somedomain.corp",
+          polladdr: NetAddr.ip("192.168.97.3"),
+          physaddr: NetAddr.mac_48("00:00:00:00:00:03"),
+          uplink: "Po5",
+          fdb: [
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 1},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 2},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 3},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 4},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 6},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 8},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 20},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 66},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 80},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 81},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 100},
+            {"Po5", NetAddr.mac_48("00:00:00:00:00:01"), 2011}
+          ]
+        },
+        %Giraphe.Switch{
+          name: "OneMoreSwitch.somedomain.corp",
+          polladdr: NetAddr.ip("192.168.97.4"),
+          physaddr: NetAddr.mac_48("00:00:00:00:00:02"),
+          uplink: "Po3",
+          fdb: [
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 1},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 2},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 3},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 4},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 6},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 20},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 66},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 80},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 81},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 87},
+            {"Gi2/0/13", NetAddr.mac_48("00:00:00:00:00:01"), 99},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 100},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 191},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 200},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 205},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 209},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 217},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 2000},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 2002},
+            {"Po3", NetAddr.mac_48("00:00:00:00:00:01"), 2003}
+          ]
+        }
+      ]
+
+    assert graph_switches(switches, "1970-01-01 00:00:00Z", @template)
+      == File.read!("test/graph/dot/l2_graph2.dot")
   end
 end

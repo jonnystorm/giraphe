@@ -3,20 +3,16 @@
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.L2.Dot do
+defmodule Giraphe.Graph.Dot.L2 do
   @moduledoc """
   Functions for generating switch diagrams with GraphViz dot.
   """
 
   alias Giraphe.Utility
 
-  defp get_dot_template do
-    Application.get_env :giraphe, :l2_dot_template
-  end
-
-  defp generate_dot(switches, edges, timestamp) do
+  defp generate_dot(template, switches, edges, timestamp) do
     EEx.eval_file(
-      get_dot_template,
+      template,
       [switches: switches, edges: edges, timestamp: timestamp]
     )
   end
@@ -106,14 +102,14 @@ defmodule Giraphe.L2.Dot do
   @doc """
   Generate GraphViz dot from `switches`.
   """
-  def generate_digraph_from_switches(switches) do
-    generate_digraph_from_switches switches, "#{DateTime.utc_now}"
+  def graph_switches(switches, template) do
+    graph_switches switches, "#{DateTime.utc_now}", template
   end
 
   @doc """
   Generate GraphViz dot from `switches` with timestamp.
   """
-  def generate_digraph_from_switches(switches, timestamp) do
+  def graph_switches(switches, timestamp, template) do
     switch_physaddrs = Enum.map switches, &(&1.physaddr)
 
     switches =
@@ -129,6 +125,6 @@ defmodule Giraphe.L2.Dot do
         |> get_l2_edges
         |> sort_l2_edges_by_upstream_polladdr_and_downlink
 
-    generate_dot switches, edges, timestamp
+    generate_dot template, switches, edges, timestamp
   end
 end

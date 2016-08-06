@@ -3,20 +3,16 @@
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.L3.Dot do
+defmodule Giraphe.Graph.Dot.L3 do
   @moduledoc """
   Functions for generating router diagrams with GraphViz dot.
   """
 
   alias Giraphe.Utility
 
-  defp get_dot_template do
-    Application.get_env :giraphe, :l3_dot_template
-  end
-
-  defp generate_dot(routers, subnets, edges, timestamp) do
+  defp generate_dot(template, routers, subnets, edges, timestamp) do
     EEx.eval_file(
-      get_dot_template,
+      template,
       [routers: routers, subnets: subnets, edges: edges, timestamp: timestamp]
     )
   end
@@ -48,18 +44,18 @@ defmodule Giraphe.L3.Dot do
   @doc """
   Generate GraphViz dot from `routers`.
   """
-  def generate_graph_from_routers(routers) do
-    generate_graph_from_routers routers, "#{DateTime.utc_now}"
+  def graph_routers(routers, template) do
+    graph_routers routers, "#{DateTime.utc_now}", template
   end
 
   @doc """
   Generate GraphViz dot from `routers` with timestamp.
   """
-  def generate_graph_from_routers(routers, timestamp) do
+  def graph_routers(routers, timestamp, template) do
     routers
       |> Enum.sort_by(&(&1.polladdr))
       |> get_l3_edges
-      |> generate_graph_from_edges(timestamp)
+      |> graph_edges(timestamp, template)
   end
 
   defp l3_edges_to_nodes(edges) do
@@ -70,7 +66,7 @@ defmodule Giraphe.L3.Dot do
       |> List.to_tuple
   end
 
-  defp generate_graph_from_edges(edges, timestamp) do
+  defp graph_edges(edges, timestamp, template) do
     {routers, subnets} = l3_edges_to_nodes edges
 
     subnets =
@@ -83,7 +79,7 @@ defmodule Giraphe.L3.Dot do
       {router, NetAddr.prefix(subnet)}
     end
 
-    generate_dot routers, subnets, edges, timestamp
+    generate_dot template, routers, subnets, edges, timestamp
   end
 
   defp records_to_l3_edges(records) do
@@ -101,10 +97,10 @@ defmodule Giraphe.L3.Dot do
   @doc """
   Generate GraphViz dot from the file at `path`.
   """
-  def generate_graph_from_file(path) do
+  def generate_graph_from_file(path, template) do
     path
       |> get_record_stream
       |> records_to_l3_edges
-      |> generate_graph_from_edges("#{DateTime.utc_now}")
+      |> graph_edges("#{DateTime.utc_now}", template)
   end
 end
