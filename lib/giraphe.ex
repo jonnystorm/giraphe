@@ -8,10 +8,7 @@ defmodule Giraphe do
   Giraphe escript module.
   """
 
-  alias Giraphe.Discover
-  alias Giraphe.Graph
-  alias Giraphe.Render
-  alias Giraphe.Utility
+  alias Giraphe.{Discover, Graph, Render, Utility}
 
   require Logger
 
@@ -67,8 +64,18 @@ defmodule Giraphe do
         :ok
       end
 
-    if credentials_result != :ok do
-      usage "Unable to parse credentials file: '#{switches[:credentials]}'"
+    case credentials_result do
+      :ok ->
+        nil
+
+      nil ->
+        usage
+
+      {:error, _} ->
+        usage "Unable to read credentials file: '#{switches[:credentials]}'"
+
+      _ ->
+        usage "Unable to parse credentials file: '#{switches[:credentials]}'"
     end
 
     if path = switches[:output_file] do
@@ -135,10 +142,16 @@ defmodule Giraphe do
       -q: quiet
       -v: verbose ('-vv' is more verbose)
 
-      -o: output file (without extension)
+      -o: output file (must end in .png or .svg)
 
       -c: Specify file containing credentials
         <credentials_path>: path to file containing credentials
+
+        Valid lines in this file will look like one of the following:
+          snmp v2c 'r34D0n1Y!'
+          snmp v3 noAuthNoPriv 'admin'
+          snmp v3 authNoPriv 'admin' md5 '$3cR3t!'
+          snmp v3 authPriv 'admin' sha '$3crR3t!' aes 'pR1v473!'
 
       -2: generate layer-2 topology
          <gateway_ip>: IP address of target subnet gateway
@@ -149,13 +162,13 @@ defmodule Giraphe do
                      this machines's default gateway is used
     """)
 
-    exit {:shutdown, 1}
+    System.halt 1
   end
   defp usage(message) do
     IO.puts :stderr, message
     usage
 
-    exit {:shutdown, 1}
+    System.halt 1
   end
 
   def main(argv) do
@@ -195,6 +208,7 @@ defmodule Giraphe do
           |> Render.render_l3_graph(output_file)
 
         Utility.status "Done!"
+
       _ ->
         usage
     end

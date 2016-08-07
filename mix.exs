@@ -3,7 +3,7 @@ defmodule Giraphe.Mixfile do
 
   def project do
     [ app: :giraphe,
-      version: "0.0.11",
+      version: "0.0.12",
       name: "giraphe",
       source_url: "https://github.com/jonnystorm/giraphe",
       elixir: "~> 1.3",
@@ -16,10 +16,6 @@ defmodule Giraphe.Mixfile do
         extras: ["README.md"]
       ]
     ]
-  end
-
-  defp get_priv_dir do
-    Application.app_dir :giraphe, "priv"
   end
 
   defp get_env(:test) do
@@ -46,8 +42,8 @@ defmodule Giraphe.Mixfile do
         quiet: false,
         l2_grapher: Giraphe.Graph.Dot.L2,
         l3_grapher: Giraphe.Graph.Dot.L3,
-        l2_graph_template: Path.join(get_priv_dir, "templates/dot/l2_graph.dot.eex"),
-        l3_graph_template: Path.join(get_priv_dir, "templates/dot/l3_graph.dot.eex"),
+        l2_graph_template: "priv/templates/dot/l2_graph.dot.eex",
+        l3_graph_template: "priv/templates/dot/l3_graph.dot.eex",
         renderer: Giraphe.Render.GraphViz,
         querier: Giraphe.IO.Query.NetSNMP,
         host_scanner: Giraphe.IO.HostScan.Nmap,
