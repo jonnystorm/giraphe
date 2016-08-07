@@ -66,7 +66,48 @@
 <h2 id="installation" class="section-heading">
   <a href="#installation" class="hover-link"><i class="icon-link"></i></a>
    Installation
-</h2><ol>
+</h2><p>To use giraphe as an escript:</p>
+<ol>
+<li><p>Install Erlang/OTP 19</p>
+</li>
+<li><p>Install GraphViz</p>
+</li>
+<li><p>Clone the giraphe repository</p>
+<pre><code class="shell">    git clone https://github.com/jonnystorm/giraphe.git
+    ```</code></pre>
+</li>
+<li><p>Run</p>
+<pre><code class="shell">    $ ./giraphe/giraphe
+    Usage: giraphe [-qv] -c &lt;credentials_path&gt; -o &lt;output_file&gt;
+                   [-2 &lt;gateway_ip&gt; [&lt;subnet_cidr&gt;]] [-3 [&lt;router_ip&gt; ...]]
+
+      -q: quiet
+      -v: verbose (&#39;-vv&#39; is more verbose)
+
+      -o: output file (must end in .png or .svg)
+
+      -c: Specify file containing credentials
+        &lt;credentials_path&gt;: path to file containing credentials
+
+        Valid lines in this file will look like one of the following:
+          snmp v2c &#39;r34D0n1Y!&#39;
+          snmp v3 noAuthNoPriv &#39;admin&#39;
+          snmp v3 authNoPriv &#39;admin&#39; md5 &#39;$3cR3t!&#39;
+          snmp v3 authPriv &#39;admin&#39; sha &#39;$3crR3t!&#39; aes &#39;pR1v473!&#39;
+
+      -2: generate layer-2 topology
+         &lt;gateway_ip&gt;: IP address of target subnet gateway
+        &lt;subnet_cidr&gt;: Specifies switch subnet to graph
+
+      -3: generate layer-3 topology
+        &lt;router_ip&gt;: IP address of seed target router; with no seed specified,
+                     this machines&#39;s default gateway is used
+
+    ```</code></pre>
+</li>
+</ol>
+<p>To use giraphe as a library:</p>
+<ol>
 <li><p>Add giraphe to your list of dependencies in <code class="inline">mix.exs</code>:</p>
 <pre><code class="elixir">    def deps do
       [{:giraphe, git: &quot;https://github.com/jonnystorm/giraphe.git&quot;}]
@@ -80,6 +121,38 @@
     ```</code></pre>
 </li>
 </ol>
+<h2 id="example" class="section-heading">
+  <a href="#example" class="hover-link"><i class="icon-link"></i></a>
+   Example
+</h2><h3>L3</h3>
+<pre><code class="elixir">$ ./giraphe -c ~/creds -o ~/new-l3-diagram.png -3 198.51.100.1
+Seeding targets 198.51.100.1/32
+New routers discovered: R1
+Next targets: 192.0.2.2/31, 198.51.100.2/32, 198.51.100.3/32
+
+12:50:25.494 [warn]  Unable to query target &#39;198.51.100.3/32&#39; for object &#39;routes&#39;: :etimedout
+
+12:50:31.524 [warn]  Unable to query target &#39;198.51.100.3/32&#39; for object &#39;addresses&#39;: :etimedout
+
+12:50:37.553 [warn]  Unable to query target &#39;198.51.100.3/32&#39; for object &#39;sysname&#39;: :etimedout
+New routers discovered: 192.0.2.2, R2, 198.51.100.3
+Next targets: 198.51.100.4/32, 198.51.100.5/32
+New routers discovered: R4, R5
+Next targets: 
+Done!</code></pre>
+<h3>L2</h3>
+<pre><code class="elixir">$ ./giraphe -c ~/creds -o ~/new-l2-diagram.svg -2 192.0.2.1
+Found subnet &#39;192.0.2.0/24&#39; for gateway &#39;192.0.2.1/32&#39;.
+Inducing ARP entries on &#39;192.0.2.0/24&#39;...
+Retrieving ARP entries for &#39;192.0.2.0/24&#39;...
+Found the following hosts: 192.0.2.1, 192.0.2.2, 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6, 192.0.2.7, 192.0.2.8
+
+12:36:57.896 [warn]  Unable to query target &#39;192.0.2.5/32&#39; for object &#39;fdb&#39;: :etimedout
+
+12:37:04.112 [warn]  Unable to query target &#39;192.0.2.7/32&#39; for object &#39;sysname&#39;: :etimedout
+
+12:37:11.680 [warn]  Unable to query target &#39;192.0.2.8/32&#39; for object &#39;sysname&#39;: :snmperr_unknown_user_name
+Done!</code></pre>
 
       <footer class="footer">
         <p>
