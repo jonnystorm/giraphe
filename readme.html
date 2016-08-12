@@ -62,7 +62,7 @@
 
 <a href="https://github.com/jonnystorm/giraphe"><img src="https://raw.githubusercontent.com/jonnystorm/giraphe/master/giraphe-title.png" height="300px" /></a><p><a href="https://travis-ci.org/jonnystorm/giraphe"><img src="https://travis-ci.org/jonnystorm/giraphe.svg?branch=master" alt="Build Status"/></a></p>
 <p>Discover and visualize layer-2 and layer-3 network topology.</p>
-<p>See the <a href="http://jonnystorm.github.io/giraphe">API documentation</a>.</p>
+<p>See the <a href="https://jonnystorm.github.io/giraphe">API documentation</a>.</p>
 <h2 id="installation" class="section-heading">
   <a href="#installation" class="hover-link"><i class="icon-link"></i></a>
    Installation
@@ -72,12 +72,15 @@
 </li>
 <li><p>Install GraphViz</p>
 </li>
-<li><p>Clone the giraphe repository</p>
-<pre><code class="shell">    git clone https://github.com/jonnystorm/giraphe.git
-    ```</code></pre>
+<li>Clone the giraphe repository
 </li>
-<li><p>Run</p>
-<pre><code class="shell">    $ ./giraphe/giraphe
+</ol>
+<pre><code class="sh">    git clone https://github.com/jonnystorm/giraphe.git</code></pre>
+<ol>
+<li>Run
+</li>
+</ol>
+<pre><code class="sh">    $ ./giraphe/giraphe
     Usage: giraphe [-qv] -c &lt;credentials_path&gt; -o &lt;output_file&gt;
                    [-2 &lt;gateway_ip&gt; [&lt;subnet_cidr&gt;]] [-3 [&lt;router_ip&gt; ...]]
 
@@ -102,25 +105,22 @@
       -3: generate layer-3 topology
         &lt;router_ip&gt;: IP address of seed target router; with no seed specified,
                      this machines&#39;s default gateway is used
-
-    ```</code></pre>
-</li>
-</ol>
+</code></pre>
 <p>To use giraphe as a library:</p>
 <ol>
-<li><p>Add giraphe to your list of dependencies in <code class="inline">mix.exs</code>:</p>
-<pre><code class="elixir">    def deps do
-      [{:giraphe, git: &quot;https://github.com/jonnystorm/giraphe.git&quot;}]
-    end
-    ```</code></pre>
-</li>
-<li><p>Ensure giraphe is started before your application:</p>
-<pre><code class="elixir">    def application do
-      [applications: [:giraphe]]
-    end
-    ```</code></pre>
+<li>Add giraphe to your list of dependencies in <code class="inline">mix.exs</code>:
 </li>
 </ol>
+<pre><code class="elixir">    def deps do
+      [{:giraphe, git: &quot;https://github.com/jonnystorm/giraphe.git&quot;}]
+    end</code></pre>
+<ol>
+<li>Ensure giraphe is started before your application:
+</li>
+</ol>
+<pre><code class="elixir">    def application do
+      [applications: [:giraphe]]
+    end</code></pre>
 <h2 id="example" class="section-heading">
   <a href="#example" class="hover-link"><i class="icon-link"></i></a>
    Example
