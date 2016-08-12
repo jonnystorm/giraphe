@@ -8,9 +8,11 @@ defmodule Giraphe.Discover.L3 do
   Discovery functions for routers.
   """
 
-  require Logger
+  # TODO: Replace route tuple with struct to ease future additions
 
   alias Giraphe.Utility
+
+  require Logger
 
   defp fetch_routers(targets) do
     Enum.map targets, &Giraphe.IO.get_router/1

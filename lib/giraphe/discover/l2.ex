@@ -8,6 +8,8 @@ defmodule Giraphe.Discover.L2 do
   Discovery functions for switches.
   """
 
+  # TODO: Replace FDB entry tuples with structs to ease future additions
+
   alias Giraphe.Utility
 
   require Logger

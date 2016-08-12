@@ -4,7 +4,7 @@
 
 Discover and visualize layer-2 and layer-3 network topology.
 
-See the [API documentation](http://jonnystorm.github.io/giraphe).
+See the [API documentation](https://jonnystorm.github.io/giraphe).
 
 ## Installation
 
@@ -15,12 +15,12 @@ To use giraphe as an escript:
   2. Install GraphViz
 
   2. Clone the giraphe repository
-    ```shell
+    ```sh
     git clone https://github.com/jonnystorm/giraphe.git
     ```
 
   3. Run
-    ```shell
+    ```sh
     $ ./giraphe/giraphe
     Usage: giraphe [-qv] -c <credentials_path> -o <output_file>
                    [-2 <gateway_ip> [<subnet_cidr>]] [-3 [<router_ip> ...]]
