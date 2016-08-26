@@ -72,15 +72,27 @@
 </li>
 <li><p>Install GraphViz</p>
 </li>
+<li><p>Install nmap</p>
+</li>
 <li>Clone the giraphe repository
 </li>
 </ol>
 <pre><code class="sh">    git clone https://github.com/jonnystorm/giraphe.git</code></pre>
 <ol>
-<li>Run
+<li>Add nmap command to sudoers
 </li>
 </ol>
-<pre><code class="sh">    $ ./giraphe/giraphe
+<pre><code class="sh">    Cmnd_Alias NMAP = /usr/bin/nmap -n -oG - -sU -p *
+
+    %wheel ALL=(root) NOPASSWD: NMAP
+
+    Defaults!NMAP !requiretty</code></pre>
+<ol>
+<li>Run from within the giraphe directory
+</li>
+</ol>
+<pre><code class="sh">    $ cd giraphe
+    $ ./giraphe
     Usage: giraphe [-qv] -c &lt;credentials_path&gt; -o &lt;output_file&gt;
                    [-2 &lt;gateway_ip&gt; [&lt;subnet_cidr&gt;]] [-3 [&lt;router_ip&gt; ...]]
 
