@@ -12,16 +12,31 @@ To use giraphe as an escript:
 
   1. Install Erlang/OTP 19
 
-  2. Install GraphViz
+  1. Install GraphViz
 
-  2. Clone the giraphe repository
+  1. Install nmap
+
+  1. Clone the giraphe repository
+
     ```sh
     git clone https://github.com/jonnystorm/giraphe.git
     ```
 
-  3. Run
+  1. Add nmap command to sudoers
+
     ```sh
-    $ ./giraphe/giraphe
+    Cmnd_Alias NMAP = /usr/bin/nmap -n -oG - -sU -p *
+
+    %wheel ALL=(root) NOPASSWD: NMAP
+
+    Defaults!NMAP !requiretty
+    ```
+
+  1. Run from within the giraphe directory
+
+    ```sh
+    $ cd giraphe
+    $ ./giraphe
     Usage: giraphe [-qv] -c <credentials_path> -o <output_file>
                    [-2 <gateway_ip> [<subnet_cidr>]] [-3 [<router_ip> ...]]
 
@@ -59,7 +74,7 @@ To use giraphe as a library:
     end
     ```
 
-  2. Ensure giraphe is started before your application:
+  1. Ensure giraphe is started before your application:
 
     ```elixir
     def application do
