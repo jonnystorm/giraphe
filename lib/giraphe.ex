@@ -189,7 +189,7 @@ defmodule Giraphe do
           gateway_address
             |> Discover.discover_l2(subnet)
             |> Graph.graph_switches
-            |> Render.render_l2_graph(output_file)
+            |> Render.render_graph(output_file)
 
           Utility.status "Done!"
 
@@ -205,7 +205,7 @@ defmodule Giraphe do
           |> Enum.filter(&Utility.is_host_address/1)
           |> Discover.discover_l3
           |> Graph.graph_routers
-          |> Render.render_l3_graph(output_file)
+          |> Render.render_graph(output_file)
 
         Utility.status "Done!"
 

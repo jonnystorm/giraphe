@@ -6,6 +6,8 @@
 defmodule Giraphe.Utility do
   @moduledoc false
 
+  require Logger
+
   def quiet? do
     Application.get_env :giraphe, :quiet
   end
@@ -21,7 +23,7 @@ defmodule Giraphe.Utility do
   end
 
   def find_route_containing_address(routes, address) do
-    Enum.find routes, &NetAddr.contains?(&1, address)
+    Enum.find routes, fn {dest, _} -> NetAddr.contains?(dest, address) end
   end
 
   def get_destinations_from_routes(routes) do
@@ -61,13 +63,13 @@ defmodule Giraphe.Utility do
   end
 
   defp _lookup_route_recursive(routes, address) do
-    with {d, nh} <- find_route_containing_address(routes, address)
+    with {dest, next_hop} <- find_route_containing_address(routes, address)
     do
-      if next_hop_is_self nh do
-        d
+      if next_hop_is_self(next_hop) or (dest == address) do
+        dest
 
       else
-        _lookup_route_recursive routes, nh
+        _lookup_route_recursive routes, next_hop
       end
     end
   end
@@ -90,8 +92,9 @@ defmodule Giraphe.Utility do
 
   def refine_address_length(address, addresses, routes) do
     set_address_length_to_matching_address_length(addresses, address)
-      || set_address_length_to_matching_address_length(addresses,
-           lookup_route_recursive(routes, address)
+      || set_address_length_to_matching_address_length(
+           [lookup_route_recursive(routes, address)],
+           address
          )
       || address
   end

@@ -1,5 +1,6 @@
 graph G {
   graph [
+    layout="neato"
     overlap=false
     label="<%= timestamp %>"
     fontname="sans bold"

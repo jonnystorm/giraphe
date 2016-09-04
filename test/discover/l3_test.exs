@@ -9,7 +9,7 @@ defmodule Giraphe.Discover.L3Test do
 
   import Giraphe.Discover.L3
 
-  test "Returns tuple of routers and routes" do
+  test "Returns list of routers and routes" do
     expected_routers =
       [ %Giraphe.Router{name: "192.0.2.3", polladdr: NetAddr.ip("192.0.2.3/31"),
           addresses: [NetAddr.ip("192.0.2.3/31"), NetAddr.ip("192.0.2.8/31")],
@@ -103,6 +103,80 @@ defmodule Giraphe.Discover.L3Test do
       ]
 
     routers = discover [NetAddr.ip("198.51.100.1"), NetAddr.ip("192.0.2.4"), NetAddr.ip("198.51.100.1/29")]
+
+    assert routers == expected_routers
+  end
+
+  test "Returns other list of routers and routes" do
+    expected_routers =
+      [ %Giraphe.Router{name: "203.0.113.1", polladdr: %NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32},
+          addresses: [%NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}],
+          routes: [
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<203, 0, 113, 16>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 5>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 5>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 16>>, length: 31}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}}
+          ]
+        },
+        %Giraphe.Router{name: "203.0.113.2", polladdr: %NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32},
+          addresses: [%NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}],
+          routes: [
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}},
+           {%NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}},
+           {%NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
+           {%NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}},
+           {%NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}},
+           {%NetAddr.IPv4{address: <<203, 0, 113, 5>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 5>>, length: 32}}
+          ]
+        },
+        %Giraphe.Router{name: "203.0.113.3", polladdr: %NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32},
+          addresses: [%NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}],
+          routes: [
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 5>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}}
+          ]
+        },
+        %Giraphe.Router{name: "203.0.113.4", polladdr: %NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32},
+          addresses: [%NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}],
+          routes: [
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 5>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 5>>, length: 32}}
+          ]
+        },
+        %Giraphe.Router{name: "203.0.113.5", polladdr: %NetAddr.IPv4{address: <<203, 0, 113, 5>>, length: 32},
+          addresses: [%NetAddr.IPv4{address: <<203, 0, 113, 5>>, length: 32}],
+          routes: [
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 1>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 3>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}, %NetAddr.IPv4{address: <<203, 0, 113, 4>>, length: 32}},
+            {%NetAddr.IPv4{address: <<203, 0, 113, 5>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}}
+          ]
+        },
+        %Giraphe.Router{name: "203.0.113.16", polladdr: %NetAddr.IPv4{address: <<203, 0, 113, 16>>, length: 31},
+          addresses: [%NetAddr.IPv4{address: <<203, 0, 113, 16>>, length: 31}],
+          routes: [
+           {%NetAddr.IPv4{address: <<203, 0, 113, 16>>, length: 31}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}}
+          ]
+        }
+      ]
+
+    routers = discover [NetAddr.ip("203.0.113.1")]
 
     assert routers == expected_routers
   end

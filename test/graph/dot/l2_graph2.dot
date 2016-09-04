@@ -1,5 +1,6 @@
 digraph G {
   graph [
+    layout="dot"
     outputorder=edgesfirst
     rankdir=LR
     forcelabels=true

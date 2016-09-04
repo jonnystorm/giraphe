@@ -122,9 +122,9 @@ defmodule Giraphe.Discover.L3 do
       new_routers
         |> get_next_targets_from_routers
         |> Enum.filter(fn next_target ->
-          not Enum.any? Enum.concat(new_routers, routers), fn r ->
+          not Enum.any?(Enum.concat(new_routers, routers), fn r ->
             any_similar_address?(r.addresses, next_target)
-          end
+          end)
         end)
 
     Utility.status "New routers discovered: " <> Enum.join(new_names, ", ")

@@ -9,20 +9,14 @@ defmodule Giraphe.Render do
   """
   @type reason :: atom
 
-  @callback render_l2_graph(graph :: String.t, output_filename :: String.t) :: :ok | {:error, reason}
-
-  @callback render_l3_graph(graph :: String.t, output_filename :: String.t) :: :ok | {:error, reason}
+  @callback render_graph(graph :: String.t, output_filename :: String.t) :: :ok | {:error, reason}
 
 
   defp renderer do
     Application.get_env :giraphe, :renderer
   end
 
-  def render_l2_graph(graph, output_filename) do
-    renderer.render_l2_graph graph, output_filename
-  end
-
-  def render_l3_graph(graph, output_filename) do
-    renderer.render_l3_graph graph, output_filename
+  def render_graph(graph, output_filename) do
+    renderer.render_graph graph, output_filename
   end
 end

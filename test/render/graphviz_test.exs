@@ -19,16 +19,13 @@ defmodule Giraphe.Render.GraphVizTest do
 
     Enum.map output_files, &File.rm(&1)
 
-    [ {&render_l2_graph/2, File.read!("test/graph/dot/l2_graph1.dot")},
-      {&render_l3_graph/2, File.read!("test/graph/dot/l3_graph.dot")}
+    [ File.read!("test/graph/dot/l2_graph1.dot"),
+      File.read!("test/graph/dot/l3_graph1.dot")
 
     ] |> List.duplicate(2)
       |> List.flatten
-      |> Enum.unzip
-      |> Tuple.to_list
-      |> Enum.concat([output_files])
-      |> List.zip
-      |> Enum.map(fn {fun, graph, file} -> fun.(graph, file) end)
+      |> Enum.zip(output_files)
+      |> Enum.map(fn {graph, file} -> render_graph(graph, file) end)
 
     Enum.map output_files, &assert(File.exists?(&1))
   end

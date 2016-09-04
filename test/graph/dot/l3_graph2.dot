@@ -1,0 +1,56 @@
+graph G {
+  graph [
+    layout="neato"
+    overlap=false
+    label="1970-01-01 00:00:00Z"
+    fontname="sans bold"
+    labelloc=t
+    labeljust=left
+  ];
+
+  node [
+    style=filled
+    penwidth=2
+    colorscheme=purples7
+    color=6
+    fontname="sans bold"
+    fontsize=10
+    fontcolor=7
+  ];
+
+  edge [
+    len=1
+    penwidth=4
+    colorscheme=purples7
+    color=6
+    labelfontname="sans bold"
+    labelfontsize=8
+    labelfontcolor=7
+  ];
+
+  // Routers
+
+  "192.0.2.2" [label="192.0.2.2" shape=circle fillcolor=2 width=1.5];
+  "198.51.100.1" [label="R1" shape=circle fillcolor=2 width=1.5];
+  "198.51.100.2" [label="R2" shape=circle fillcolor=2 width=1.5];
+  "198.51.100.3" [label="R3" shape=circle fillcolor=2 width=1.5];
+  "198.51.100.4" [label="R4" shape=circle fillcolor=2 width=1.5];
+  "198.51.100.5" [label="R5" shape=circle fillcolor=2 width=1.5];
+
+
+  // Subnets
+
+  "192.0.2.2/31" [fillcolor=1 shape=rect style="filled, rounded" width=2];
+
+
+  // Edges
+
+  "192.0.2.2" -- "192.0.2.2/31";
+  "198.51.100.1" -- "192.0.2.2/31";
+  "198.51.100.1" -- "198.51.100.2";
+  "198.51.100.1" -- "198.51.100.3";
+  "198.51.100.2" -- "198.51.100.4";
+  "198.51.100.2" -- "198.51.100.5";
+  "198.51.100.3" -- "198.51.100.4";
+
+}
