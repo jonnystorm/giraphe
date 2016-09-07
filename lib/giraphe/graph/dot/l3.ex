@@ -1,4 +1,4 @@
-# Copyright © 2016 Jonathan Storm <the.jonathan.storm@gmail.com>
+# copyright © 2016 jonathan storm <the.jonathan.storm@gmail.com>
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
@@ -27,16 +27,58 @@ defmodule Giraphe.Graph.Dot.L3 do
     Enum.filter groups, fn {_, [_, _ | _]} -> true; _ -> false end
   end
 
+  defp get_point_to_point_next_hops(routes) do
+    routes
+      |> Enum.filter(fn {nh, nh} -> true; _ -> false end)
+      |> Enum.map(&elem(&1, 1))
+      |> Enum.sort
+      |> Enum.dedup
+  end
+
+  defp router_to_node(router) do
+    %{name: router.name, id: NetAddr.address(router.polladdr)}
+  end
+
+  defp join_sorted(list, delimiter) do
+    list
+      |> Enum.sort
+      |> Enum.join(delimiter)
+  end
+
+  defp make_point_to_point_edge(router, router_node, next_hop, nil) do
+    next_hop_router = %{name: "#{next_hop}", polladdr: next_hop}
+    pseudonode = join_sorted([router.polladdr, next_hop_router.polladdr], ":")
+    next_hop_node = router_to_node(next_hop_router)
+
+    [{router_node, pseudonode}, {next_hop_node, pseudonode}]
+  end
+  defp make_point_to_point_edge(router, router_node, _next_hop, next_hop_router) do
+    pseudonode = join_sorted([router.polladdr, next_hop_router.polladdr], ":")
+
+    [{router_node, pseudonode}]
+  end
+
   defp get_l3_edges(routers) do
     routers
+      |> Map.values
+      |> Enum.sort_by(& &1.polladdr)
       |> Enum.flat_map(fn router ->
         router = Utility.trim_domain_from_device_sysname router
+        router_node = router_to_node(router)
 
-        %{name: router.name, id: NetAddr.address(router.polladdr)}
+        point_to_point_edges =
+          router.routes
+            |> get_point_to_point_next_hops
+            |> Enum.flat_map(fn nh ->
+              make_point_to_point_edge(router, router_node, nh, routers[nh])
+            end)
+
+        router_node
           |> List.duplicate(length router.addresses)
           |> Enum.zip(router.addresses)
+          |> Enum.map(fn {r, s} -> {r, NetAddr.first_address(s)} end)
+          |> Enum.concat(point_to_point_edges)
       end)
-      |> Enum.map(fn {r, s} -> {r, NetAddr.first_address(s)} end)
       |> group_edges_by_subnet
       |> find_edge_groups_with_at_least_two_edges
       |> Enum.flat_map(fn {_, edges} -> edges end)
@@ -55,7 +97,8 @@ defmodule Giraphe.Graph.Dot.L3 do
   """
   def graph_devices(routers, timestamp, template) do
     routers
-      |> Enum.sort_by(&(&1.polladdr))
+      |> Enum.map(& {&1.polladdr, &1})
+      |> Enum.into(%{})
       |> get_l3_edges
       |> graph_edges(timestamp, template)
   end
@@ -74,11 +117,15 @@ defmodule Giraphe.Graph.Dot.L3 do
     subnets =
       subnets
         |> Enum.sort
-        |> Enum.map(&NetAddr.prefix/1)
+        |> Enum.map(fn <<_::binary>> = s -> s; s -> NetAddr.prefix(s) end)
         |> Enum.dedup
 
-    edges = Enum.map edges, fn {router, subnet} ->
-      {router, NetAddr.prefix(subnet)}
+    edges = Enum.map edges, fn
+      {router, <<_::binary>> = subnet} ->
+        {router, subnet}
+
+      {router, subnet} ->
+        {router, NetAddr.prefix(subnet)}
     end
 
     generate_dot template, routers, subnets, edges, timestamp

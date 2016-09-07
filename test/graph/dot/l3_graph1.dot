@@ -39,12 +39,12 @@ graph G {
 
   // Subnets
 
-  "192.0.2.2/31" [fillcolor=1 shape=rect style="filled, rounded" width=2];
-  "192.0.2.4/31" [fillcolor=1 shape=rect style="filled, rounded" width=2];
-  "192.0.2.6/31" [fillcolor=1 shape=rect style="filled, rounded" width=2];
-  "192.0.2.8/31" [fillcolor=1 shape=rect style="filled, rounded" width=2];
-  "192.0.2.10/31" [fillcolor=1 shape=rect style="filled, rounded" width=2];
-  "192.0.2.12/30" [fillcolor=1 shape=rect style="filled, rounded" width=2];
+  "192.0.2.2/31" [label="" shape=circle fillcolor=1 width=0.25];
+  "192.0.2.4/31" [label="" shape=circle fillcolor=1 width=0.25];
+  "192.0.2.6/31" [label="" shape=circle fillcolor=1 width=0.25];
+  "192.0.2.8/31" [label="" shape=circle fillcolor=1 width=0.25];
+  "192.0.2.10/31" [label="" shape=circle fillcolor=1 width=0.25];
+  "192.0.2.12/30" [label="" shape=circle fillcolor=1 width=0.25];
 
 
   // Edges

@@ -58,4 +58,80 @@ defmodule Giraphe.Graph.Dot.L3Test do
     assert graph_devices(routers, "1970-01-01 00:00:00Z", @template)
       == File.read!("test/graph/dot/l3_graph1.dot")
   end
+
+  test "Generates dot from other routers" do
+    routers =
+      [ %Giraphe.Router{name: "192.0.2.2", polladdr: %NetAddr.IPv4{address: <<192, 0, 2, 2>>, length: 31},
+          addresses: [%NetAddr.IPv4{address: <<192, 0, 2, 2>>, length: 31}],
+          routes: [
+           {%NetAddr.IPv4{address: <<192, 0, 2, 2>>, length: 31}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}}
+          ]
+        },
+        %Giraphe.Router{name: "R1", polladdr: %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32},
+          addresses: [
+            %NetAddr.IPv4{address: <<192, 0, 2, 3>>, length: 31},
+            %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}
+          ],
+          routes: [
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<192, 0, 2, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<192, 0, 2, 2>>, length: 31}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}}
+          ]
+        },
+        %Giraphe.Router{name: "R2", polladdr: %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32},
+          addresses: [%NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}],
+          routes: [
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}},
+           {%NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}},
+           {%NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
+           {%NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}},
+           {%NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}},
+           {%NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32}}
+          ]
+        },
+        %Giraphe.Router{name: "R3", polladdr: %NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32},
+          addresses: [%NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}],
+          routes: [
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}}
+          ]
+        },
+        %Giraphe.Router{name: "R4", polladdr: %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32},
+          addresses: [%NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}],
+          routes: [
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32}}
+          ]
+        },
+        %Giraphe.Router{name: "R5", polladdr: %NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32},
+          addresses: [%NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32}],
+          routes: [
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}},
+            {%NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}}
+          ]
+        }
+      ]
+
+    assert graph_devices(routers, "1970-01-01 00:00:00Z", @template)
+      == File.read!("test/graph/dot/l3_graph2.dot")
+  end
 end

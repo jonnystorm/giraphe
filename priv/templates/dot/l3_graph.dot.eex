@@ -43,7 +43,7 @@ end
 <%=
 for s <- subnets do
   """
-    "#{s}" [fillcolor=1 shape=rect style="filled, rounded" width=2];
+    "#{s}" [label="" shape=circle fillcolor=1 width=0.25];
   """
 end
 %>
