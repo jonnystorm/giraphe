@@ -18,7 +18,7 @@ end
 <%=
 for {r, e} <- incidences do
   """
-    "#{r.id}" -- "#{e}";
+    "#{r}" -- "#{e}";
   """
 end
 %>

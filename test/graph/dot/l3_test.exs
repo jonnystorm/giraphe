@@ -228,4 +228,26 @@ defmodule Giraphe.Graph.Dot.L3Test do
       }
       """
   end
+
+  test "Outputs router label without domain name" do
+    routers =
+      [ %Giraphe.Router{name: "R1.test.net", polladdr: NetAddr.ip("192.0.2.1/24"),
+          addresses: [NetAddr.ip("192.0.2.1/24")], routes: []
+        }
+      ]
+
+    timestamp = "1970-01-01 00:00:00Z"
+
+    assert graph_devices(routers, timestamp, @template) ==
+      """
+      graph G {
+        label="#{timestamp}"
+
+        "192.0.2.1" [label="R1"];
+
+
+
+      }
+      """
+  end
 end

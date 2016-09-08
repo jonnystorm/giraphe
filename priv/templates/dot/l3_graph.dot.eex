@@ -52,12 +52,12 @@ for e <- edges do
 end
 %>
 
-  // Edges
+  // Incidences
 
 <%=
 for {r, e} <- incidences do
   """
-    "#{r.id}" -- "#{e}";
+    "#{r}" -- "#{e}";
   """
 end
 %>

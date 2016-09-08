@@ -24,7 +24,7 @@ defmodule Giraphe.Graph.Dot.L3 do
   end
 
   defp find_incidence_groups_with_at_least_two_incidences(groups) do
-    Enum.filter groups, fn {_, [_, _ | _]} -> true; _ -> false end
+    Stream.filter groups, fn {_, [_, _ | _]} -> true; _ -> false end
   end
 
   defp get_point_to_point_next_hops(routes) do
@@ -41,17 +41,23 @@ defmodule Giraphe.Graph.Dot.L3 do
       |> Enum.join(delimiter)
   end
 
-  defp make_point_to_point_incidence(router, router_node, next_hop, nil) do
-    next_hop_router = %{name: "#{next_hop}", polladdr: next_hop}
-    pseudonode = join_sorted([router.polladdr, next_hop_router.polladdr], ":")
-    next_hop_node = next_hop_router.name
+  defp _make_point_to_point_incidence(router, next_hop, make_nh_incidence?) do
+    pseudonode = join_sorted([router.polladdr, next_hop], ":")
+    pseudoincidences = [{router.polladdr, pseudonode}]
 
-    [{router_node, pseudonode}, {next_hop_node, pseudonode}]
+    if make_nh_incidence? do
+      [{next_hop, pseudonode} | pseudoincidences]
+
+    else
+      pseudoincidences
+    end
   end
-  defp make_point_to_point_incidence(router, router_node, _next_hop, next_hop_router) do
-    pseudonode = join_sorted([router.polladdr, next_hop_router.polladdr], ":")
 
-    [{router_node, pseudonode}]
+  defp make_point_to_point_incidence(router, next_hop, nil) do
+    _make_point_to_point_incidence(router, next_hop, true)
+  end
+  defp make_point_to_point_incidence(router, _, %{polladdr: next_hop}) do
+    _make_point_to_point_incidence(router, next_hop, false)
   end
 
   defp get_l3_incidences(routers) do
@@ -59,26 +65,24 @@ defmodule Giraphe.Graph.Dot.L3 do
       |> Map.values
       |> Enum.sort_by(& &1.polladdr)
       |> Enum.flat_map(fn router ->
-        router = Utility.trim_domain_from_device_sysname router
-        router_node = router_to_node(router)
-
         point_to_point_incidences =
           router.routes
             |> get_point_to_point_next_hops
             |> Enum.flat_map(fn nh ->
-              make_point_to_point_incidence(router, router_node, nh, routers[nh])
+              make_point_to_point_incidence(router, nh, routers[nh])
             end)
 
-        router_node
+        router.polladdr
           |> List.duplicate(length router.addresses)
           |> Stream.zip(router.addresses)
           |> Stream.map(fn {r, s} -> {r, NetAddr.first_address(s)} end)
           |> Stream.dedup
-          |> Enum.concat(point_to_point_incidences)
+          |> Stream.concat(point_to_point_incidences)
+          |> Enum.map(fn {r, s} -> {NetAddr.address(r), s} end)
       end)
       |> group_incidences_by_subnet
       |> find_incidence_groups_with_at_least_two_incidences
-      |> Enum.flat_map(fn {_, incidences} -> incidences end)
+      |> Stream.flat_map(fn {_, incidences} -> incidences end)
       |> Enum.sort
       |> Enum.dedup
   end
@@ -112,7 +116,9 @@ defmodule Giraphe.Graph.Dot.L3 do
   end
 
   defp router_to_node(router) do
-    %{name: router.name, id: NetAddr.address(router.polladdr)}
+    %{name: name} = Utility.trim_domain_from_device_sysname router
+
+    %{name: name, id: NetAddr.address(router.polladdr)}
   end
 
   defp graph_routers_and_incidences(routers, incidences, timestamp, template) do
