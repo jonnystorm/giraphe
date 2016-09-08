@@ -102,7 +102,7 @@ defmodule Giraphe.Discover.L3Test do
         }
       ]
 
-    routers = discover [NetAddr.ip("198.51.100.1"), NetAddr.ip("192.0.2.4"), NetAddr.ip("198.51.100.1/29")]
+    routers = discover([NetAddr.ip("198.51.100.1"), NetAddr.ip("192.0.2.4"), NetAddr.ip("198.51.100.1/29")])
 
     assert routers == expected_routers
   end
@@ -176,8 +176,19 @@ defmodule Giraphe.Discover.L3Test do
         }
       ]
 
-    routers = discover [NetAddr.ip("203.0.113.1")]
+    routers = discover([NetAddr.ip("203.0.113.1")])
 
     assert routers == expected_routers
+  end
+
+  test "Router has connected route for polling address when no routing entries exist" do
+    expected_routers =
+      [ %Giraphe.Router{name: "203.0.113.6", polladdr: NetAddr.ip("203.0.113.6/31"),
+          addresses: [NetAddr.ip("203.0.113.6/31")],
+          routes: [{NetAddr.ip("203.0.113.6/31"), NetAddr.ip("0.0.0.0")}]
+        }
+      ]
+
+    assert discover([NetAddr.ip("203.0.113.6/31")]) == expected_routers
   end
 end

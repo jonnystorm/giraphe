@@ -48,7 +48,7 @@ defmodule Giraphe.IO do
 
   def get_router(target) do
     if is_snmp_agent(target) do
-      routes = get_target_routes target
+      routes = get_target_routes(target)
       addresses =
         target
           |> get_target_addresses
@@ -108,7 +108,7 @@ defmodule Giraphe.IO do
   end
 
   def get_target_fdb(target) do
-    query :fdb, target, fn(_, _) -> [] end
+    query(:fdb, target, fn(_, _) -> [] end)
   end
 
   defp address_to_next_hop_self(address) do
@@ -118,15 +118,15 @@ defmodule Giraphe.IO do
   end
 
   def get_target_routes(target) do
-    Enum.sort query(:routes, target,
-      fn(t, _) ->
+    :routes
+      |> query(target, fn(t, _) ->
         [{NetAddr.first_address(t), address_to_next_hop_self(t)}]
-      end
-    )
+      end)
+      |> Enum.sort
   end
 
   def get_target_sysname(target) do
-    query :sysname, target, fn(t, _) -> NetAddr.address(t) end
+    query(:sysname, target, fn(t, _) -> NetAddr.address(t) end)
   end
 
   def ping_subnet(subnet) do

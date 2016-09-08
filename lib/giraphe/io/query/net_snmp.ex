@@ -189,11 +189,15 @@ defmodule Giraphe.IO.Query.NetSNMP do
     end
   end
   defp _query(:routes, target) do
-    with [%{} | _] = rows <- snmptable(ip_cidr_route_table_object, target)
-    do
-      Enum.map rows, fn row ->
-        {NetAddr.ip(row.dest, row.mask), NetAddr.ip(row.nexthop)}
-      end
+    case snmptable(ip_cidr_route_table_object, target) do
+      [%{} | _] = rows ->
+        Enum.map(rows, & {NetAddr.ip(&1.dest, &1.mask), NetAddr.ip(&1.nexthop)})
+
+      [] ->
+        [{:error, :enoent}]
+
+      [{:error, _}] = error ->
+        error
     end
   end
   defp _query(:sysname, target) do
