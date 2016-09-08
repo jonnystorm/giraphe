@@ -34,7 +34,7 @@ defimpl String.Chars, for: Giraphe.Router do
 
     routes =
       router.routes
-        |> Enum.map(fn {destination, next_hop} ->
+        |> Stream.map(fn {destination, next_hop} ->
           "#{destination} => #{next_hop}"
         end)
         |> Enum.join(",\n    ")

@@ -244,8 +244,94 @@ defmodule Giraphe.Graph.Dot.L2Test do
         }
       ]
 
-    assert graph_devices(switches, "1970-01-01 00:00:00Z", @template)
-      == File.read!("test/graph/dot/l2_graph1.dot")
+    assert graph_devices(switches, "1970-01-01 00:00:00Z", @template) ==
+      """
+      digraph G {
+        label="1970-01-01 00:00:00Z"
+
+        "192.0.2.3" [label="192.0.2.3" height=19.5];
+        "192.0.2.7" [label="192.0.2.7" height=19.0];
+        "192.0.2.10" [label="192.0.2.10" height=0.25];
+        "192.0.2.20" [label="192.0.2.20" height=0.25];
+        "192.0.2.30" [label="192.0.2.30" height=0.25];
+        "192.0.2.40" [label="192.0.2.40" height=0.25];
+        "192.0.2.50" [label="192.0.2.50" height=4.5];
+        "192.0.2.51" [label="192.0.2.51" height=0.25];
+        "192.0.2.52" [label="192.0.2.52" height=0.25];
+        "192.0.2.53" [label="192.0.2.53" height=0.25];
+        "192.0.2.54" [label="192.0.2.54" height=0.25];
+        "192.0.2.55" [label="192.0.2.55" height=2.0];
+        "192.0.2.56" [label="192.0.2.56" height=0.25];
+        "192.0.2.57" [label="192.0.2.57" height=0.25];
+        "192.0.2.58" [label="192.0.2.58" height=0.25];
+        "192.0.2.59" [label="192.0.2.59" height=0.25];
+        "192.0.2.60" [label="192.0.2.60" height=0.25];
+        "192.0.2.70" [label="192.0.2.70" height=0.25];
+        "192.0.2.80" [label="192.0.2.80" height=0.25];
+        "192.0.2.90" [label="192.0.2.90" height=0.25];
+        "192.0.2.100" [label="192.0.2.100" height=4.5];
+        "192.0.2.101" [label="192.0.2.101" height=0.25];
+        "192.0.2.102" [label="192.0.2.102" height=0.25];
+        "192.0.2.103" [label="192.0.2.103" height=0.25];
+        "192.0.2.104" [label="192.0.2.104" height=0.25];
+        "192.0.2.105" [label="192.0.2.105" height=0.25];
+        "192.0.2.106" [label="192.0.2.106" height=0.25];
+        "192.0.2.107" [label="192.0.2.107" height=0.25];
+        "192.0.2.108" [label="192.0.2.108" height=0.25];
+        "192.0.2.109" [label="192.0.2.109" height=0.25];
+        "192.0.2.110" [label="192.0.2.110" height=0.25];
+        "192.0.2.120" [label="192.0.2.120" height=0.25];
+        "192.0.2.130" [label="192.0.2.130" height=0.25];
+        "192.0.2.140" [label="192.0.2.140" height=0.25];
+        "192.0.2.150" [label="192.0.2.150" height=0.25];
+        "192.0.2.160" [label="192.0.2.160" height=0.25];
+        "192.0.2.170" [label="192.0.2.170" height=0.25];
+        "192.0.2.180" [label="192.0.2.180" height=0.25];
+        "192.0.2.190" [label="192.0.2.190" height=0.25];
+        "192.0.2.200" [label="192.0.2.200" height=0.25];
+
+        "192.0.2.3" -> "192.0.2.7" [taillabel="Gi1/1" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.10" [taillabel="Gi1/1" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.20" [taillabel="Gi1/2" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.30" [taillabel="Gi1/3" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.40" [taillabel="Gi1/4" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.50" [taillabel="Gi1/5" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.60" [taillabel="Gi1/6" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.70" [taillabel="Gi1/7" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.80" [taillabel="Gi1/8" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.90" [taillabel="Gi1/9" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.100" [taillabel="Gi1/10" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.110" [taillabel="Gi1/11" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.120" [taillabel="Gi1/12" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.130" [taillabel="Gi1/13" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.140" [taillabel="Gi1/14" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.150" [taillabel="Gi1/15" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.160" [taillabel="Gi1/16" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.170" [taillabel="Gi1/17" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.180" [taillabel="Gi1/18" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.190" [taillabel="Gi1/19" headlabel="Gi1/24"];
+        "192.0.2.7" -> "192.0.2.200" [taillabel="Gi1/20" headlabel="Gi1/24"];
+        "192.0.2.50" -> "192.0.2.51" [taillabel="Gi1/1" headlabel="Gi1/24"];
+        "192.0.2.50" -> "192.0.2.52" [taillabel="Gi1/2" headlabel="Gi1/24"];
+        "192.0.2.50" -> "192.0.2.53" [taillabel="Gi1/3" headlabel="Gi1/24"];
+        "192.0.2.50" -> "192.0.2.54" [taillabel="Gi1/4" headlabel="Gi1/24"];
+        "192.0.2.50" -> "192.0.2.55" [taillabel="Gi1/5" headlabel="Gi1/24"];
+        "192.0.2.55" -> "192.0.2.56" [taillabel="Gi1/1" headlabel="Gi1/24"];
+        "192.0.2.55" -> "192.0.2.57" [taillabel="Gi1/2" headlabel="Gi1/24"];
+        "192.0.2.55" -> "192.0.2.58" [taillabel="Gi1/3" headlabel="Gi1/24"];
+        "192.0.2.55" -> "192.0.2.59" [taillabel="Gi1/4" headlabel="Gi1/24"];
+        "192.0.2.100" -> "192.0.2.101" [taillabel="Gi1/1" headlabel="Gi1/24"];
+        "192.0.2.100" -> "192.0.2.102" [taillabel="Gi1/2" headlabel="Gi1/24"];
+        "192.0.2.100" -> "192.0.2.103" [taillabel="Gi1/3" headlabel="Gi1/24"];
+        "192.0.2.100" -> "192.0.2.104" [taillabel="Gi1/4" headlabel="Gi1/24"];
+        "192.0.2.100" -> "192.0.2.105" [taillabel="Gi1/5" headlabel="Gi1/24"];
+        "192.0.2.100" -> "192.0.2.106" [taillabel="Gi1/6" headlabel="Gi1/24"];
+        "192.0.2.100" -> "192.0.2.107" [taillabel="Gi1/7" headlabel="Gi1/24"];
+        "192.0.2.100" -> "192.0.2.108" [taillabel="Gi1/8" headlabel="Gi1/24"];
+        "192.0.2.100" -> "192.0.2.109" [taillabel="Gi1/9" headlabel="Gi1/24"];
+
+      }
+      """
   end
 
   test "Generates dot from different switches" do
@@ -310,7 +396,20 @@ defmodule Giraphe.Graph.Dot.L2Test do
         }
       ]
 
-    assert graph_devices(switches, "1970-01-01 00:00:00Z", @template)
-      == File.read!("test/graph/dot/l2_graph2.dot")
+    assert graph_devices(switches, "1970-01-01 00:00:00Z", @template) ==
+      """
+      digraph G {
+        label="1970-01-01 00:00:00Z"
+
+        "192.168.97.1" [label="AnSwitch" height=1.0];
+        "192.168.97.3" [label="AnOtherSwitch" height=0.25];
+        "192.168.97.4" [label="OneMoreSwitch" height=0.5];
+
+        "192.168.97.1" -> "192.168.97.3" [taillabel="Po5" headlabel="Po5"];
+        "192.168.97.1" -> "192.168.97.4" [taillabel="Po69" headlabel="Po3"];
+        "192.168.97.4" -> "192.168.97.1" [taillabel="Gi2/0/13" headlabel=""];
+
+      }
+      """
   end
 end

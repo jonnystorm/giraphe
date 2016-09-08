@@ -12,18 +12,18 @@ defmodule Giraphe.Graph.Dot.L3 do
 
   alias Giraphe.Utility
 
-  defp generate_dot(template, routers, subnets, edges, timestamp) do
+  defp generate_dot(template, routers, edges, incidences, timestamp) do
     EEx.eval_file(
       template,
-      [routers: routers, subnets: subnets, edges: edges, timestamp: timestamp]
+      [routers: routers, edges: edges, incidences: incidences, timestamp: timestamp]
     )
   end
 
-  defp group_edges_by_subnet(edges) do
-    Enum.group_by edges, &elem(&1, 1)
+  defp group_incidences_by_subnet(incidences) do
+    Enum.group_by incidences, &elem(&1, 1)
   end
 
-  defp find_edge_groups_with_at_least_two_edges(groups) do
+  defp find_incidence_groups_with_at_least_two_incidences(groups) do
     Enum.filter groups, fn {_, [_, _ | _]} -> true; _ -> false end
   end
 
@@ -35,30 +35,26 @@ defmodule Giraphe.Graph.Dot.L3 do
       |> Enum.dedup
   end
 
-  defp router_to_node(router) do
-    %{name: router.name, id: NetAddr.address(router.polladdr)}
-  end
-
   defp join_sorted(list, delimiter) do
     list
       |> Enum.sort
       |> Enum.join(delimiter)
   end
 
-  defp make_point_to_point_edge(router, router_node, next_hop, nil) do
+  defp make_point_to_point_incidence(router, router_node, next_hop, nil) do
     next_hop_router = %{name: "#{next_hop}", polladdr: next_hop}
     pseudonode = join_sorted([router.polladdr, next_hop_router.polladdr], ":")
-    next_hop_node = router_to_node(next_hop_router)
+    next_hop_node = next_hop_router.name
 
     [{router_node, pseudonode}, {next_hop_node, pseudonode}]
   end
-  defp make_point_to_point_edge(router, router_node, _next_hop, next_hop_router) do
+  defp make_point_to_point_incidence(router, router_node, _next_hop, next_hop_router) do
     pseudonode = join_sorted([router.polladdr, next_hop_router.polladdr], ":")
 
     [{router_node, pseudonode}]
   end
 
-  defp get_l3_edges(routers) do
+  defp get_l3_incidences(routers) do
     routers
       |> Map.values
       |> Enum.sort_by(& &1.polladdr)
@@ -66,23 +62,25 @@ defmodule Giraphe.Graph.Dot.L3 do
         router = Utility.trim_domain_from_device_sysname router
         router_node = router_to_node(router)
 
-        point_to_point_edges =
+        point_to_point_incidences =
           router.routes
             |> get_point_to_point_next_hops
             |> Enum.flat_map(fn nh ->
-              make_point_to_point_edge(router, router_node, nh, routers[nh])
+              make_point_to_point_incidence(router, router_node, nh, routers[nh])
             end)
 
         router_node
           |> List.duplicate(length router.addresses)
-          |> Enum.zip(router.addresses)
-          |> Enum.map(fn {r, s} -> {r, NetAddr.first_address(s)} end)
-          |> Enum.concat(point_to_point_edges)
+          |> Stream.zip(router.addresses)
+          |> Stream.map(fn {r, s} -> {r, NetAddr.first_address(s)} end)
+          |> Stream.dedup
+          |> Enum.concat(point_to_point_incidences)
       end)
-      |> group_edges_by_subnet
-      |> find_edge_groups_with_at_least_two_edges
-      |> Enum.flat_map(fn {_, edges} -> edges end)
+      |> group_incidences_by_subnet
+      |> find_incidence_groups_with_at_least_two_incidences
+      |> Enum.flat_map(fn {_, incidences} -> incidences end)
       |> Enum.sort
+      |> Enum.dedup
   end
 
   @doc """
@@ -96,42 +94,58 @@ defmodule Giraphe.Graph.Dot.L3 do
   Generate GraphViz dot from `routers` with timestamp.
   """
   def graph_devices(routers, timestamp, template) do
-    routers
-      |> Enum.map(& {&1.polladdr, &1})
-      |> Enum.into(%{})
-      |> get_l3_edges
-      |> graph_edges(timestamp, template)
+    incidences =
+      routers
+        |> Enum.map(& {&1.polladdr, &1})
+        |> Enum.into(%{})
+        |> get_l3_incidences
+
+    graph_routers_and_incidences(routers, incidences, timestamp, template)
   end
 
-  defp l3_edges_to_nodes(edges) do
-    edges
+  defp l3_incidences_to_nodes(incidences) do
+    incidences
       |> Enum.unzip
       |> Tuple.to_list
       |> Enum.map(&Enum.uniq/1)
       |> List.to_tuple
   end
 
-  defp graph_edges(edges, timestamp, template) do
-    {routers, subnets} = l3_edges_to_nodes edges
+  defp router_to_node(router) do
+    %{name: router.name, id: NetAddr.address(router.polladdr)}
+  end
 
-    subnets =
-      subnets
+  defp graph_routers_and_incidences(routers, incidences, timestamp, template) do
+    router_nodes =
+      routers
+        |> Enum.map(&router_to_node/1)
+        |> Enum.sort_by(& &1.id)
+
+    edge_nodes =
+      incidences
+        |> Stream.map(&elem(&1, 1))
         |> Enum.sort
         |> Enum.map(fn <<_::binary>> = s -> s; s -> NetAddr.prefix(s) end)
         |> Enum.dedup
 
-    edges = Enum.map edges, fn
-      {router, <<_::binary>> = subnet} ->
-        {router, subnet}
+    incidences = Enum.map incidences, fn
+      {router, <<_::binary>> = edge} ->
+        {router, edge}
 
-      {router, subnet} ->
-        {router, NetAddr.prefix(subnet)}
+      {router, edge} ->
+        {router, NetAddr.prefix(edge)}
     end
 
-    generate_dot template, routers, subnets, edges, timestamp
+    generate_dot template, router_nodes, edge_nodes, incidences, timestamp
   end
 
-  defp records_to_l3_edges(records) do
+  defp graph_incidences(incidences, timestamp, template) do
+    {routers, _} = l3_incidences_to_nodes(incidences)
+
+    graph_routers_and_incidences(routers, incidences, timestamp, template)
+  end
+
+  defp records_to_l3_incidences(records) do
     Stream.map records, fn [router, subnet | _] -> {router, subnet} end
   end
 
@@ -149,7 +163,7 @@ defmodule Giraphe.Graph.Dot.L3 do
   def generate_graph_from_file(path, template) do
     path
       |> get_record_stream
-      |> records_to_l3_edges
-      |> graph_edges("#{DateTime.utc_now}", template)
+      |> records_to_l3_incidences
+      |> graph_incidences("#{DateTime.utc_now}", template)
   end
 end

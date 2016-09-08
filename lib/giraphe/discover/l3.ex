@@ -67,6 +67,8 @@ defmodule Giraphe.Discover.L3 do
     Enum.reverse routers
   end
   defp _filter_new_routers([new_router | tail], routers) do
+    # TODO: Write tests that clearly express when this heuristic is required
+
     case get_best_router routers, new_router do
       {^new_router, nil} ->
         :ok = Logger.debug "No loop detected: '#{new_router.name}'."
@@ -154,13 +156,13 @@ defmodule Giraphe.Discover.L3 do
   @spec discover([NetAddr.t]) :: [Giraphe.Router.t]
 
   def discover([]) do
-    discover [get_default_gateway]
+    discover([get_default_gateway])
   end
   def discover(targets) do
     Utility.status "Seeding targets " <> Enum.join(targets, ", ")
 
     targets
       |> _discover([])
-      |> Enum.sort_by(&(&1.polladdr))
+      |> Enum.sort_by(& &1.polladdr)
   end
 end

@@ -6,6 +6,7 @@ graph G {
     fontname="sans bold"
     labelloc=t
     labeljust=left
+    outputorder=edgesfirst
   ];
 
   node [
@@ -20,9 +21,12 @@ graph G {
 
   edge [
     len=1
+    dir=both
+    arrowhead=inv
+    arrowtail=inv
     penwidth=4
     colorscheme=purples7
-    color=6
+    color="6;0.1 : 5;0.1 : 4;0.1 : 5;0.1 : 6;0.2 : 5;0.1 : 4;0.1 : 5;0.1 : 6;0.1"
     labelfontname="sans bold"
     labelfontsize=8
     labelfontcolor=7
@@ -41,9 +45,9 @@ end
   // Subnets
 
 <%=
-for s <- subnets do
+for e <- edges do
   """
-    "#{s}" [label="" shape=circle fillcolor=1 width=0.25];
+    "#{e}" [label="" shape=circle fillcolor=1 width=0.25];
   """
 end
 %>
@@ -51,9 +55,9 @@ end
   // Edges
 
 <%=
-for {r, s} <- edges do
+for {r, e} <- incidences do
   """
-    "#{r.id}" -- "#{s}";
+    "#{r.id}" -- "#{e}";
   """
 end
 %>

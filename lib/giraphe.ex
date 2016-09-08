@@ -17,7 +17,7 @@ defmodule Giraphe do
   end
 
   defp get_session_parameter(key) do
-    Agent.get __MODULE__, &Keyword.fetch!(&1, key)
+    Agent.get __MODULE__, &Keyword.get(&1, key)
   end
 
   defp set_session_parameter(key, value) do
@@ -82,6 +82,10 @@ defmodule Giraphe do
       set_session_parameter :output_file, Path.expand(path)
     end
 
+    if path = switches[:export_path] do
+      set_session_parameter :export_path, Path.expand(path)
+    end
+
     if switches[:info] do
       :ok = Logger.configure [level: :info]
     end
@@ -105,6 +109,7 @@ defmodule Giraphe do
           info: :boolean,
           debug: :boolean,
           output_file: :string,
+          export_path: :string,
           credentials: :string
         ],
         aliases: [
@@ -112,6 +117,7 @@ defmodule Giraphe do
            v: :info,
           vv: :debug,
            o: :output_file,
+           x: :export_path,
            c: :credentials
         ]
       )
@@ -136,13 +142,14 @@ defmodule Giraphe do
   defp usage do
     IO.puts(:stderr,
     """
-    Usage: giraphe [-qv] -c <credentials_path> -o <output_file>
+    Usage: giraphe [-qv] -c <credentials_path> -o <output_file> [-x <export_path>]
                    [-2 <gateway_ip> [<subnet_cidr>]] [-3 [<router_ip> ...]]
 
       -q: quiet
       -v: verbose ('-vv' is more verbose)
 
       -o: output file (must end in .png or .svg)
+      -x: export routes to the given directory (layer-3 topology, only)
 
       -c: Specify file containing credentials
         <credentials_path>: path to file containing credentials
@@ -169,6 +176,29 @@ defmodule Giraphe do
     usage
 
     System.halt 1
+  end
+
+  defp routes_to_string(routes) do
+    routes
+      |> Stream.map(fn {destination, next_hop} ->
+        "#{destination} => #{NetAddr.address(next_hop)}"
+      end)
+      |> Enum.join("\n")
+  end
+
+  defp export_routes(routers, export_path) do
+    Enum.map(routers, fn router ->
+      path = Path.join([export_path, "#{router.name}.txt"])
+
+      with {:error, error} <- File.write(path, routes_to_string(router.routes))
+      do
+        Logger.error "Failed to export '#{router.routes}'"
+
+        raise "Unable to export routes to '#{path}': #{inspect error}"
+      end
+
+      router
+    end)
   end
 
   def main(argv) do
@@ -199,11 +229,13 @@ defmodule Giraphe do
 
       ["-3" | target_strings] ->
         output_file = get_session_parameter :output_file
+        export_path = get_session_parameter :export_path
 
         target_strings
           |> parse_ip_args
           |> Enum.filter(&Utility.is_host_address/1)
           |> Discover.discover_l3
+          |> export_routes(export_path)
           |> Graph.graph_routers
           |> Render.render_graph(output_file)
 

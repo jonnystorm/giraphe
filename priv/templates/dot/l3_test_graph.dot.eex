@@ -1,0 +1,25 @@
+graph G {
+  label="<%= timestamp %>"
+
+<%=
+for r <- routers do
+  """
+    "#{r.id}" [label="#{r.name}"];
+  """
+end
+%>
+<%=
+for e <- edges do
+  """
+    "#{e}";
+  """
+end
+%>
+<%=
+for {r, e} <- incidences do
+  """
+    "#{r.id}" -- "#{e}";
+  """
+end
+%>
+}
