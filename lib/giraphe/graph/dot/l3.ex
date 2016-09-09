@@ -60,7 +60,29 @@ defmodule Giraphe.Graph.Dot.L3 do
     _make_point_to_point_incidence(router, next_hop, false)
   end
 
+  defp router_is_not_an_island?(router) do
+    Utility.find_non_connected_routes(router.routes) != []
+  end
+
+  defp address_is_a_known_next_hop?(next_hops, address) do
+    Map.has_key?(next_hops, NetAddr.address(address))
+  end
+
+  defp router_has_connected_route_for_address?(router, address) do
+    router.routes
+      |> Enum.reverse
+      |> Utility.find_route_containing_address(address)
+      |> Utility.is_connected_route
+  end
+
   defp get_l3_incidences(routers) do
+    next_hops =
+      routers
+        |> Map.values
+        |> Enum.flat_map(& &1.routes)
+        |> Enum.map(& {NetAddr.address(elem(&1, 1)), nil})
+        |> Enum.into(%{})
+
     routers
       |> Map.values
       |> Enum.sort_by(& &1.polladdr)
@@ -73,10 +95,10 @@ defmodule Giraphe.Graph.Dot.L3 do
             end)
 
         addresses = Enum.filter(router.addresses, fn a ->
-          router.routes
-            |> Enum.reverse
-            |> Utility.find_route_containing_address(a)
-            |> Utility.is_connected_route
+          router_has_connected_route_for_address?(router, a)
+            && ( router_is_not_an_island?(router)
+                   || address_is_a_known_next_hop?(next_hops, a)
+               )
         end)
 
         router.polladdr

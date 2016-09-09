@@ -32,6 +32,10 @@ defmodule Giraphe.Utility do
     end)
   end
 
+  def find_non_connected_routes(routes) do
+    Enum.filter(routes, & !is_connected_route(&1))
+  end
+
   def get_destinations_from_routes(routes) do
     routes
       |> unzip_and_get_elem(0)
