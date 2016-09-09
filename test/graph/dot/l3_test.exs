@@ -16,31 +16,46 @@ defmodule Giraphe.Graph.Dot.L3Test do
       [ %Giraphe.Router{name: "192.0.2.3", polladdr: NetAddr.ip("192.0.2.3"),
           addresses: [
             NetAddr.ip("192.0.2.3/31"),
-            NetAddr.ip("192.0.2.8/31")
+            NetAddr.ip("192.0.2.8/31"),
           ],
-          routes: []
+          routes: [
+            {NetAddr.ip("192.0.2.2/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("192.0.2.8/31"), NetAddr.ip("0.0.0.0")},
+          ],
         },
         %Giraphe.Router{name: "192.0.2.7", polladdr: NetAddr.ip("192.0.2.7"),
           addresses: [
             NetAddr.ip("192.0.2.7/31"),
             NetAddr.ip("192.0.2.10/31"),
             NetAddr.ip("198.51.100.25/29"),
-            NetAddr.ip("198.51.100.33/29")
+            NetAddr.ip("198.51.100.33/29"),
           ],
-          routes: []
+          routes: [
+            {NetAddr.ip("192.0.2.6/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("192.0.2.10/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("198.51.100.24/29"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("198.51.100.32/29"), NetAddr.ip("0.0.0.0")},
+          ],
         },
         %Giraphe.Router{name: "192.0.2.9", polladdr: NetAddr.ip("192.0.2.9"),
           addresses: [
-            NetAddr.ip("192.0.2.13/30"),
+            NetAddr.ip("192.0.2.5/31"),
             NetAddr.ip("192.0.2.9/31"),
-            NetAddr.ip("192.0.2.10/31"),
-            NetAddr.ip("192.0.2.5/31")
+            NetAddr.ip("192.0.2.11/31"),
+            NetAddr.ip("192.0.2.13/30"),
           ],
-          routes: []
+          routes: [
+            {NetAddr.ip("192.0.2.4/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("192.0.2.8/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("192.0.2.10/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("192.0.2.12/30"), NetAddr.ip("0.0.0.0")},
+          ],
         },
         %Giraphe.Router{name: "192.0.2.14", polladdr: NetAddr.ip("192.0.2.14"),
           addresses: [NetAddr.ip("192.0.2.14/30")],
-          routes: []
+          routes: [
+            {NetAddr.ip("192.0.2.14/30"), NetAddr.ip("0.0.0.0")},
+          ],
         },
         %Giraphe.Router{name: "198.51.100.1", polladdr: NetAddr.ip("198.51.100.1"),
           addresses: [
@@ -49,9 +64,17 @@ defmodule Giraphe.Graph.Dot.L3Test do
             NetAddr.ip("192.0.2.6/31"),
             NetAddr.ip("198.51.100.1/29"),
             NetAddr.ip("198.51.100.9/29"),
-            NetAddr.ip("198.51.100.17/29")
+            NetAddr.ip("198.51.100.17/29"),
           ],
-          routes: []
+          routes: [
+            {NetAddr.ip("192.0.2.2/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("192.0.2.4/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("192.0.2.6/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("192.0.2.10/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("198.51.100.0/29"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("198.51.100.8/29"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("198.51.100.16/29"), NetAddr.ip("0.0.0.0")},
+          ],
         }
       ]
 
@@ -106,8 +129,8 @@ defmodule Giraphe.Graph.Dot.L3Test do
             %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}
           ],
           routes: [
-            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<192, 0, 2, 2>>, length: 32}},
-            {%NetAddr.IPv4{address: <<192, 0, 2, 2>>, length: 31}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
+            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0},       %NetAddr.IPv4{address: <<192, 0, 2, 2>>, length: 32}},
+            {%NetAddr.IPv4{address: <<192, 0, 2, 2>>, length: 31},    %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
             {%NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
             {%NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}},
             {%NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}},
@@ -119,7 +142,7 @@ defmodule Giraphe.Graph.Dot.L3Test do
         %Giraphe.Router{name: "R2", polladdr: %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32},
           addresses: [%NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}],
           routes: [
-            {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0}, %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}},
+           {%NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0},       %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}},
            {%NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}},
            {%NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32}, %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}},
            {%NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32}, %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}},
@@ -210,7 +233,8 @@ defmodule Giraphe.Graph.Dot.L3Test do
   do
     routers =
       [ %Giraphe.Router{name: "192.0.2.1", polladdr: NetAddr.ip("192.0.2.1/24"),
-          addresses: [NetAddr.ip("192.0.2.1/24"), NetAddr.ip("192.0.2.2/24")], routes: []
+          addresses: [NetAddr.ip("192.0.2.1/24"), NetAddr.ip("192.0.2.2/24")],
+          routes: [{NetAddr.ip("192.0.2.0/24"), NetAddr.ip("0.0.0.0")}]
         }
       ]
 
@@ -246,6 +270,68 @@ defmodule Giraphe.Graph.Dot.L3Test do
         "192.0.2.1" [label="R1"];
 
 
+
+      }
+      """
+  end
+
+  test "(VRF) Addresses without corresponding connected routes do not induce incidences" do
+    routers =
+      [ %Giraphe.Router{name: "192.0.2.1", polladdr: NetAddr.ip("192.0.2.1/24"),
+          addresses: [NetAddr.ip("192.0.2.1/24"), NetAddr.ip("198.51.100.2/31")],
+          routes: [
+            {NetAddr.ip("192.0.2.0/24"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("198.51.100.2/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("198.51.100.4/31"), NetAddr.ip("198.51.100.3")},
+            {NetAddr.ip("203.0.113.0/24"), NetAddr.ip("198.51.100.3")},
+          ]
+        },
+        %Giraphe.Router{name: "198.51.100.3", polladdr: NetAddr.ip("198.51.100.3/31"),
+          addresses: [NetAddr.ip("198.51.100.3/31")],
+          routes: [
+            {NetAddr.ip("198.51.100.2/31"), NetAddr.ip("0.0.0.0")},
+          ]
+        },
+        %Giraphe.Router{name: "198.51.100.4", polladdr: NetAddr.ip("198.51.100.4/31"),
+          addresses: [NetAddr.ip("198.51.100.4/31")],
+          routes: [
+            {NetAddr.ip("198.51.100.4/31"), NetAddr.ip("0.0.0.0")},
+          ]
+        },
+        %Giraphe.Router{name: "198.51.100.5", polladdr: NetAddr.ip("198.51.100.5/31"),
+          addresses: [
+            NetAddr.ip("192.0.2.0/24"),
+            NetAddr.ip("198.51.100.4/31"),
+            NetAddr.ip("203.0.113.1/24"),
+          ],
+          routes: [
+            {NetAddr.ip("192.0.2.0/24"), NetAddr.ip("198.51.100.4")},
+            {NetAddr.ip("198.51.100.2/31"), NetAddr.ip("198.51.100.4")},
+            {NetAddr.ip("198.51.100.4/31"), NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("203.0.113.0/24"), NetAddr.ip("0.0.0.0")},
+          ]
+        }
+      ]
+
+    timestamp = "1970-01-01 00:00:00Z"
+
+    assert graph_devices(routers, timestamp, @template) ==
+      """
+      graph G {
+        label="#{timestamp}"
+
+        "192.0.2.1" [label="192.0.2.1"];
+        "198.51.100.3" [label="198.51.100.3"];
+        "198.51.100.4" [label="198.51.100.4"];
+        "198.51.100.5" [label="198.51.100.5"];
+
+        "198.51.100.2/31";
+        "198.51.100.4/31";
+
+        "192.0.2.1" -- "198.51.100.2/31";
+        "198.51.100.3" -- "198.51.100.2/31";
+        "198.51.100.4" -- "198.51.100.4/31";
+        "198.51.100.5" -- "198.51.100.4/31";
 
       }
       """

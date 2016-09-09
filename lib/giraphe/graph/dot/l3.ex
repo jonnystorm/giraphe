@@ -72,9 +72,13 @@ defmodule Giraphe.Graph.Dot.L3 do
               make_point_to_point_incidence(router, nh, routers[nh])
             end)
 
+        addresses = Enum.filter(router.addresses, fn a ->
+          Utility.find_connected_route_containing_address(router.routes, a)
+        end)
+
         router.polladdr
-          |> List.duplicate(length router.addresses)
-          |> Stream.zip(router.addresses)
+          |> List.duplicate(length addresses)
+          |> Stream.zip(addresses)
           |> Stream.map(fn {r, s} -> {r, NetAddr.first_address(s)} end)
           |> Stream.dedup
           |> Stream.concat(point_to_point_incidences)
@@ -134,13 +138,13 @@ defmodule Giraphe.Graph.Dot.L3 do
         |> Enum.map(fn <<_::binary>> = s -> s; s -> NetAddr.prefix(s) end)
         |> Enum.dedup
 
-    incidences = Enum.map incidences, fn
+    incidences = Enum.map(incidences, fn
       {router, <<_::binary>> = edge} ->
         {router, edge}
 
       {router, edge} ->
         {router, NetAddr.prefix(edge)}
-    end
+    end)
 
     generate_dot template, router_nodes, edge_nodes, incidences, timestamp
   end

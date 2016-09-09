@@ -48,6 +48,7 @@ defmodule Giraphe.IO.Query.Dummy do
   defp _query_addresses("203.0.113.3"), do: ["203.0.113.3/32"]
   defp _query_addresses("203.0.113.4"), do: ["203.0.113.4/32"]
   defp _query_addresses("203.0.113.5"), do: ["203.0.113.5/32"]
+  defp _query_addresses("203.0.113.7"), do: ["203.0.113.7/31", "203.0.113.8/31"]
   defp _query_addresses(_target) do
     []
   end

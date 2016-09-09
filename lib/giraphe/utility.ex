@@ -19,11 +19,17 @@ defmodule Giraphe.Utility do
   end
 
   def find_prefix_containing_address(prefixes, address) do
-    Enum.find prefixes, &NetAddr.contains?(&1, address)
+    Enum.find(prefixes, &NetAddr.contains?(&1, address))
   end
 
   def find_route_containing_address(routes, address) do
-    Enum.find routes, fn {dest, _} -> NetAddr.contains?(dest, address) end
+    Enum.find(routes, fn {dest, _} -> NetAddr.contains?(dest, address) end)
+  end
+
+  def find_connected_route_containing_address(routes, address) do
+    Enum.find(routes, fn {dest, next_hop} ->
+        NetAddr.contains?(dest, address) && next_hop_is_self(next_hop)
+    end)
   end
 
   def get_destinations_from_routes(routes) do

@@ -54,6 +54,17 @@ defmodule Giraphe.IO do
           |> get_target_addresses
           |> find_addresses_with_matching_connected_routes(routes)
 
+      routes =
+        case routes do
+          [] ->
+            Enum.map(addresses, fn a ->
+              {NetAddr.first_address(a), address_to_next_hop_self(a)}
+            end)
+
+          routes ->
+            routes
+        end
+
       polladdr = Utility.refine_address_length target, addresses, routes
 
       %Giraphe.Router{
@@ -119,9 +130,7 @@ defmodule Giraphe.IO do
 
   def get_target_routes(target) do
     :routes
-      |> query(target, fn(t, _) ->
-        [{NetAddr.first_address(t), address_to_next_hop_self(t)}]
-      end)
+      |> query(target, fn(_, _) -> [] end)
       |> Enum.sort
   end
 
