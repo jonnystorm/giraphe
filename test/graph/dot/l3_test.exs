@@ -275,7 +275,7 @@ defmodule Giraphe.Graph.Dot.L3Test do
       """
   end
 
-  test "(VRF) Addresses without corresponding connected routes do not induce incidences" do
+  test "(VRF) Addresses without corresponding non-summary connected routes do not induce incidences" do
     routers =
       [ %Giraphe.Router{name: "192.0.2.1", polladdr: NetAddr.ip("192.0.2.1/24"),
           addresses: [NetAddr.ip("192.0.2.1/24"), NetAddr.ip("198.51.100.2/31")],
@@ -305,6 +305,7 @@ defmodule Giraphe.Graph.Dot.L3Test do
             NetAddr.ip("203.0.113.1/24"),
           ],
           routes: [
+            {NetAddr.ip("192.0.0.0/8"), NetAddr.ip("0.0.0.0")},
             {NetAddr.ip("192.0.2.0/24"), NetAddr.ip("198.51.100.4")},
             {NetAddr.ip("198.51.100.2/31"), NetAddr.ip("198.51.100.4")},
             {NetAddr.ip("198.51.100.4/31"), NetAddr.ip("0.0.0.0")},

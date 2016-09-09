@@ -47,6 +47,11 @@ defmodule Giraphe.Utility do
       |> Enum.dedup
   end
 
+  def is_connected_route({_destination, next_hop}) do
+    next_hop_is_self(next_hop)
+  end
+  def is_connected_route(_), do: false
+
   def is_host_address(%{} = address) do
     NetAddr.first_address(address) == NetAddr.last_address(address)
   end

@@ -73,7 +73,10 @@ defmodule Giraphe.Graph.Dot.L3 do
             end)
 
         addresses = Enum.filter(router.addresses, fn a ->
-          Utility.find_connected_route_containing_address(router.routes, a)
+          router.routes
+            |> Enum.reverse
+            |> Utility.find_route_containing_address(a)
+            |> Utility.is_connected_route
         end)
 
         router.polladdr
