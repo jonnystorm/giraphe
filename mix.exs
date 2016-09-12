@@ -3,7 +3,7 @@ defmodule Giraphe.Mixfile do
 
   def project do
     [ app: :giraphe,
-      version: "0.0.27",
+      version: "0.0.28",
       name: "giraphe",
       source_url: "https://github.com/jonnystorm/giraphe",
       elixir: "~> 1.3",
