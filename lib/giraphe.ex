@@ -186,6 +186,7 @@ defmodule Giraphe do
       |> Enum.join("\n")
   end
 
+  defp export_routes(routers, nil), do: routers
   defp export_routes(routers, export_path) do
     Enum.map(routers, fn router ->
       path = Path.join([export_path, "#{router.name}.txt"])
