@@ -12,6 +12,8 @@ defmodule Giraphe.Graph.Dot.L2 do
 
   alias Giraphe.Utility
 
+  require Logger
+
   defp generate_dot(template, switches, edges, timestamp) do
     EEx.eval_file(
       template,
@@ -122,11 +124,19 @@ defmodule Giraphe.Graph.Dot.L2 do
           |> Utility.trim_domain_from_device_sysname
       end
 
-    edges =
-      switches
-        |> get_l2_edges
-        |> sort_l2_edges_by_upstream_polladdr_and_downlink
+    try do
+      edges =
+        switches
+          |> get_l2_edges
+          |> sort_l2_edges_by_upstream_polladdr_and_downlink
 
-    generate_dot template, switches, edges, timestamp
+      generate_dot template, switches, edges, timestamp
+
+    rescue
+      _ in Enum.EmptyError ->
+        :ok = Logger.error("No switch edges found")
+
+        ""
+    end
   end
 end

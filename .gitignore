@@ -2,6 +2,7 @@
 /cover
 /deps
 /doc
+/tmpdoc
 erl_crash.dump
 *.ez
 *~
