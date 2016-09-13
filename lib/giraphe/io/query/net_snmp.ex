@@ -82,7 +82,12 @@ defmodule Giraphe.IO.Query.NetSNMP do
   defp get_fdb_by_vlan_id(target, vlan_id) when is_integer vlan_id do
     context = vlan_id_to_context vlan_id
 
-    case snmptable dot1d_tp_fdb_table_object, target, context do
+    case snmptable(dot1d_tp_fdb_table_object, target, context)do
+      [] ->
+        :ok = Logger.info "No FDB entries for VLAN #{vlan_id} on '#{target}'."
+
+        []
+
       [{:error, reason} | _] = error ->
         :ok = Logger.debug "Unable to query FDB for '#{target}' on VLAN '#{inspect vlan_id}': #{reason}."
 
@@ -98,7 +103,12 @@ defmodule Giraphe.IO.Query.NetSNMP do
   defp get_port_mappings_by_vlan_id(target, vlan_id) when is_integer vlan_id do
     context = vlan_id_to_context vlan_id
 
-    case snmptable dot1d_base_port_table_object, target, context do
+    case snmptable(dot1d_base_port_table_object, target, context) do
+      [] ->
+        :ok = Logger.info "No port mappings for VLAN #{vlan_id} on '#{target}'."
+
+        []
+
       [{:error, reason} | _] = error ->
         :ok = Logger.debug "Unable to query dot1dBasePortTable for '#{target}' on VLAN '#{inspect vlan_id}': #{reason}."
 
@@ -217,6 +227,10 @@ defmodule Giraphe.IO.Query.NetSNMP do
         {:error, target, object, reason}
 
       result ->
+        if result == [] do
+          :ok = Logger.warn("Got empty result for object #{object} on target #{target}")
+        end
+
         {:ok, target, object, result}
     end
   end
