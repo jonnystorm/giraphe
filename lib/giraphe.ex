@@ -193,7 +193,7 @@ defmodule Giraphe do
 
       with {:error, error} <- File.write(path, routes_to_string(router.routes))
       do
-        Logger.error "Failed to export '#{router.routes}'"
+        Logger.error "Failed to export '#{inspect router.routes}'"
 
         raise "Unable to export routes to '#{path}': #{inspect error}"
       end

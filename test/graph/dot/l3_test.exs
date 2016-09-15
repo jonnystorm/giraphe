@@ -343,7 +343,7 @@ defmodule Giraphe.Graph.Dot.L3Test do
       """
   end
 
-  test "Router addresses for which no other router has next-hops do not induce incidences" do
+  test "Router address that is not a next-hop for other routers does not induce incidences" do
     routers =
       [ %Giraphe.Router{name: "192.0.2.1", polladdr: NetAddr.ip("192.0.2.1/24"),
           addresses: [NetAddr.ip("192.0.2.1/24")],
