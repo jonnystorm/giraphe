@@ -77,6 +77,7 @@ defmodule Giraphe.Utility do
     not next_hop_is_self address
   end
 
+  defp _lookup_route_recursive([], _address), do: nil
   defp _lookup_route_recursive(routes, address) do
     with {dest, next_hop} <- find_route_containing_address(routes, address)
     do
@@ -84,12 +85,14 @@ defmodule Giraphe.Utility do
         dest
 
       else
-        _lookup_route_recursive routes, next_hop
+        routes
+          |> Enum.filter(& &1 != {dest, next_hop})
+          |> _lookup_route_recursive(next_hop)
       end
     end
   end
 
-  defp lookup_route_recursive(routes, address) do
+  def lookup_route_recursive(routes, address) do
     routes
       |> Enum.sort
       |> Enum.reverse

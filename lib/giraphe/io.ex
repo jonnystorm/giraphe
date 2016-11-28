@@ -49,20 +49,23 @@ defmodule Giraphe.IO do
   def get_router(target) do
     if is_snmp_agent(target) do
       routes = get_target_routes(target)
+      addresses = get_target_addresses(target)
+
+      # Nexus can have routes that don't correspond to addresses
       addresses =
-        target
-          |> get_target_addresses
-          |> find_addresses_with_matching_connected_routes(routes)
+        if length(routes) <= length(addresses) do
+          addresses
+        else
+          find_addresses_with_matching_connected_routes(addresses, routes)
+        end
 
       routes =
-        case routes do
-          [] ->
-            Enum.map(addresses, fn a ->
-              {NetAddr.first_address(a), address_to_next_hop_self(a)}
-            end)
-
-          routes ->
-            routes
+        if length(routes) <= length(addresses) do
+          Enum.map(addresses, fn a ->
+            {NetAddr.first_address(a), address_to_next_hop_self(a)}
+          end)
+        else
+          routes
         end
 
       polladdr = Utility.refine_address_length target, addresses, routes

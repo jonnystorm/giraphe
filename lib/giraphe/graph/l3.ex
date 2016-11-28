@@ -1,23 +1,14 @@
-# copyright © 2016 jonathan storm <the.jonathan.storm@gmail.com>
+# Copyright © 2016 Jonathan Storm <the.jonathan.storm@gmail.com>
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.Graph.Dot.L3 do
+defmodule Giraphe.Graph.L3 do
   @moduledoc """
-  A grapher implementation for GraphViz dot.
+  A Layer 3 grapher implementation.
   """
 
-  @behaviour Giraphe.Graph
-
   alias Giraphe.Utility
-
-  defp generate_dot(template, routers, edges, incidences, timestamp) do
-    EEx.eval_file(
-      template,
-      [routers: routers, edges: edges, incidences: incidences, timestamp: timestamp]
-    )
-  end
 
   defp group_incidences_by_subnet(incidences) do
     Enum.group_by incidences, &elem(&1, 1)
@@ -47,7 +38,6 @@ defmodule Giraphe.Graph.Dot.L3 do
 
     if make_nh_incidence? do
       [{next_hop, pseudonode} | pseudoincidences]
-
     else
       pseudoincidences
     end
@@ -96,9 +86,9 @@ defmodule Giraphe.Graph.Dot.L3 do
 
         addresses = Enum.filter(router.addresses, fn a ->
           router_has_connected_route_for_address?(router, a)
-            && ( router_is_not_an_island?(router)
-                   || address_is_a_known_next_hop?(next_hops, a)
-               )
+          && ( router_is_not_an_island?(router)
+               || address_is_a_known_next_hop?(next_hops, a)
+             )
         end)
 
         router.polladdr
@@ -116,89 +106,19 @@ defmodule Giraphe.Graph.Dot.L3 do
       |> Enum.dedup
   end
 
-  @doc """
-  Generate GraphViz dot from `routers`.
-  """
-  def graph_devices(routers, template) do
-    graph_devices routers, "#{DateTime.utc_now}", template
+  def graph_devices(routers, timestamp, template_path) do
+    incidences = abduce_incidences(routers)
+
+    Giraphe.evaluate_l3_template(incidences, routers, template_path, timestamp)
   end
 
   @doc """
-  Generate GraphViz dot from `routers` with timestamp.
+  Generate abstract graph representation from `routers`.
   """
-  def graph_devices(routers, timestamp, template) do
-    incidences =
-      routers
-        |> Enum.map(& {&1.polladdr, &1})
-        |> Enum.into(%{})
-        |> get_l3_incidences
-
-    graph_routers_and_incidences(routers, incidences, timestamp, template)
-  end
-
-  defp l3_incidences_to_nodes(incidences) do
-    incidences
-      |> Enum.unzip
-      |> Tuple.to_list
-      |> Enum.map(&Enum.uniq/1)
-      |> List.to_tuple
-  end
-
-  defp router_to_node(router) do
-    %{name: name} = Utility.trim_domain_from_device_sysname router
-
-    %{name: name, id: NetAddr.address(router.polladdr)}
-  end
-
-  defp graph_routers_and_incidences(routers, incidences, timestamp, template) do
-    router_nodes =
-      routers
-        |> Enum.map(&router_to_node/1)
-        |> Enum.sort_by(& &1.id)
-
-    edge_nodes =
-      incidences
-        |> Stream.map(&elem(&1, 1))
-        |> Enum.sort
-        |> Enum.map(fn <<_::binary>> = s -> s; s -> NetAddr.prefix(s) end)
-        |> Enum.dedup
-
-    incidences = Enum.map(incidences, fn
-      {router, <<_::binary>> = edge} ->
-        {router, edge}
-
-      {router, edge} ->
-        {router, NetAddr.prefix(edge)}
-    end)
-
-    generate_dot template, router_nodes, edge_nodes, incidences, timestamp
-  end
-
-  defp graph_incidences(incidences, timestamp, template) do
-    {routers, _} = l3_incidences_to_nodes(incidences)
-
-    graph_routers_and_incidences(routers, incidences, timestamp, template)
-  end
-
-  defp records_to_l3_incidences(records) do
-    Stream.map records, fn [router, subnet | _] -> {router, subnet} end
-  end
-
-  defp get_record_stream(path) do
-    path
-      |> Path.expand
-      |> File.stream!
-      |> Stream.map(&String.trim/1)
-      |> Stream.map(&String.split/1)
-  end
-
-  @doc """
-  Generate GraphViz dot from the file at `path`.
-  """
-  def generate_graph_from_file(path, template) do
-    path
-      |> get_record_stream
-      |> records_to_l3_incidences
-      |> graph_incidences("#{DateTime.utc_now}", template)
+  def abduce_incidences(routers) do
+    routers
+      |> Enum.map(& {&1.polladdr, &1})
+      |> Enum.into(%{})
+      |> get_l3_incidences
   end
 end

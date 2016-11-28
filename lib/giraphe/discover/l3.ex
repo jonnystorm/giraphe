@@ -71,25 +71,25 @@ defmodule Giraphe.Discover.L3 do
 
     case get_best_router routers, new_router do
       {^new_router, nil} ->
-        :ok = Logger.debug "No loop detected: '#{new_router.name}'."
+        :ok = Logger.debug("No loop detected: '#{new_router.name}'.")
 
         _filter_new_routers tail, [new_router | routers]
 
       {^new_router, old_router} ->
-        :ok = Logger.info "Loop: new '#{new_router.name}' usurps '#{old_router.name}'."
+        :ok = Logger.info("Loop: new '#{new_router.name}' usurps '#{old_router.name}'.")
 
         routers = [new_router | Enum.filter(routers, &(&1 != old_router))]
 
         _filter_new_routers tail, routers
 
       {old_router, new_router} ->
-        :ok = Logger.info "Loop: incumbent '#{old_router.name}' defeats '#{new_router.name}'."
+        :ok = Logger.info("Loop: incumbent '#{old_router.name}' defeats '#{new_router.name}'.")
 
-        _filter_new_routers tail, routers
+        _filter_new_routers(tail, routers)
     end
   end
   defp filter_new_routers(new_routers) do
-    _filter_new_routers new_routers, []
+    _filter_new_routers(new_routers, [])
   end
 
   defp _get_next_targets_from_routers(routers) do
@@ -97,7 +97,7 @@ defmodule Giraphe.Discover.L3 do
         next_hop <- Utility.get_next_hops_from_routes(router.routes),
         Utility.next_hop_is_not_self(next_hop)
     do
-      Utility.refine_address_length next_hop, router.addresses, router.routes
+      Utility.refine_address_length(next_hop, router.addresses, router.routes)
     end
   end
 

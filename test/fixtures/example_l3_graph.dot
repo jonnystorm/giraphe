@@ -51,7 +51,7 @@ graph G {
   "192.0.2.12/30" [label="" shape=circle fillcolor=1 width=0.25];
 
 
-  // Edges
+  // Incidences
 
   "192.0.2.14" -- "192.0.2.12/30";
   "192.0.2.3" -- "192.0.2.2/31";

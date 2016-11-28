@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <graph id="G" edgedefault="undirected">
+
+    <!-- Generated at 1970-01-01 00:00:00Z -->
+
+    <!-- Routers -->
+
+    <node id="n192.0.2.14">
+      <desc>192.0.2.14</desc>
+    </node>
+    <node id="n192.0.2.3">
+      <desc>192.0.2.3</desc>
+    </node>
+    <node id="n192.0.2.7">
+      <desc>192.0.2.7</desc>
+    </node>
+    <node id="n192.0.2.9">
+      <desc>192.0.2.9</desc>
+    </node>
+    <node id="n198.51.100.1">
+      <desc>198.51.100.1</desc>
+    </node>
+
+
+    <!-- Subnets -->
+
+    <node id="n192.0.2.2_31">
+      <desc>192.0.2.2/31</desc>
+    </node>
+    <node id="n192.0.2.4_31">
+      <desc>192.0.2.4/31</desc>
+    </node>
+    <node id="n192.0.2.6_31">
+      <desc>192.0.2.6/31</desc>
+    </node>
+    <node id="n192.0.2.8_31">
+      <desc>192.0.2.8/31</desc>
+    </node>
+    <node id="n192.0.2.10_31">
+      <desc>192.0.2.10/31</desc>
+    </node>
+    <node id="n192.0.2.12_30">
+      <desc>192.0.2.12/30</desc>
+    </node>
+
+
+    <!-- Incidences -->
+
+    <edge source="n192.0.2.14" target="n192.0.2.12_30"/>
+    <edge source="n192.0.2.3" target="n192.0.2.2_31"/>
+    <edge source="n192.0.2.3" target="n192.0.2.8_31"/>
+    <edge source="n192.0.2.7" target="n192.0.2.6_31"/>
+    <edge source="n192.0.2.7" target="n192.0.2.10_31"/>
+    <edge source="n192.0.2.9" target="n192.0.2.4_31"/>
+    <edge source="n192.0.2.9" target="n192.0.2.8_31"/>
+    <edge source="n192.0.2.9" target="n192.0.2.10_31"/>
+    <edge source="n192.0.2.9" target="n192.0.2.12_30"/>
+    <edge source="n198.51.100.1" target="n192.0.2.2_31"/>
+    <edge source="n198.51.100.1" target="n192.0.2.4_31"/>
+    <edge source="n198.51.100.1" target="n192.0.2.6_31"/>
+
+  </graph>
+</graphml>

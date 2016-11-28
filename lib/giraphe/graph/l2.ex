@@ -3,9 +3,9 @@
 # terms of the Do What The Fuck You Want To Public License, Version 2,
 # as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
 
-defmodule Giraphe.Graph.Dot.L2 do
+defmodule Giraphe.Graph.L2 do
   @moduledoc """
-  A grapher implementation for GraphViz dot.
+  A Layer 2 grapher implementation.
   """
 
   @behaviour Giraphe.Graph
@@ -13,13 +13,6 @@ defmodule Giraphe.Graph.Dot.L2 do
   alias Giraphe.Utility
 
   require Logger
-
-  defp generate_dot(template, switches, edges, timestamp) do
-    EEx.eval_file(
-      template,
-      [switches: switches, edges: edges, timestamp: timestamp]
-    )
-  end
 
   defp max_string_length(strings) do
     strings
@@ -40,25 +33,25 @@ defmodule Giraphe.Graph.Dot.L2 do
         |> Enum.into(%{})
 
     ipv6_string = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
-    max_polladdr_len = String.length ipv6_string
-    max_downlink_len = max_string_length Map.values(downlinks)
+    max_polladdr_len = String.length(ipv6_string)
+    max_downlink_len = max_string_length(Map.values(downlinks))
 
     lengths = [max_polladdr_len, max_downlink_len]
 
-    Enum.sort_by edges, fn({_, upstream_switch} = edge) ->
+    Enum.sort_by(edges, fn({_, upstream_switch} = edge) ->
       downlink = downlinks[edge]
-      upstream_polladdr = NetAddr.address upstream_switch.polladdr
+      upstream_polladdr = NetAddr.address(upstream_switch.polladdr)
 
       pad_and_concat [upstream_polladdr, downlink], lengths
-    end
+    end)
   end
 
   defp get_downlink_from_edge({downstream_switch, upstream_switch}) do
-    get_fdb_port_by_physaddr upstream_switch.fdb, downstream_switch.physaddr
+    get_fdb_port_by_physaddr(upstream_switch.fdb, downstream_switch.physaddr)
   end
 
   defp get_fdb_port_by_physaddr(fdb, physaddr) do
-    Enum.find_value fdb, fn {port, ^physaddr, _} -> port; _ -> nil end
+    Enum.find_value(fdb, fn {port, ^physaddr, _} -> port; _ -> nil end)
   end
 
   defp uniq_edges_by_topologically_closest_switches(edges) do
@@ -70,9 +63,9 @@ defmodule Giraphe.Graph.Dot.L2 do
     edges
       |> Enum.group_by(fn {downstream_switch, _} -> downstream_switch end)
       |> Enum.map(fn {_, grouped_edges} ->
-        Enum.min_by grouped_edges, fn {_, upstream_switch} ->
+        Enum.min_by(grouped_edges, fn {_, upstream_switch} ->
           length upstream_switch.fdb
-        end
+        end)
       end)
   end
 
@@ -82,8 +75,7 @@ defmodule Giraphe.Graph.Dot.L2 do
 
   defp get_l2_edges(switches) do
     for downstream_switch <- switches,
-        upstream_switch <- switches,
-        #fdb_proper_subset?(downstream_switch.fdb, upstream_switch.fdb),
+          upstream_switch <- switches,
         physaddr_in_fdb?(upstream_switch.fdb, downstream_switch.physaddr)
     do
       {downstream_switch, upstream_switch}
@@ -96,25 +88,37 @@ defmodule Giraphe.Graph.Dot.L2 do
   end
 
   defp remove_switch_fdb_entries_by_port(switch, portname) do
-    filter_switch_fdb switch, fn {^portname, _, _} -> false; _ -> true end
+    filter_switch_fdb(switch, fn {^portname, _, _} -> false; _ -> true end)
   end
 
   defp intersect_switch_fdb_entries_with_physaddrs(switch, physaddrs) do
-    filter_switch_fdb switch, fn {_, physaddr, _} -> physaddr in physaddrs end
+    filter_switch_fdb(switch, fn {_, physaddr, _} -> physaddr in physaddrs end)
   end
 
   @doc """
-  Generate GraphViz dot from `switches`.
+  Generate graph representation from `switches`.
   """
   def graph_devices(switches, template) do
-    graph_devices switches, "#{DateTime.utc_now}", template
+    graph_devices(switches, "#{DateTime.utc_now}", template)
+  end
+
+  defp generate_graph(template_path, switches, edges, timestamp) do
+    EEx.eval_file(
+      template_path,
+      [ timestamp: timestamp,
+        switches: switches,
+        edges: edges,
+      ]
+    )
   end
 
   @doc """
-  Generate GraphViz dot from `switches` with timestamp.
+  Generate graph representation from `switches` with timestamp.
   """
   def graph_devices(switches, timestamp, template) do
-    switch_physaddrs = Enum.map switches, &(&1.physaddr)
+    :ok = Logger.info("Graphing switches '#{inspect switches}'...")
+
+    switch_physaddrs = Enum.map(switches, &(&1.physaddr))
 
     switches =
       for switch <- switches do
@@ -124,19 +128,19 @@ defmodule Giraphe.Graph.Dot.L2 do
           |> Utility.trim_domain_from_device_sysname
       end
 
-    try do
-      edges =
+    edges =
+      try do
         switches
           |> get_l2_edges
           |> sort_l2_edges_by_upstream_polladdr_and_downlink
 
-      generate_dot template, switches, edges, timestamp
+      rescue
+        _ in Enum.EmptyError ->
+          :ok = Logger.error("No switch edges found")
 
-    rescue
-      _ in Enum.EmptyError ->
-        :ok = Logger.error("No switch edges found")
+          []
+      end
 
-        ""
-    end
+    generate_graph(template, switches, edges, timestamp)
   end
 end

@@ -3,7 +3,7 @@ defmodule Giraphe.Mixfile do
 
   def project do
     [ app: :giraphe,
-      version: "0.0.34",
+      version: "0.0.36",
       name: "giraphe",
       source_url: "https://github.com/jonnystorm/giraphe",
       elixir: "~> 1.3",
@@ -20,8 +20,8 @@ defmodule Giraphe.Mixfile do
 
   defp get_env(:test) do
     [ quiet: true,
-      l2_graph_template: "priv/templates/dot/l2_test_graph.dot.eex",
-      l3_graph_template: "priv/templates/dot/l3_test_graph.dot.eex",
+      l2_graph_template: "priv/templates/l2_test_graph.dot.eex",
+      l3_graph_template: "priv/templates/l3_test_graph.dot.eex",
       querier: Giraphe.IO.Query.Dummy,
       host_scanner: Giraphe.IO.HostScan.Dummy,
     ]
@@ -29,9 +29,7 @@ defmodule Giraphe.Mixfile do
   defp get_env(:dev) do
     [credentials: [snmp: [:v2c, "public"]]]
   end
-  defp get_env(:prod) do
-    []
-  end
+  defp get_env(:prod), do: []
 
   def application do
     [ applications: [
@@ -42,10 +40,10 @@ defmodule Giraphe.Mixfile do
       ],
       env: [
         quiet: false,
-        l2_grapher: Giraphe.Graph.Dot.L2,
-        l3_grapher: Giraphe.Graph.Dot.L3,
-        l2_graph_template: "priv/templates/dot/l2_graph.dot.eex",
-        l3_graph_template: "priv/templates/dot/l3_graph.dot.eex",
+        l2_grapher: Giraphe.Graph.L2,
+        l3_grapher: Giraphe.Graph.L3,
+        l2_graph_template: "priv/templates/l2_graph.dot.eex",
+        l3_graph_template: "priv/templates/l3_graph.dot.eex",
         renderer: Giraphe.Render.GraphViz,
         querier: Giraphe.IO.Query.NetSNMP,
         host_scanner: Giraphe.IO.HostScan.Nmap,
@@ -56,10 +54,10 @@ defmodule Giraphe.Mixfile do
   end
 
   defp deps do
-    [ {:credo, "~> 0.4", only: [:dev, :test]},
+    [ {:credo, "~> 0.5", only: [:dev, :test]},
       {:netaddr_ex, git: "https://github.com/jonnystorm/netaddr-elixir.git"},
       {:net_snmp_ex, git: "https://github.com/jonnystorm/net-snmp-elixir.git"},
-      {:ex_doc, "~> 0.13", only: :dev}
+      {:ex_doc, "~> 0.14", only: :dev}
     ]
   end
 end

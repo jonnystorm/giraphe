@@ -13,10 +13,10 @@ defmodule Giraphe.Render do
 
 
   defp renderer do
-    Application.get_env :giraphe, :renderer
+    Application.get_env(:giraphe, :renderer)
   end
 
   def render_graph(graph, output_filename) do
-    renderer.render_graph graph, output_filename
+    renderer.render_graph(graph, output_filename)
   end
 end

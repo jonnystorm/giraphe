@@ -19,8 +19,8 @@ defmodule Giraphe.Render.GraphVizTest do
 
     Enum.map output_files, &File.rm(&1)
 
-    [ File.read!("test/graph/dot/example_l2_graph.dot"),
-      File.read!("test/graph/dot/example_l3_graph.dot")
+    [ File.read!("test/fixtures/example_l2_graph.dot"),
+      File.read!("test/fixtures/example_l3_graph.dot")
 
     ] |> List.duplicate(2)
       |> List.flatten

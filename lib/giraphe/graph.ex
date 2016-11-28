@@ -15,34 +15,32 @@ defmodule Giraphe.Graph do
 
 
   defp l2_grapher do
-    Application.get_env :giraphe, :l2_grapher
+    Application.get_env(:giraphe, :l2_grapher)
   end
 
   defp l3_grapher do
-    Application.get_env :giraphe, :l3_grapher
+    Application.get_env(:giraphe, :l3_grapher)
   end
 
-  @doc false
-  def l2_graph_template do
-    Application.get_env :giraphe, :l2_graph_template
+  defp l2_graph_template do
+    Application.get_env(:giraphe, :l2_graph_template)
   end
 
-  @doc false
-  def l3_graph_template do
-    Application.get_env :giraphe, :l3_graph_template
+  defp l3_graph_template do
+    Application.get_env(:giraphe, :l3_graph_template)
   end
 
   @doc """
   Delegates to L3 grapher module.
   """
   def graph_routers(routers) do
-    l3_grapher.graph_devices routers, l3_graph_template
+    l3_grapher.graph_devices(routers, l3_graph_template)
   end
 
   @doc """
   Delegates to L2 grapher module.
   """
   def graph_switches(switches) do
-    l2_grapher.graph_devices switches, l2_graph_template
+    l2_grapher.graph_devices(switches, l2_graph_template)
   end
 end

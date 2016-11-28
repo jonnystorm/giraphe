@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <graph id="G" edgedefault="undirected">
+
+    <!-- Generated at <%= timestamp %> -->
+
+    <!-- Routers -->
+
+<%=
+for r <- routers do
+  """
+      <node id="n#{r.id}">
+        <desc>#{r.name}</desc>
+      </node>
+  """
+end
+%>
+
+    <!-- Subnets -->
+
+<%=
+for e <- edges do
+  scrubbed = String.replace("#{e}", "/", "_")
+
+  """
+      <node id="n#{scrubbed}">
+        <desc>#{e}</desc>
+      </node>
+  """
+end
+%>
+
+    <!-- Incidences -->
+
+<%=
+for {r, e}   <- incidences do
+  scrubbed = String.replace("#{e}", "/", "_")
+
+  """
+      <edge source="n#{r}" target="n#{scrubbed}"/>
+  """
+end %>
+  </graph>
+</graphml>

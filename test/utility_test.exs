@@ -13,4 +13,11 @@ defmodule Giraphe.UtilityTest do
 
     assert trim_domain_from_device_sysname(device) == %{device | name: "R1"}
   end
+
+  test "Terminates recursive route lookup in presence of loop" do
+    routes = [{NetAddr.ip("192.0.2.0/30"), NetAddr.ip("192.0.2.1")}]
+    address = NetAddr.ip("192.0.2.1")
+
+    assert lookup_route_recursive(routes, address) == nil
+  end
 end
