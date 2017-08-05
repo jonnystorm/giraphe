@@ -1,7 +1,6 @@
-# Copyright © 2016 Jonathan Storm <the.jonathan.storm@gmail.com>
-# This work is free. You can redistribute it and/or modify it under the
-# terms of the Do What The Fuck You Want To Public License, Version 2,
-# as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 defmodule Giraphe.Render.GraphVizTest do
   use ExUnit.Case
@@ -19,8 +18,8 @@ defmodule Giraphe.Render.GraphVizTest do
 
     Enum.map output_files, &File.rm(&1)
 
-    [ File.read!("test/graph/dot/example_l2_graph.dot"),
-      File.read!("test/graph/dot/example_l3_graph.dot")
+    [ File.read!("test/fixtures/example_l2_graph.dot"),
+      File.read!("test/fixtures/example_l3_graph.dot")
 
     ] |> List.duplicate(2)
       |> List.flatten

@@ -1,7 +1,6 @@
-# Copyright © 2016 Jonathan Storm <the.jonathan.storm@gmail.com>
-# This work is free. You can redistribute it and/or modify it under the
-# terms of the Do What The Fuck You Want To Public License, Version 2,
-# as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 defmodule Giraphe.IO.HostScan.Nmap do
   @moduledoc """
@@ -18,7 +17,7 @@ defmodule Giraphe.IO.HostScan.Nmap do
   def scan(subnet) do
     args = ~w(-n -sn -PE -T4 #{subnet})
 
-    case System.cmd "nmap", args, stderr_to_stdout: true do
+    case System.cmd("nmap", args, stderr_to_stdout: true) do
       {_, 0} ->
         :ok
 
@@ -35,9 +34,9 @@ defmodule Giraphe.IO.HostScan.Nmap do
     port = 161
     args = ~w(nmap -n -oG - -sU -p #{port} #{address})
 
-    case System.cmd "sudo", args, stderr_to_stdout: true do
+    case System.cmd("sudo", args, stderr_to_stdout: true) do
       {output, 0} ->
-        Regex.match? ~r|Ports: #{port}/open/|, output
+        Regex.match?(~r|Ports: #{port}/open/|, output)
 
       {error, _} ->
         raise "Unable to scan target '#{target}' for SNMP: '#{error}'."

@@ -1,7 +1,6 @@
-# Copyright © 2016 Jonathan Storm <the.jonathan.storm@gmail.com>
-# This work is free. You can redistribute it and/or modify it under the
-# terms of the Do What The Fuck You Want To Public License, Version 2,
-# as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 defmodule Giraphe do
   @moduledoc """
@@ -12,35 +11,33 @@ defmodule Giraphe do
 
   require Logger
 
-  defp init_session_parameters do
-    Agent.start_link fn -> [] end, name: __MODULE__
-  end
+  defp init_session_parameters,
+    do: Agent.start_link(fn -> [] end, name: __MODULE__)
 
   defp get_session_parameter(key) do
-    Agent.get __MODULE__, &Keyword.get(&1, key)
+    Agent.get(   __MODULE__, &Keyword.get(&1, key))
   end
 
   defp set_session_parameter(key, value) do
-    Agent.update __MODULE__, &Keyword.put(&1, key, value)
+    Agent.update(__MODULE__, &Keyword.put(&1, key, value))
   end
 
-  defp arg_to_atom("snmp"),do: :snmp
-  defp arg_to_atom("v1"),  do: :v1
-  defp arg_to_atom("v2c"), do: :v2c
-  defp arg_to_atom("v3"),  do: :v3
+  defp arg_to_atom("snmp"), do: :snmp
+  defp arg_to_atom("v1"),   do: :v1
+  defp arg_to_atom("v2c"),  do: :v2c
+  defp arg_to_atom("v3"),   do: :v3
   defp arg_to_atom("noAuthNoPriv"), do: :no_auth_no_priv
   defp arg_to_atom("authNoPriv"),   do: :auth_no_priv
   defp arg_to_atom("authPriv"),     do: :auth_priv
-  defp arg_to_atom("md5"), do: :md5
-  defp arg_to_atom("sha"), do: :sha
-  defp arg_to_atom("dsa"), do: :dsa
-  defp arg_to_atom("aes"), do: :aes
-  defp arg_to_atom(other), do: other
+  defp arg_to_atom("md5"),  do: :md5
+  defp arg_to_atom("sha"),  do: :sha
+  defp arg_to_atom("dsa"),  do: :dsa
+  defp arg_to_atom("aes"),  do: :aes
+  defp arg_to_atom(other),  do: other
 
   defp args_to_atoms(string) do
-    for arg <- String.split string do
-      arg_to_atom arg
-    end
+    for arg <- String.split(string),
+      do: arg_to_atom(arg)
   end
 
   defp parse_credentials(text) do
@@ -48,18 +45,28 @@ defmodule Giraphe do
       |> String.split("\n")
       |> Enum.map(&args_to_atoms/1)
       |> Enum.filter(&(length(&1) >= 1))
-      |> Enum.group_by(fn [type | _] -> type end, fn [t | c] -> {t, c} end)
+      |> Enum.group_by(
+        fn [type|_] -> type end,
+        fn [type|credential] -> {type, credential} end
+      )
       |> Map.values
       |> Enum.concat
   end
 
   defp handle_switches(switches) do
     credentials_result =
-      with     path when not is_nil(path) <- switches[:credentials],
-                              {:ok, text} <- File.read(Path.expand path),
-           credentials = [{:snmp, _} | _] <- parse_credentials(text)
+      with path when not is_nil(path)
+            <- switches[:credentials],
+
+          {:ok, text}
+            <- File.read(Path.expand(path)),
+
+          [{:snmp, _}|_] = credentials
+            <- parse_credentials(text)
       do
-        :ok = Application.put_env :giraphe, :credentials, credentials
+        :ok =
+          :giraphe
+          |> Application.put_env(:credentials, credentials)
 
         :ok
       end
@@ -69,7 +76,7 @@ defmodule Giraphe do
         nil
 
       nil ->
-        usage
+        usage()
 
       {:error, _} ->
         usage "Unable to read credentials file: '#{switches[:credentials]}'"
@@ -79,25 +86,25 @@ defmodule Giraphe do
     end
 
     if path = switches[:output_file] do
-      set_session_parameter :output_file, Path.expand(path)
+      set_session_parameter(:output_file, Path.expand(path))
     end
 
     if path = switches[:export_path] do
-      set_session_parameter :export_path, Path.expand(path)
+      set_session_parameter(:export_path, Path.expand(path))
     end
 
     if switches[:info] do
-      :ok = Logger.configure [level: :info]
+      :ok = Logger.configure([level: :info])
     end
 
     if switches[:debug] do
-      :ok = Logger.configure [level: :debug]
+      :ok = Logger.configure([level: :debug])
     end
 
     if switches[:quiet] do
-      :ok = Application.put_env :giraphe, :quiet, true
+      :ok = Application.put_env(:giraphe, :quiet, true)
 
-      :ok = Logger.configure [level: :error]
+      :ok = Logger.configure([level: :error])
     end
   end
 
@@ -106,7 +113,7 @@ defmodule Giraphe do
       OptionParser.parse(argv,
         switches: [
           quiet: :boolean,
-          info: :boolean,
+          info:  :boolean,
           debug: :boolean,
           output_file: :string,
           export_path: :string,
@@ -142,14 +149,15 @@ defmodule Giraphe do
   defp usage do
     IO.puts(:stderr,
     """
-    Usage: giraphe [-qv] -c <credentials_path> -o <output_file> [-x <export_path>]
+    Usage: giraphe [-qv] -c <credentials_path> -o <output_file>
+                   [-dgr -x <export_path>]
                    [-2 <gateway_ip> [<subnet_cidr>]] [-3 [<router_ip> ...]]
 
       -q: quiet
       -v: verbose ('-vv' is more verbose)
 
       -o: output file (must end in .png or .svg)
-      -x: export routes to the given directory (layer-3 topology, only)
+      -x: export routes to path
 
       -c: Specify file containing credentials
         <credentials_path>: path to file containing credentials
@@ -172,78 +180,190 @@ defmodule Giraphe do
     System.halt 1
   end
   defp usage(message) do
-    IO.puts :stderr, message
-    usage
-
-    System.halt 1
+    :ok = IO.puts :stderr, message
+    usage()
   end
 
   defp routes_to_string(routes) do
     routes
-      |> Stream.map(fn {destination, next_hop} ->
-        "#{destination} => #{NetAddr.address(next_hop)}"
-      end)
-      |> Enum.join("\n")
+    |> Stream.map(fn {destination, next_hop} ->
+      "#{destination} => #{NetAddr.address(next_hop)}"
+    end)
+    |> Enum.join("\n")
   end
 
-  defp export_routes(routers, nil), do: routers
+  defp export_routes(routers, nil),
+    do: routers
+
   defp export_routes(routers, export_path) do
-    Enum.map(routers, fn router ->
-      path = Path.join([export_path, "#{router.name}.txt"])
+    Enum.map routers, fn router ->
+        path = Path.join [export_path, "#{router.name}.txt"]
+      string = routes_to_string router.routes
 
-      with {:error, error} <- File.write(path, routes_to_string(router.routes))
+      with {:error, error} <- File.write(path, string)
       do
-        Logger.error "Failed to export '#{inspect router.routes}'"
+        :ok = Logger.error("Failed to export '#{inspect router.routes}'")
 
-        raise "Unable to export routes to '#{path}': #{inspect error}"
+        raise("Unable to export routes to #{inspect path}: #{inspect error}")
       end
 
       router
+    end
+  end
+
+  def evaluate_l3_template(
+    incidences,
+    routers,
+    template_path
+  ) do
+    current_datetime_utc = "#{DateTime.utc_now}"
+
+    evaluate_l3_template(
+      incidences,
+      routers,
+      template_path,
+      current_datetime_utc
+    )
+  end
+  def evaluate_l3_template(
+    incidences,
+    routers,
+    template_path,
+    timestamp
+  ) do
+    routers =
+      routers
+      |> Enum.map(&router_to_node/1)
+      |> Enum.sort_by(& &1.id)
+
+    edges =
+      incidences
+      |> Enum.map(fn {_, subnet} -> subnet end)
+      |> Enum.sort
+      |> Enum.map(fn
+        <<_::binary>> = subnet ->
+          subnet
+
+        subnet ->
+          NetAddr.prefix subnet
+      end)
+      |> Enum.dedup
+
+    EEx.eval_file template_path,
+      [ timestamp: timestamp,
+        routers: routers,
+        edges: edges,
+        incidences: incidences,
+      ]
+  end
+
+  defp export_l3_notation(
+    format,
+    incidences,
+    routers,
+    export_path
+  ) do
+    template =
+      case format do
+        :dot     -> "priv/templates/l3_graph.dot.eex"
+        :graphml -> "priv/templates/l3_graph.graphml.eex"
+      end
+
+    notation =
+      evaluate_l3_template(incidences, routers, template)
+
+    with {:error, error}
+           <- File.write(export_path, notation)
+    do
+      :ok = Logger.error("Failed to export '#{notation}'")
+
+      raise("Unable to export GraphML to #{inspect export_path}: #{inspect error}")
+    end
+  end
+
+  defp router_to_node(router) do
+    %{name: name} =
+      Utility.trim_domain_from_device_sysname router
+
+    %{name: name,
+      id: NetAddr.address(router.polladdr)
+    }
+  end
+
+  defp graph_l2(gateway_address, subnet) do
+    if Utility.is_host_address gateway_address do
+      template_file = "priv/templates/l2_graph.dot.eex"
+        output_file = get_session_parameter :output_file
+
+      gateway_address
+      |> Discover.L2.discover(subnet)
+      |> Graph.L2.graph_devices(template_file)
+      |> Render.render_graph(output_file)
+
+      Utility.status "Done!"
+    else
+      usage "No valid gateway address found."
+    end
+  end
+
+  defp graph_l3(targets) do
+    output_file = get_session_parameter :output_file
+    export_path = get_session_parameter :export_path
+
+    routers =
+      targets
+      |> Enum.filter(&Utility.is_host_address/1)
+      |> Discover.L3.discover
+      |> export_routes(export_path)
+
+    incidences = Graph.L3.abduce_incidences routers
+
+    _ = [
+      {:dot,     (Path.rootname(output_file) <> ".dot")},
+      {:graphml, (Path.rootname(output_file) <> ".graphml")},
+
+    ] |> Enum.map(fn {format, path} ->
+      export_l3_notation(format, routers, incidences, path)
     end)
+
+    template =
+      Application.get_env(:giraphe, :l3_graph_template)
+
+    incidences
+    |> Enum.map(fn
+      {router, <<_::binary>> = edge} ->
+        {router, edge}
+
+      {router, edge} ->
+        {router, NetAddr.prefix(edge)}
+    end)
+    |> evaluate_l3_template(routers, template)
+    |> Render.render_graph(output_file)
+
+    Utility.status "Done!"
   end
 
   def main(argv) do
-    init_session_parameters
+    _ = init_session_parameters()
 
     case parse_args argv do
       [] ->
-        usage
+        usage()
 
       ["-2", gateway_string | subnet_args] ->
-        gateway_address = NetAddr.ip gateway_string
+        subnet = List.first parse_ip_args(subnet_args)
 
-        if Utility.is_host_address gateway_address do
-          subnet = List.first parse_ip_args(subnet_args)
-
-          output_file = get_session_parameter :output_file
-
-          gateway_address
-            |> Discover.discover_l2(subnet)
-            |> Graph.graph_switches
-            |> Render.render_graph(output_file)
-
-          Utility.status "Done!"
-
-        else
-          usage "No valid gateway address found."
-        end
+        gateway_string
+        |> NetAddr.ip
+        |> graph_l2(subnet)
 
       ["-3" | target_strings] ->
-        output_file = get_session_parameter :output_file
-        export_path = get_session_parameter :export_path
-
         target_strings
-          |> parse_ip_args
-          |> Enum.filter(&Utility.is_host_address/1)
-          |> Discover.discover_l3
-          |> export_routes(export_path)
-          |> Graph.graph_routers
-          |> Render.render_graph(output_file)
-
-        Utility.status "Done!"
+        |> parse_ip_args
+        |> graph_l3
 
       _ ->
-        usage
+        usage()
     end
   end
 end

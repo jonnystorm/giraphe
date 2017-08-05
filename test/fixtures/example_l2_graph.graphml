@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <graph id="G" edgedefault="undirected">
+
+    <!-- Switches -->
+
+    <node id="n192.0.2.3">
+      <desc>192.0.2.3</desc>
+      <port name="Gi1/1"/>
+    </node>
+    <node id="n192.0.2.7">
+      <desc>192.0.2.7</desc>
+      <port name="Gi1/1"/>
+      <port name="Gi1/2"/>
+      <port name="Gi1/3"/>
+      <port name="Gi1/4"/>
+      <port name="Gi1/5"/>
+      <port name="Gi1/6"/>
+      <port name="Gi1/7"/>
+      <port name="Gi1/8"/>
+      <port name="Gi1/9"/>
+      <port name="Gi1/10"/>
+      <port name="Gi1/11"/>
+      <port name="Gi1/12"/>
+      <port name="Gi1/13"/>
+      <port name="Gi1/14"/>
+      <port name="Gi1/15"/>
+      <port name="Gi1/16"/>
+      <port name="Gi1/17"/>
+      <port name="Gi1/18"/>
+      <port name="Gi1/19"/>
+      <port name="Gi1/20"/>
+    </node>
+    <node id="n192.0.2.10">
+      <desc>192.0.2.10</desc>
+    </node>
+    <node id="n192.0.2.20">
+      <desc>192.0.2.20</desc>
+    </node>
+    <node id="n192.0.2.30">
+      <desc>192.0.2.30</desc>
+    </node>
+    <node id="n192.0.2.40">
+      <desc>192.0.2.40</desc>
+    </node>
+    <node id="n192.0.2.50">
+      <desc>192.0.2.50</desc>
+      <port name="Gi1/1"/>
+      <port name="Gi1/2"/>
+      <port name="Gi1/3"/>
+      <port name="Gi1/4"/>
+      <port name="Gi1/5"/>
+    </node>
+    <node id="n192.0.2.51">
+      <desc>192.0.2.51</desc>
+    </node>
+    <node id="n192.0.2.52">
+      <desc>192.0.2.52</desc>
+    </node>
+    <node id="n192.0.2.53">
+      <desc>192.0.2.53</desc>
+    </node>
+    <node id="n192.0.2.54">
+      <desc>192.0.2.54</desc>
+    </node>
+    <node id="n192.0.2.55">
+      <desc>192.0.2.55</desc>
+      <port name="Gi1/1"/>
+      <port name="Gi1/2"/>
+      <port name="Gi1/3"/>
+      <port name="Gi1/4"/>
+    </node>
+    <node id="n192.0.2.56">
+      <desc>192.0.2.56</desc>
+    </node>
+    <node id="n192.0.2.57">
+      <desc>192.0.2.57</desc>
+    </node>
+    <node id="n192.0.2.58">
+      <desc>192.0.2.58</desc>
+    </node>
+    <node id="n192.0.2.59">
+      <desc>192.0.2.59</desc>
+    </node>
+    <node id="n192.0.2.60">
+      <desc>192.0.2.60</desc>
+    </node>
+    <node id="n192.0.2.70">
+      <desc>192.0.2.70</desc>
+    </node>
+    <node id="n192.0.2.80">
+      <desc>192.0.2.80</desc>
+    </node>
+    <node id="n192.0.2.90">
+      <desc>192.0.2.90</desc>
+    </node>
+    <node id="n192.0.2.100">
+      <desc>192.0.2.100</desc>
+      <port name="Gi1/1"/>
+      <port name="Gi1/2"/>
+      <port name="Gi1/3"/>
+      <port name="Gi1/4"/>
+      <port name="Gi1/5"/>
+      <port name="Gi1/6"/>
+      <port name="Gi1/7"/>
+      <port name="Gi1/8"/>
+      <port name="Gi1/9"/>
+    </node>
+    <node id="n192.0.2.101">
+      <desc>192.0.2.101</desc>
+    </node>
+    <node id="n192.0.2.102">
+      <desc>192.0.2.102</desc>
+    </node>
+    <node id="n192.0.2.103">
+      <desc>192.0.2.103</desc>
+    </node>
+    <node id="n192.0.2.104">
+      <desc>192.0.2.104</desc>
+    </node>
+    <node id="n192.0.2.105">
+      <desc>192.0.2.105</desc>
+    </node>
+    <node id="n192.0.2.106">
+      <desc>192.0.2.106</desc>
+    </node>
+    <node id="n192.0.2.107">
+      <desc>192.0.2.107</desc>
+    </node>
+    <node id="n192.0.2.108">
+      <desc>192.0.2.108</desc>
+    </node>
+    <node id="n192.0.2.109">
+      <desc>192.0.2.109</desc>
+    </node>
+    <node id="n192.0.2.110">
+      <desc>192.0.2.110</desc>
+    </node>
+    <node id="n192.0.2.120">
+      <desc>192.0.2.120</desc>
+    </node>
+    <node id="n192.0.2.130">
+      <desc>192.0.2.130</desc>
+    </node>
+    <node id="n192.0.2.140">
+      <desc>192.0.2.140</desc>
+    </node>
+    <node id="n192.0.2.150">
+      <desc>192.0.2.150</desc>
+    </node>
+    <node id="n192.0.2.160">
+      <desc>192.0.2.160</desc>
+    </node>
+    <node id="n192.0.2.170">
+      <desc>192.0.2.170</desc>
+    </node>
+    <node id="n192.0.2.180">
+      <desc>192.0.2.180</desc>
+    </node>
+    <node id="n192.0.2.190">
+      <desc>192.0.2.190</desc>
+    </node>
+    <node id="n192.0.2.200">
+      <desc>192.0.2.200</desc>
+    </node>
+
+
+    <!-- Edges -->
+
+    <edge source="n192.0.2.3" target="n192.0.2.7" sourceport="Gi1/1" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.10" sourceport="Gi1/1" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.20" sourceport="Gi1/2" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.30" sourceport="Gi1/3" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.40" sourceport="Gi1/4" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.50" sourceport="Gi1/5" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.60" sourceport="Gi1/6" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.70" sourceport="Gi1/7" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.80" sourceport="Gi1/8" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.90" sourceport="Gi1/9" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.100" sourceport="Gi1/10" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.110" sourceport="Gi1/11" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.120" sourceport="Gi1/12" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.130" sourceport="Gi1/13" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.140" sourceport="Gi1/14" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.150" sourceport="Gi1/15" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.160" sourceport="Gi1/16" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.170" sourceport="Gi1/17" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.180" sourceport="Gi1/18" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.190" sourceport="Gi1/19" targetport="Gi1/24"/>
+    <edge source="n192.0.2.7" target="n192.0.2.200" sourceport="Gi1/20" targetport="Gi1/24"/>
+    <edge source="n192.0.2.50" target="n192.0.2.51" sourceport="Gi1/1" targetport="Gi1/24"/>
+    <edge source="n192.0.2.50" target="n192.0.2.52" sourceport="Gi1/2" targetport="Gi1/24"/>
+    <edge source="n192.0.2.50" target="n192.0.2.53" sourceport="Gi1/3" targetport="Gi1/24"/>
+    <edge source="n192.0.2.50" target="n192.0.2.54" sourceport="Gi1/4" targetport="Gi1/24"/>
+    <edge source="n192.0.2.50" target="n192.0.2.55" sourceport="Gi1/5" targetport="Gi1/24"/>
+    <edge source="n192.0.2.55" target="n192.0.2.56" sourceport="Gi1/1" targetport="Gi1/24"/>
+    <edge source="n192.0.2.55" target="n192.0.2.57" sourceport="Gi1/2" targetport="Gi1/24"/>
+    <edge source="n192.0.2.55" target="n192.0.2.58" sourceport="Gi1/3" targetport="Gi1/24"/>
+    <edge source="n192.0.2.55" target="n192.0.2.59" sourceport="Gi1/4" targetport="Gi1/24"/>
+    <edge source="n192.0.2.100" target="n192.0.2.101" sourceport="Gi1/1" targetport="Gi1/24"/>
+    <edge source="n192.0.2.100" target="n192.0.2.102" sourceport="Gi1/2" targetport="Gi1/24"/>
+    <edge source="n192.0.2.100" target="n192.0.2.103" sourceport="Gi1/3" targetport="Gi1/24"/>
+    <edge source="n192.0.2.100" target="n192.0.2.104" sourceport="Gi1/4" targetport="Gi1/24"/>
+    <edge source="n192.0.2.100" target="n192.0.2.105" sourceport="Gi1/5" targetport="Gi1/24"/>
+    <edge source="n192.0.2.100" target="n192.0.2.106" sourceport="Gi1/6" targetport="Gi1/24"/>
+    <edge source="n192.0.2.100" target="n192.0.2.107" sourceport="Gi1/7" targetport="Gi1/24"/>
+    <edge source="n192.0.2.100" target="n192.0.2.108" sourceport="Gi1/8" targetport="Gi1/24"/>
+    <edge source="n192.0.2.100" target="n192.0.2.109" sourceport="Gi1/9" targetport="Gi1/24"/>
+
+  </graph>
+</graphml>

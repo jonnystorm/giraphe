@@ -9,14 +9,18 @@ defmodule Giraphe.Render do
   """
   @type reason :: atom
 
-  @callback render_graph(graph :: String.t, output_filename :: String.t) :: :ok | {:error, reason}
+  @callback render_graph(
+    graph           :: String.t,
+    output_filename :: String.t
+  ) :: :ok
+     | {:error, reason}
 
 
   defp renderer do
-    Application.get_env :giraphe, :renderer
+    Application.get_env(:giraphe, :renderer)
   end
 
   def render_graph(graph, output_filename) do
-    renderer.render_graph graph, output_filename
+    renderer().render_graph(graph, output_filename)
   end
 end

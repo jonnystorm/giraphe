@@ -1,147 +1,126 @@
-# Copyright © 2016 Jonathan Storm <the.jonathan.storm@gmail.com>
-# This work is free. You can redistribute it and/or modify it under the
-# terms of the Do What The Fuck You Want To Public License, Version 2,
-# as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-defmodule Giraphe.Graph.Dot.L3Test do
+defmodule Giraphe.Graph.L3Test do
   use ExUnit.Case
-  doctest Giraphe.Graph.Dot.L3
 
-  import Giraphe.Graph.Dot.L3
+  import Giraphe.Graph.L3
 
-  @template Giraphe.Graph.l3_graph_template
+  @test_template    "priv/templates/l3_test_graph.dot.eex"
+  @dot_template     "priv/templates/l3_graph.dot.eex"
+  @graphml_template "priv/templates/l3_graph.graphml.eex"
+
+  defp get_test_network1 do
+    [ %Giraphe.Router{name: "192.0.2.3", polladdr: NetAddr.ip("192.0.2.3"),
+        addresses: [
+          NetAddr.ip("192.0.2.3/31"),
+          NetAddr.ip("192.0.2.8/31"),
+        ],
+        routes: [
+          {NetAddr.ip("192.0.2.2/31"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("192.0.2.4/31"), NetAddr.ip("192.0.2.2")},
+          {NetAddr.ip("192.0.2.6/31"), NetAddr.ip("192.0.2.2")},
+          {NetAddr.ip("192.0.2.8/31"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("192.0.2.10/31"), NetAddr.ip("192.0.2.2")},
+          {NetAddr.ip("192.0.2.12/30"), NetAddr.ip("192.0.2.9")},
+          {NetAddr.ip("198.51.100.0/29"), NetAddr.ip("192.0.2.2")},
+          {NetAddr.ip("198.51.100.8/29"), NetAddr.ip("192.0.2.2")},
+          {NetAddr.ip("198.51.100.16/29"), NetAddr.ip("192.0.2.2")},
+          {NetAddr.ip("198.51.100.24/29"), NetAddr.ip("192.0.2.2")},
+          {NetAddr.ip("198.51.100.32/29"), NetAddr.ip("192.0.2.2")},
+          {NetAddr.ip("198.51.100.40/29"), NetAddr.ip("192.0.2.9")},
+        ],
+      },
+      %Giraphe.Router{name: "192.0.2.7", polladdr: NetAddr.ip("192.0.2.7"),
+        addresses: [
+          NetAddr.ip("192.0.2.7/31"),
+          NetAddr.ip("192.0.2.10/31"),
+          NetAddr.ip("198.51.100.25/29"),
+          NetAddr.ip("198.51.100.33/29"),
+        ],
+        routes: [
+          {NetAddr.ip("192.0.2.2/31"), NetAddr.ip("192.0.2.6")},
+          {NetAddr.ip("192.0.2.4/31"), NetAddr.ip("192.0.2.6")},
+          {NetAddr.ip("192.0.2.6/31"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("192.0.2.8/31"), NetAddr.ip("192.0.2.6")},
+          {NetAddr.ip("192.0.2.10/31"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("192.0.2.12/30"), NetAddr.ip("192.0.2.6")},
+          {NetAddr.ip("198.51.100.0/29"), NetAddr.ip("192.0.2.6")},
+          {NetAddr.ip("198.51.100.8/29"), NetAddr.ip("192.0.2.6")},
+          {NetAddr.ip("198.51.100.16/29"), NetAddr.ip("192.0.2.6")},
+          {NetAddr.ip("198.51.100.24/29"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("198.51.100.32/29"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("198.51.100.40/29"), NetAddr.ip("192.0.2.6")},
+        ],
+      },
+      %Giraphe.Router{name: "192.0.2.9", polladdr: NetAddr.ip("192.0.2.9"),
+        addresses: [
+          NetAddr.ip("192.0.2.5/31"),
+          NetAddr.ip("192.0.2.9/31"),
+          NetAddr.ip("192.0.2.11/31"),
+          NetAddr.ip("192.0.2.13/30"),
+        ],
+        routes: [
+          {NetAddr.ip("192.0.2.2/31"), NetAddr.ip("192.0.2.8")},
+          {NetAddr.ip("192.0.2.4/31"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("192.0.2.6/31"), NetAddr.ip("192.0.2.8")},
+          {NetAddr.ip("192.0.2.8/31"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("192.0.2.10/31"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("192.0.2.12/30"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("198.51.100.0/29"), NetAddr.ip("192.0.2.8")},
+          {NetAddr.ip("198.51.100.8/29"), NetAddr.ip("192.0.2.8")},
+          {NetAddr.ip("198.51.100.16/29"), NetAddr.ip("192.0.2.8")},
+          {NetAddr.ip("198.51.100.24/29"), NetAddr.ip("192.0.2.8")},
+          {NetAddr.ip("198.51.100.32/29"), NetAddr.ip("192.0.2.8")},
+          {NetAddr.ip("198.51.100.40/29"), NetAddr.ip("192.0.2.14")},
+        ],
+      },
+      %Giraphe.Router{name: "192.0.2.14", polladdr: NetAddr.ip("192.0.2.14"),
+        addresses: [NetAddr.ip("192.0.2.14/30")],
+        routes: [{NetAddr.ip("192.0.2.14/30"), NetAddr.ip("0.0.0.0")}],
+      },
+      %Giraphe.Router{name: "198.51.100.1", polladdr: NetAddr.ip("198.51.100.1"),
+        addresses: [
+          NetAddr.ip("192.0.2.2/31"),
+          NetAddr.ip("192.0.2.4/31"),
+          NetAddr.ip("192.0.2.6/31"),
+          NetAddr.ip("198.51.100.1/29"),
+          NetAddr.ip("198.51.100.9/29"),
+          NetAddr.ip("198.51.100.17/29"),
+        ],
+        routes: [
+          {NetAddr.ip("192.0.2.2/31"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("192.0.2.4/31"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("192.0.2.6/31"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("192.0.2.8/31"), NetAddr.ip("192.0.2.3")},
+          {NetAddr.ip("192.0.2.10/31"), NetAddr.ip("192.0.2.7")},
+          {NetAddr.ip("192.0.2.12/30"), NetAddr.ip("192.0.2.3")},
+          {NetAddr.ip("198.51.100.0/29"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("198.51.100.8/29"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("198.51.100.16/29"), NetAddr.ip("0.0.0.0")},
+          {NetAddr.ip("198.51.100.24/29"), NetAddr.ip("192.0.2.7")},
+          {NetAddr.ip("198.51.100.32/29"), NetAddr.ip("192.0.2.7")},
+          {NetAddr.ip("198.51.100.40/29"), NetAddr.ip("192.0.2.3")},
+        ],
+      },
+    ]
+  end
 
   test "Generates dot from routers" do
-    routers =
-      [ %Giraphe.Router{name: "192.0.2.3", polladdr: NetAddr.ip("192.0.2.3"),
-          addresses: [
-            NetAddr.ip("192.0.2.3/31"),
-            NetAddr.ip("192.0.2.8/31"),
-          ],
-          routes: [
-            {NetAddr.ip("192.0.2.2/31"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("192.0.2.4/31"), NetAddr.ip("192.0.2.2")},
-            {NetAddr.ip("192.0.2.6/31"), NetAddr.ip("192.0.2.2")},
-            {NetAddr.ip("192.0.2.8/31"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("192.0.2.10/31"), NetAddr.ip("192.0.2.2")},
-            {NetAddr.ip("192.0.2.12/30"), NetAddr.ip("192.0.2.9")},
-            {NetAddr.ip("198.51.100.0/29"), NetAddr.ip("192.0.2.2")},
-            {NetAddr.ip("198.51.100.8/29"), NetAddr.ip("192.0.2.2")},
-            {NetAddr.ip("198.51.100.16/29"), NetAddr.ip("192.0.2.2")},
-            {NetAddr.ip("198.51.100.24/29"), NetAddr.ip("192.0.2.2")},
-            {NetAddr.ip("198.51.100.32/29"), NetAddr.ip("192.0.2.2")},
-            {NetAddr.ip("198.51.100.40/29"), NetAddr.ip("192.0.2.9")},
-          ],
-        },
-        %Giraphe.Router{name: "192.0.2.7", polladdr: NetAddr.ip("192.0.2.7"),
-          addresses: [
-            NetAddr.ip("192.0.2.7/31"),
-            NetAddr.ip("192.0.2.10/31"),
-            NetAddr.ip("198.51.100.25/29"),
-            NetAddr.ip("198.51.100.33/29"),
-          ],
-          routes: [
-            {NetAddr.ip("192.0.2.2/31"), NetAddr.ip("192.0.2.6")},
-            {NetAddr.ip("192.0.2.4/31"), NetAddr.ip("192.0.2.6")},
-            {NetAddr.ip("192.0.2.6/31"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("192.0.2.8/31"), NetAddr.ip("192.0.2.6")},
-            {NetAddr.ip("192.0.2.10/31"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("192.0.2.12/30"), NetAddr.ip("192.0.2.6")},
-            {NetAddr.ip("198.51.100.0/29"), NetAddr.ip("192.0.2.6")},
-            {NetAddr.ip("198.51.100.8/29"), NetAddr.ip("192.0.2.6")},
-            {NetAddr.ip("198.51.100.16/29"), NetAddr.ip("192.0.2.6")},
-            {NetAddr.ip("198.51.100.24/29"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("198.51.100.32/29"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("198.51.100.40/29"), NetAddr.ip("192.0.2.6")},
-          ],
-        },
-        %Giraphe.Router{name: "192.0.2.9", polladdr: NetAddr.ip("192.0.2.9"),
-          addresses: [
-            NetAddr.ip("192.0.2.5/31"),
-            NetAddr.ip("192.0.2.9/31"),
-            NetAddr.ip("192.0.2.11/31"),
-            NetAddr.ip("192.0.2.13/30"),
-          ],
-          routes: [
-            {NetAddr.ip("192.0.2.2/31"), NetAddr.ip("192.0.2.8")},
-            {NetAddr.ip("192.0.2.4/31"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("192.0.2.6/31"), NetAddr.ip("192.0.2.8")},
-            {NetAddr.ip("192.0.2.8/31"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("192.0.2.10/31"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("192.0.2.12/30"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("198.51.100.0/29"), NetAddr.ip("192.0.2.8")},
-            {NetAddr.ip("198.51.100.8/29"), NetAddr.ip("192.0.2.8")},
-            {NetAddr.ip("198.51.100.16/29"), NetAddr.ip("192.0.2.8")},
-            {NetAddr.ip("198.51.100.24/29"), NetAddr.ip("192.0.2.8")},
-            {NetAddr.ip("198.51.100.32/29"), NetAddr.ip("192.0.2.8")},
-            {NetAddr.ip("198.51.100.40/29"), NetAddr.ip("192.0.2.14")},
-          ],
-        },
-        %Giraphe.Router{name: "192.0.2.14", polladdr: NetAddr.ip("192.0.2.14"),
-          addresses: [NetAddr.ip("192.0.2.14/30")],
-          routes: [{NetAddr.ip("192.0.2.14/30"), NetAddr.ip("0.0.0.0")}],
-        },
-        %Giraphe.Router{name: "198.51.100.1", polladdr: NetAddr.ip("198.51.100.1"),
-          addresses: [
-            NetAddr.ip("192.0.2.2/31"),
-            NetAddr.ip("192.0.2.4/31"),
-            NetAddr.ip("192.0.2.6/31"),
-            NetAddr.ip("198.51.100.1/29"),
-            NetAddr.ip("198.51.100.9/29"),
-            NetAddr.ip("198.51.100.17/29"),
-          ],
-          routes: [
-            {NetAddr.ip("192.0.2.2/31"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("192.0.2.4/31"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("192.0.2.6/31"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("192.0.2.8/31"), NetAddr.ip("192.0.2.3")},
-            {NetAddr.ip("192.0.2.10/31"), NetAddr.ip("192.0.2.7")},
-            {NetAddr.ip("192.0.2.12/30"), NetAddr.ip("192.0.2.3")},
-            {NetAddr.ip("198.51.100.0/29"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("198.51.100.8/29"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("198.51.100.16/29"), NetAddr.ip("0.0.0.0")},
-            {NetAddr.ip("198.51.100.24/29"), NetAddr.ip("192.0.2.7")},
-            {NetAddr.ip("198.51.100.32/29"), NetAddr.ip("192.0.2.7")},
-            {NetAddr.ip("198.51.100.40/29"), NetAddr.ip("192.0.2.3")},
-          ],
-        },
-      ]
-
+    routers = get_test_network1()
     timestamp = "1970-01-01 00:00:00Z"
+    expected = File.read!("test/fixtures/example_l3_graph.dot")
 
-    assert graph_devices(routers, timestamp, @template) ==
-      """
-      graph G {
-        label="#{timestamp}"
+    assert graph_devices(routers, timestamp, @dot_template) == expected
+  end
 
-        "192.0.2.14" [label="192.0.2.14"];
-        "192.0.2.3" [label="192.0.2.3"];
-        "192.0.2.7" [label="192.0.2.7"];
-        "192.0.2.9" [label="192.0.2.9"];
-        "198.51.100.1" [label="198.51.100.1"];
+  test "Generates GraphML from routers" do
+    routers = get_test_network1()
+    timestamp = "1970-01-01 00:00:00Z"
+    expected = File.read!("test/fixtures/example_l3_graph.graphml")
 
-        "192.0.2.2/31";
-        "192.0.2.4/31";
-        "192.0.2.6/31";
-        "192.0.2.8/31";
-        "192.0.2.10/31";
-        "192.0.2.12/30";
-
-        "192.0.2.14" -- "192.0.2.12/30";
-        "192.0.2.3" -- "192.0.2.2/31";
-        "192.0.2.3" -- "192.0.2.8/31";
-        "192.0.2.7" -- "192.0.2.6/31";
-        "192.0.2.7" -- "192.0.2.10/31";
-        "192.0.2.9" -- "192.0.2.4/31";
-        "192.0.2.9" -- "192.0.2.8/31";
-        "192.0.2.9" -- "192.0.2.10/31";
-        "192.0.2.9" -- "192.0.2.12/30";
-        "198.51.100.1" -- "192.0.2.2/31";
-        "198.51.100.1" -- "192.0.2.4/31";
-        "198.51.100.1" -- "192.0.2.6/31";
-
-      }
-      """
+    assert graph_devices(routers, timestamp, @graphml_template) == expected
   end
 
   test "Generates dot from other routers" do
@@ -218,7 +197,7 @@ defmodule Giraphe.Graph.Dot.L3Test do
 
     timestamp = "1970-01-01 00:00:00Z"
 
-    assert graph_devices(routers, timestamp, @template) ==
+    assert graph_devices(routers, timestamp, @test_template) ==
       """
       graph G {
         label="#{timestamp}"
@@ -269,7 +248,7 @@ defmodule Giraphe.Graph.Dot.L3Test do
 
     timestamp = "1970-01-01 00:00:00Z"
 
-    assert graph_devices(routers, timestamp, @template) ==
+    assert graph_devices(routers, timestamp, @test_template) ==
       """
       graph G {
         label="#{timestamp}"
@@ -291,7 +270,7 @@ defmodule Giraphe.Graph.Dot.L3Test do
 
     timestamp = "1970-01-01 00:00:00Z"
 
-    assert graph_devices(routers, timestamp, @template) ==
+    assert graph_devices(routers, timestamp, @test_template) ==
       """
       graph G {
         label="#{timestamp}"
@@ -329,7 +308,7 @@ defmodule Giraphe.Graph.Dot.L3Test do
 
     timestamp = "1970-01-01 00:00:00Z"
 
-    assert graph_devices(routers, timestamp, @template) ==
+    assert graph_devices(routers, timestamp, @test_template) ==
       """
       graph G {
         label="#{timestamp}"
@@ -357,7 +336,7 @@ defmodule Giraphe.Graph.Dot.L3Test do
 
     timestamp = "1970-01-01 00:00:00Z"
 
-    assert graph_devices(routers, timestamp, @template) ==
+    assert graph_devices(routers, timestamp, @test_template) ==
       """
       graph G {
         label="#{timestamp}"

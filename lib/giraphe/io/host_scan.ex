@@ -1,7 +1,6 @@
-# Copyright © 2016 Jonathan Storm <the.jonathan.storm@gmail.com>
-# This work is free. You can redistribute it and/or modify it under the
-# terms of the Do What The Fuck You Want To Public License, Version 2,
-# as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 defmodule Giraphe.IO.HostScan do
   @moduledoc """
@@ -20,10 +19,10 @@ defmodule Giraphe.IO.HostScan do
   end
 
   def scan(subnet) do
-    host_scanner.scan subnet
+    host_scanner().scan subnet
   end
 
   def udp_161_open?(target) do
-    host_scanner.udp_161_open? target
+    host_scanner().udp_161_open? target
   end
 end
