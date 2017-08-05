@@ -246,15 +246,30 @@ defmodule Giraphe.IO.Query.NetSNMP do
       end
     end
   end
+
   defp _query(:routes, target) do
     object = ip_cidr_route_table_object()
 
     with [%{} | _] = rows <- snmptable(object, target)
     do
-      Enum.map rows, fn row ->
-        { NetAddr.ip(row.dest, row.mask),
-          NetAddr.ip(row.nexthop)
-        }
+      Enum.reduce rows, [], fn(row, acc) ->
+        destination = NetAddr.ip(row.dest, row.mask)
+        nexthop     = NetAddr.ip(row.nexthop)
+
+        case {destination, nexthop} do
+          {{:error, _}, _} ->
+            :ok = Logger.warn "Received bad destination or mask from #{target}: #{row.dest}/#{row.mask} -> #{row.nexthop}"
+
+            acc
+
+          {_, {:error, _}} ->
+            :ok = Logger.warn "Received bad nexthop from #{target}: #{row.dest}/#{row.mask} -> #{row.nexthop}"
+
+            acc
+
+          route ->
+            [route|acc]
+        end
       end
     end
   end

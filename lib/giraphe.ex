@@ -323,7 +323,7 @@ defmodule Giraphe do
       {:graphml, (Path.rootname(output_file) <> ".graphml")},
 
     ] |> Enum.map(fn {format, path} ->
-      export_l3_notation(format, routers, incidences, path)
+      export_l3_notation(format, incidences, routers, path)
     end)
 
     template =
