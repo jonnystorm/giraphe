@@ -18,69 +18,69 @@ To use giraphe as an escript:
 
   1. Clone the giraphe repository
 
-    ```sh
-    git clone https://github.com/jonnystorm/giraphe.git
-    ```
+  ```sh
+  git clone https://github.com/jonnystorm/giraphe.git
+  ```
 
   1. Add nmap command to sudoers
 
-    ```sh
-    Cmnd_Alias NMAP = /usr/bin/nmap -n -oG - -sU -p *
+  ```sh
+  Cmnd_Alias NMAP = /usr/bin/nmap -n -oG - -sU -p *
 
-    %wheel ALL=(root) NOPASSWD: NMAP
+  %wheel ALL=(root) NOPASSWD: NMAP
 
-    Defaults!NMAP !requiretty
-    ```
+  Defaults!NMAP !requiretty
+  ```
 
   1. Run from within the giraphe directory
 
-    ```sh
-    $ cd giraphe
-    $ ./giraphe
-    Usage: giraphe [-qv] -c <credentials_path> -o <output_file>
-                   [-2 <gateway_ip> [<subnet_cidr>]] [-3 [<router_ip> ...]]
+  ```sh
+  $ cd giraphe
+  $ ./giraphe
+  Usage: giraphe [-qv] -c <credentials_path> -o <output_file>
+                 [-2 <gateway_ip> [<subnet_cidr>]] [-3 [<router_ip> ...]]
 
-      -q: quiet
-      -v: verbose ('-vv' is more verbose)
+    -q: quiet
+    -v: verbose ('-vv' is more verbose)
 
-      -o: output file (must end in .png or .svg)
+    -o: output file (must end in .png or .svg)
 
-      -c: Specify file containing credentials
-        <credentials_path>: path to file containing credentials
+    -c: Specify file containing credentials
+      <credentials_path>: path to file containing credentials
 
-        Valid lines in this file will look like one of the following:
-          snmp v2c 'r34D0n1Y!'
-          snmp v3 noAuthNoPriv 'admin'
-          snmp v3 authNoPriv 'admin' md5 '$3cR3t!'
-          snmp v3 authPriv 'admin' sha '$3crR3t!' aes 'pR1v473!'
+      Valid lines in this file will look like one of the following:
+        snmp v2c 'r34D0n1Y!'
+        snmp v3 noAuthNoPriv 'admin'
+        snmp v3 authNoPriv 'admin' md5 '$3cR3t!'
+        snmp v3 authPriv 'admin' sha '$3crR3t!' aes 'pR1v473!'
 
-      -2: generate layer-2 topology
-         <gateway_ip>: IP address of target subnet gateway
-        <subnet_cidr>: Specifies switch subnet to graph
+    -2: generate layer-2 topology
+       <gateway_ip>: IP address of target subnet gateway
+      <subnet_cidr>: Specifies switch subnet to graph
 
-      -3: generate layer-3 topology
-        <router_ip>: IP address of seed target router; with no seed specified,
-                     this machines's default gateway is used
+    -3: generate layer-3 topology
+      <router_ip>: IP address of seed target router; with no seed specified,
+                   this machines's default gateway is used
 
-    ```
+  ```
 
 To use giraphe as a library:
 
   1. Add giraphe to your list of dependencies in `mix.exs`:
 
-    ```elixir
-    def deps do
-      [{:giraphe, git: "https://github.com/jonnystorm/giraphe.git"}]
-    end
-    ```
+  ```elixir
+  def deps do
+    [{:giraphe, git: "https://github.com/jonnystorm/giraphe.git"}]
+  end
+  ```
 
   1. Ensure giraphe is started before your application:
 
-    ```elixir
-    def application do
-      [applications: [:giraphe]]
-    end
-    ```
+  ```elixir
+  def application do
+    [applications: [:giraphe]]
+  end
+  ```
 
 ## Example
 
