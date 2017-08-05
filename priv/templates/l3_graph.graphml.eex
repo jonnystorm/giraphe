@@ -10,10 +10,10 @@
     <!-- Routers -->
 
 <%=
-for r <- routers do
+for router <- routers do
   """
-      <node id="n#{r.id}">
-        <desc>#{r.name}</desc>
+      <node id="n#{router.id}">
+        <desc>#{router.name}</desc>
       </node>
   """
 end
@@ -22,12 +22,12 @@ end
     <!-- Subnets -->
 
 <%=
-for e <- edges do
-  scrubbed = String.replace("#{e}", "/", "_")
+for edge <- edges do
+  scrubbed = String.replace("#{edge}", "/", "_")
 
   """
       <node id="n#{scrubbed}">
-        <desc>#{e}</desc>
+        <desc>#{edge}</desc>
       </node>
   """
 end
@@ -36,11 +36,11 @@ end
     <!-- Incidences -->
 
 <%=
-for {r, e}   <- incidences do
-  scrubbed = String.replace("#{e}", "/", "_")
+for {router, edge} <- incidences do
+  scrubbed = String.replace("#{edge}", "/", "_")
 
   """
-      <edge source="n#{r}" target="n#{scrubbed}"/>
+      <edge source="n#{router}" target="n#{scrubbed}"/>
   """
 end %>
   </graph>

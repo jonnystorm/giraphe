@@ -35,9 +35,9 @@ graph G {
   // Routers
 
 <%=
-for r <- routers do
+for router <- routers do
   """
-    "#{r.id}" [label="#{r.name}" shape=circle fillcolor=2 width=1.5];
+    "#{router.id}" [label="#{router.name}" shape=circle fillcolor=2 width=1.5];
   """
 end
 %>
@@ -45,9 +45,9 @@ end
   // Subnets
 
 <%=
-for e <- edges do
+for edge <- edges do
   """
-    "#{e}" [label="" shape=circle fillcolor=1 width=0.25];
+    "#{edge}" [label="" shape=circle fillcolor=1 width=0.25];
   """
 end
 %>
@@ -55,9 +55,9 @@ end
   // Incidences
 
 <%=
-for {r, e} <- incidences do
+for {router, edge} <- incidences do
   """
-    "#{r}" -- "#{e}";
+    "#{router}" -- "#{edge}";
   """
 end
 %>

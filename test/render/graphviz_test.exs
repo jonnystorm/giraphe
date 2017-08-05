@@ -12,7 +12,9 @@ defmodule Giraphe.Render.GraphVizTest do
 
   test "Renders layer-3 dot graphs with GraphViz" do
     output_files =
-      for format <- ["png", "svg"], suffix <- ["l2", "l3"] do
+      for format <- ["png", "svg"],
+          suffix <- ["l2", "l3"]
+      do
         "examples/example-#{suffix}.#{format}"
       end
 
@@ -24,7 +26,9 @@ defmodule Giraphe.Render.GraphVizTest do
     ] |> List.duplicate(2)
       |> List.flatten
       |> Enum.zip(output_files)
-      |> Enum.map(fn {graph, file} -> render_graph(graph, file) end)
+      |> Enum.map(fn {graph, file} ->
+        render_graph(graph, file)
+      end)
 
     Enum.map output_files, &assert(File.exists?(&1))
   end

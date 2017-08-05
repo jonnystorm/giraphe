@@ -11,10 +11,10 @@
 for s <- switches do
   ports =
     s.fdb
-      |> Enum.map(& elem(&1, 0))
-      |> Enum.uniq
-      |> Enum.map(& "\n      <port name=\"#{&1}\"/>")
-      |> Enum.join("")
+    |> Enum.map(& elem(&1, 0))
+    |> Enum.uniq
+    |> Enum.map(& "\n      <port name=\"#{&1}\"/>")
+    |> Enum.join("")
 
   """
       <node id="n#{NetAddr.address(s.polladdr)}">
@@ -31,10 +31,13 @@ for {%{physaddr: down_physaddr} = down, up} <- edges do
   up_id = NetAddr.address up.polladdr
   down_id = NetAddr.address down.polladdr
 
-  downlink = Enum.find_value(up.fdb, fn
-    {port, ^down_physaddr, _} -> port
-                            _ -> nil
-  end)
+  downlink =
+    Enum.find_value(up.fdb, fn
+      {port, ^down_physaddr, _} ->
+        port
+      _ ->
+        nil
+    end)
 
   """
       <edge source="n#{up_id}" target="n#{down_id}" sourceport="#{downlink}" targetport="#{down.uplink}"/>
