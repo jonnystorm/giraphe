@@ -8,7 +8,11 @@ defmodule Giraphe.IO.Query.Dummy do
   @behaviour Giraphe.IO.Query
 
   defp _query_addresses(target)
-      when target in ["192.0.2.2", "192.0.2.6", "198.51.100.1"]
+      when target in [
+        "192.0.2.2",
+        "192.0.2.6",
+        "198.51.100.1",
+      ]
   do
     [ "192.0.2.2/31",
       "192.0.2.4/31",
@@ -16,38 +20,56 @@ defmodule Giraphe.IO.Query.Dummy do
       "192.0.2.254/31",
       "198.51.100.1/29",
       "198.51.100.9/29",
-      "198.51.100.17/29"
+      "198.51.100.17/29",
     ]
   end
   defp _query_addresses("192.0.2.7") do
     [ "192.0.2.7/31",
       "192.0.2.10/31",
       "198.51.100.25/29",
-      "198.51.100.33/29"
+      "198.51.100.33/29",
     ]
   end
-  defp _query_addresses(target) when target in ["192.0.2.3", "192.0.2.8"] do
+  defp _query_addresses(target)
+      when target in [
+        "192.0.2.3",
+        "192.0.2.8",
+      ]
+  do
     [ "192.0.2.3/31",
-      "192.0.2.8/31"
+      "192.0.2.8/31",
     ]
   end
   defp _query_addresses("192.0.2.9") do
     [ "192.0.2.13/30",
       "192.0.2.9/31",
       "192.0.2.11/31",
-      "192.0.2.5/31"
+      "192.0.2.5/31",
     ]
   end
   defp _query_addresses("192.0.2.1") do
     [ "192.0.2.1/31",
-      "198.51.100.1/29"
+      "198.51.100.1/29",
     ]
   end
-  defp _query_addresses("203.0.113.2"), do: ["203.0.113.2/32"]
-  defp _query_addresses("203.0.113.3"), do: ["203.0.113.3/32"]
-  defp _query_addresses("203.0.113.4"), do: ["203.0.113.4/32"]
-  defp _query_addresses("203.0.113.5"), do: ["203.0.113.5/32"]
-  defp _query_addresses("203.0.113.7"), do: ["203.0.113.7/31", "203.0.113.8/31"]
+  defp _query_addresses("203.0.113.2"),
+    do: ["203.0.113.2/32"]
+
+  defp _query_addresses("203.0.113.3"),
+    do: ["203.0.113.3/32"]
+
+  defp _query_addresses("203.0.113.4"),
+    do: ["203.0.113.4/32"]
+
+  defp _query_addresses("203.0.113.5"),
+    do: ["203.0.113.5/32"]
+
+  defp _query_addresses("203.0.113.7"),
+    do: ["203.0.113.7/31", "203.0.113.8/31"]
+
+  defp _query_addresses("203.0.113.9"),
+    do: ["203.0.113.9/31"]
+
   defp _query_addresses(_target) do
     []
   end
@@ -329,7 +351,11 @@ defmodule Giraphe.IO.Query.Dummy do
     [{"192.0.2.0/24", "0.0.0.0"}]
   end
   defp _query_routes(target)
-      when target in ["192.0.2.2", "192.0.2.6", "198.51.100.1"]
+      when target in [
+        "192.0.2.2",
+        "192.0.2.6",
+        "198.51.100.1",
+      ]
   do
     [ {    "192.0.2.2/31", "0.0.0.0"},
       {    "192.0.2.4/31", "0.0.0.0"},
@@ -360,7 +386,12 @@ defmodule Giraphe.IO.Query.Dummy do
       {"198.51.100.40/29", "192.0.2.6"}
     ]
   end
-  defp _query_routes(target) when target in ["192.0.2.3", "192.0.2.8"] do
+  defp _query_routes(target)
+      when target in [
+        "192.0.2.3",
+        "192.0.2.8",
+      ]
+  do
     [ {    "192.0.2.2/31", "0.0.0.0"},
       {    "192.0.2.4/31", "192.0.2.2"},
       {    "192.0.2.6/31", "192.0.2.2"},
@@ -437,6 +468,13 @@ defmodule Giraphe.IO.Query.Dummy do
       {   "203.0.113.3/32", "203.0.113.4"},
       {   "203.0.113.4/32", "203.0.113.4"},
       {   "203.0.113.5/32", "0.0.0.0"}
+    ]
+  end
+  defp _query_routes("203.0.113.9") do
+    [ {        "0.0.0.0/0", "203.0.113.8"},
+      # '?' appears when column indices are missing. This is
+      # observed during route churn.
+      {   "203.0.113.8/31", "?"},
     ]
   end
   defp _query_routes(_target) do
