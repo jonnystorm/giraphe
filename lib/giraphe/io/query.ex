@@ -1,23 +1,30 @@
-# Copyright © 2016 Jonathan Storm <the.jonathan.storm@gmail.com>
-# This work is free. You can redistribute it and/or modify it under the
-# terms of the Do What The Fuck You Want To Public License, Version 2,
-# as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 defmodule Giraphe.IO.Query do
   @moduledoc """
   A behaviour for querier implementations.
   """
 
-  @type query_object :: :addresses | :arp_cache | :fdb | :routes | :sysname
+  @type query_object
+    :: :addresses
+     | :arp_cache
+     | :fdb
+     | :routes
+     | :sysname
 
-  @callback query(object :: query_object, target :: NetAddr.t) :: [NetAddr.t]
-
+  @callback query(
+    object :: query_object,
+    target :: NetAddr.t
+  ) :: {   :ok, NetAddr.t, query_object, any}
+     | {:error, NetAddr.t, query_object, any}
 
   defp querier do
     Application.get_env :giraphe, :querier
   end
 
   def query(object, target) do
-    querier.query object, target
+    querier().query object, target
   end
 end

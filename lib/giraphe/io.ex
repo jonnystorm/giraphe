@@ -1,7 +1,6 @@
-# Copyright © 2016 Jonathan Storm <the.jonathan.storm@gmail.com>
-# This work is free. You can redistribute it and/or modify it under the
-# terms of the Do What The Fuck You Want To Public License, Version 2,
-# as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 defmodule Giraphe.IO do
   @moduledoc false
@@ -24,77 +23,98 @@ defmodule Giraphe.IO do
 
   defp query(object, target, default_fun) do
     object
-      |> Giraphe.IO.Query.query(target)
-      |> get_query_output(default_fun)
+    |> Giraphe.IO.Query.query(target)
+    |> get_query_output(default_fun)
   end
 
   def credentials do
-    Application.get_env :giraphe, :credentials
+    Application.get_env(:giraphe, :credentials)
   end
 
-  defp find_connected_route_containing_address(routes, address) do
+  defp find_connected_route_containing_address(
+      routes,
+      address
+  ) do
     Enum.find routes, fn {destination, next_hop} ->
       NetAddr.contains?(destination, address)
-        && Utility.next_hop_is_self(next_hop)
+      && Utility.next_hop_is_self(next_hop)
     end
   end
 
-  defp find_addresses_with_matching_connected_routes(addresses, []) do
-    addresses
-  end
-  defp find_addresses_with_matching_connected_routes(addresses, routes) do
-    Enum.filter addresses, &find_connected_route_containing_address(routes, &1)
+  defp find_addresses_with_matching_connected_routes(
+    addresses,
+    routes
+  ) do
+    Enum.filter addresses,
+      &find_connected_route_containing_address(routes, &1)
   end
 
   def get_router(target) do
     if is_snmp_agent(target) do
       routes = get_target_routes(target)
-      addresses = get_target_addresses(target)
+      target_addresses = get_target_addresses(target)
 
-      # Nexus can have routes that don't correspond to addresses
+      # Cisco Nexus may have routes that don't correspond to
+      # addresses
+      #
       addresses =
-        if length(routes) <= length(addresses) do
-          addresses
+        if length(routes) <= length(target_addresses) do
+          target_addresses
         else
-          find_addresses_with_matching_connected_routes(addresses, routes)
+          find_addresses_with_matching_connected_routes(
+            target_addresses,
+            routes
+          )
         end
 
       routes =
         if length(routes) <= length(addresses) do
-          Enum.map(addresses, fn a ->
-            {NetAddr.first_address(a), address_to_next_hop_self(a)}
-          end)
+          Enum.map addresses, fn address ->
+            { NetAddr.first_address(address),
+              address_to_next_hop_self(address)
+            }
+          end
         else
           routes
         end
 
-      polladdr = Utility.refine_address_length target, addresses, routes
+      polladdr =
+        target
+        |> Utility.refine_address_length(addresses, routes)
 
       %Giraphe.Router{
+             name: get_target_sysname(target),
          polladdr: polladdr,
         addresses: addresses,
-           routes: routes,
-             name: get_target_sysname(target)
+           routes: routes
       }
 
     else
       %Giraphe.Router{
+             name: NetAddr.address(target),
          polladdr: target,
         addresses: [target],
-           routes: [{target, address_to_next_hop_self(target)}],
-             name: NetAddr.address(target)
+           routes: [
+            {target, address_to_next_hop_self(target)}
+          ]
       }
     end
   end
 
   defp get_switchport_by_mac(switch, mac) do
-    fdb = Enum.filter switch.fdb, fn {_, a, _} -> a != switch.physaddr end
-
-    Enum.find_value fdb, fn {p, ^mac, _} -> p; _ -> nil end
+    switch.fdb
+    |> Enum.filter(fn {_, a, _} ->
+      a != switch.physaddr
+    end)
+    |> Enum.find_value(fn
+      {p, ^mac, _} -> p
+      _ -> nil
+    end)
   end
 
   def get_switch(target, physaddr, gateway_mac) do
-    switch = %Giraphe.Switch{polladdr: target, physaddr: physaddr}
+    switch =
+      %Giraphe.Switch{polladdr: target, physaddr: physaddr}
 
     if is_snmp_agent(target) do
       switch =
@@ -103,7 +123,9 @@ defmodule Giraphe.IO do
            fdb: get_target_fdb(target)
         }
 
-      %{switch | uplink: get_switchport_by_mac(switch, gateway_mac)}
+      %{switch |
+        uplink: get_switchport_by_mac(switch, gateway_mac)
+      }
 
     else
       %{switch |
@@ -114,39 +136,47 @@ defmodule Giraphe.IO do
   end
 
   def get_target_addresses(target) do
-    Enum.sort query(:addresses, target, fn(t, _) -> [t] end)
+    :addresses
+    |> query(target, fn(t, _) -> [t] end)
+    |> Enum.sort
   end
 
   def get_target_arp_cache(target) do
-    Enum.sort query(:arp_cache, target, fn(_, _) -> [] end)
+    :arp_cache
+    |> query(target, fn(_, _) -> [] end)
+    |> Enum.sort
   end
 
-  def get_target_fdb(target) do
-    query(:fdb, target, fn(_, _) -> [] end)
-  end
+  def get_target_fdb(target),
+    do: query(:fdb, target, fn(_, _) -> [] end)
 
   defp address_to_next_hop_self(address) do
-    List.duplicate(0, NetAddr.address_size address)
-      |> :binary.list_to_bin
-      |> NetAddr.netaddr
+    0
+    |> List.duplicate(NetAddr.address_size(address))
+    |> :binary.list_to_bin
+    |> NetAddr.netaddr
   end
 
   def get_target_routes(target) do
     :routes
-      |> query(target, fn(_, _) -> [] end)
-      |> Enum.sort
+    |> query(target, fn(_, _) -> [] end)
+    |> Enum.sort
   end
 
   def get_target_sysname(target) do
-    query(:sysname, target, fn(t, _) -> NetAddr.address(t) end)
+    query(
+      :sysname,
+      target,
+      fn(t, _) -> NetAddr.address(t) end
+    )
   end
 
-  def ping_subnet(subnet) do
-    Giraphe.IO.HostScan.scan subnet
-  end
+  def ping_subnet(subnet),
+    do: Giraphe.IO.HostScan.scan subnet
 
-  def is_snmp_agent(%{} = target) do
-    Giraphe.IO.HostScan.udp_161_open? target
-  end
-  def is_snmp_agent(_), do: false
+  def is_snmp_agent(%{} = target),
+    do: Giraphe.IO.HostScan.udp_161_open? target
+
+  def is_snmp_agent(_),
+    do: false
 end

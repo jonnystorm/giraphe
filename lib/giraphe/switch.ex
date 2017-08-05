@@ -1,15 +1,20 @@
-# Copyright © 2016 Jonathan Storm <the.jonathan.storm@gmail.com>
-# This work is free. You can redistribute it and/or modify it under the
-# terms of the Do What The Fuck You Want To Public License, Version 2,
-# as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 defmodule Giraphe.Switch do
   @moduledoc """
-  Defines a struct for storing forwarding database entries and other
-  switch information.
+  Defines a struct for storing forwarding database entries
+  and other switch information.
   """
 
-  defstruct name: nil, physaddr: nil, fdb: nil, polladdr: nil, uplink: nil
+  defstruct [
+    :name,
+    :physaddr,
+    :fdb,
+    :polladdr,
+    :uplink
+  ]
 
   @type name     :: String.t
   @type netaddr  :: NetAddr.t
@@ -31,10 +36,10 @@ defimpl String.Chars, for: Giraphe.Switch do
   def to_string(switch) do
     fdb =
       switch.fdb
-        |> Enum.map(fn {port, address, vlan} ->
-          "#{port}, V#{vlan} => #{address}"
-        end)
-        |> Enum.join(",\n    ")
+      |> Enum.map(fn {port, address, vlan} ->
+        "#{port}, V#{vlan} => #{address}"
+      end)
+      |> Enum.join(",\n    ")
 
     "#{switch.uplink} <- #{switch.name}: #{switch.polladdr} (#{switch.physaddr})
     #{fdb}\n"

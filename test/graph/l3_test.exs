@@ -1,7 +1,6 @@
-# Copyright © 2016 Jonathan Storm <the.jonathan.storm@gmail.com>
-# This work is free. You can redistribute it and/or modify it under the
-# terms of the Do What The Fuck You Want To Public License, Version 2,
-# as published by Sam Hocevar. See the COPYING.WTFPL file for more details.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 defmodule Giraphe.Graph.L3Test do
   use ExUnit.Case
@@ -109,7 +108,7 @@ defmodule Giraphe.Graph.L3Test do
   end
 
   test "Generates dot from routers" do
-    routers = get_test_network1
+    routers = get_test_network1()
     timestamp = "1970-01-01 00:00:00Z"
     expected = File.read!("test/fixtures/example_l3_graph.dot")
 
@@ -117,7 +116,7 @@ defmodule Giraphe.Graph.L3Test do
   end
 
   test "Generates GraphML from routers" do
-    routers = get_test_network1
+    routers = get_test_network1()
     timestamp = "1970-01-01 00:00:00Z"
     expected = File.read!("test/fixtures/example_l3_graph.graphml")
 

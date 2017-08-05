@@ -10,10 +10,27 @@ defmodule Giraphe.Mixfile do
       escript: [main_module: Giraphe],
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      deps: deps,
+      deps: deps(),
       docs: [
         logo: "giraphe-logo.png",
         extras: ["README.md"],
+      ],
+      dialyzer: [
+        add_plt_apps: [
+          :logger,
+          :jds_math_ex,
+          :linear_ex,
+          :netaddr_ex,
+          :snmp_mib_ex,
+          :net_snmp_ex,
+        ],
+        ignore_warnings: "dialyzer.ignore",
+        flags: [
+          :unmatched_returns,
+          :error_handling,
+          :race_conditions,
+          :underspecs,
+        ],
       ],
     ]
   end
