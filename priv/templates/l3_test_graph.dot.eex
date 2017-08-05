@@ -2,23 +2,23 @@ graph G {
   label="<%= timestamp %>"
 
 <%=
-for r <- routers do
+for router <- routers do
   """
-    "#{r.id}" [label="#{r.name}"];
-  """
-end
-%>
-<%=
-for e <- edges do
-  """
-    "#{e}";
+    "#{router.id}" [label="#{router.name}"];
   """
 end
 %>
 <%=
-for {r, e} <- incidences do
+for edge <- edges do
   """
-    "#{r}" -- "#{e}";
+    "#{edge}";
+  """
+end
+%>
+<%=
+for {router, edge} <- incidences do
+  """
+    "#{router}" -- "#{edge}";
   """
 end
 %>
