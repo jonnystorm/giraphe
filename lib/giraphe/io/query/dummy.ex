@@ -70,9 +70,8 @@ defmodule Giraphe.IO.Query.Dummy do
   defp _query_addresses("203.0.113.9"),
     do: ["203.0.113.9/31"]
 
-  defp _query_addresses(_target) do
-    []
-  end
+  defp _query_addresses(_target),
+    do: []
 
   defp _query_arp_cache("192.0.2.1") do
     [ {  "192.0.2.1", "00:00:00:00:00:01"},
@@ -118,6 +117,9 @@ defmodule Giraphe.IO.Query.Dummy do
       {"192.0.2.200", "00:00:00:00:02:00"}
     ]
   end
+
+  defp _query_arp_cache(_target),
+    do: []
 
   defp _query_fdb("192.0.2.3") do
     [ {"Gi1/24", "00:00:00:00:00:01", 1},

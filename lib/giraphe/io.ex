@@ -51,8 +51,8 @@ defmodule Giraphe.IO do
 
   def get_router(target) do
     if is_snmp_agent(target) do
-      routes = get_target_routes(target)
-      target_addresses = get_target_addresses(target)
+      routes           = get_target_routes    target
+      target_addresses = get_target_addresses target
 
       # Cisco Nexus may have routes that don't correspond to
       # addresses
@@ -95,7 +95,7 @@ defmodule Giraphe.IO do
          polladdr: target,
         addresses: [target],
            routes: [
-            {target, address_to_next_hop_self(target)}
+            {target, address_to_next_hop_self(target)},
           ]
       }
     end

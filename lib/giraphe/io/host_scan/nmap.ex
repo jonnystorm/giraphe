@@ -15,9 +15,9 @@ defmodule Giraphe.IO.HostScan.Nmap do
   Scans all hosts in `subnet`.
   """
   def scan(subnet) do
-    args = ~w(-n -sn -PE -T4 #{subnet})
+    args = ~w(nmap -n -sn -PE -T4 --max-retries 0 #{subnet})
 
-    case System.cmd("nmap", args, stderr_to_stdout: true) do
+    case System.cmd("sudo", args) do
       {_, 0} ->
         :ok
 

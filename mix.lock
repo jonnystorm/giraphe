@@ -5,5 +5,5 @@
   "jds_math_ex": {:git, "https://github.com/jonnystorm/jds-math-elixir", "144e35409a234b05be29ed4eb2000df9f2a9b804", []},
   "linear_ex": {:git, "https://github.com/jonnystorm/linear-elixir", "c7132141cc060a22a38d89bea1c272145b07d206", []},
   "net_snmp_ex": {:git, "https://github.com/jonnystorm/net-snmp-elixir.git", "eae26d777fb84bdc53787841c39cc07b9e5b8395", []},
-  "netaddr_ex": {:git, "https://github.com/jonnystorm/netaddr-elixir.git", "1da6020f3369eb04b3761c2f1e9bc1d6ab14730c", []},
+  "netaddr_ex": {:git, "https://github.com/jonnystorm/netaddr-elixir.git", "ba9efc1c4b504310f87aeb0e160320127b85f9be", []},
   "snmp_mib_ex": {:git, "https://github.com/jonnystorm/snmp-mib-elixir", "5df5999333e97ece702045b2d1de47025daa15a8", []}}

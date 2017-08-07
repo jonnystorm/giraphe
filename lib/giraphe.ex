@@ -15,7 +15,7 @@ defmodule Giraphe do
     do: Agent.start_link(fn -> [] end, name: __MODULE__)
 
   defp get_session_parameter(key) do
-    Agent.get(   __MODULE__, &Keyword.get(&1, key))
+    Agent.get(__MODULE__, &Keyword.get(&1, key))
   end
 
   defp set_session_parameter(key, value) do
@@ -44,7 +44,7 @@ defmodule Giraphe do
     text
       |> String.split("\n")
       |> Enum.map(&args_to_atoms/1)
-      |> Enum.filter(&(length(&1) >= 1))
+      |> Enum.filter(& length(&1) >= 1)
       |> Enum.group_by(
         fn [type|_] -> type end,
         fn [type|credential] -> {type, credential} end
@@ -93,6 +93,10 @@ defmodule Giraphe do
       set_session_parameter(:export_path, Path.expand(path))
     end
 
+    if path = switches[:hosts_file] do
+      set_session_parameter(:hosts_file, Path.expand(path))
+    end
+
     if switches[:info] do
       :ok = Logger.configure([level: :info])
     end
@@ -117,7 +121,7 @@ defmodule Giraphe do
           debug: :boolean,
           output_file: :string,
           export_path: :string,
-          credentials: :string
+          credentials: :string,
         ],
         aliases: [
            q: :quiet,
@@ -125,7 +129,8 @@ defmodule Giraphe do
           vv: :debug,
            o: :output_file,
            x: :export_path,
-           c: :credentials
+           h: :hosts_file,
+           c: :credentials,
         ]
       )
 
@@ -150,7 +155,7 @@ defmodule Giraphe do
     IO.puts(:stderr,
     """
     Usage: giraphe [-qv] -c <credentials_path> -o <output_file>
-                   [-dgr -x <export_path>]
+                   [-x <export_path>] [-h <hosts_file>]
                    [-2 <gateway_ip> [<subnet_cidr>]] [-3 [<router_ip> ...]]
 
       -q: quiet
@@ -158,6 +163,7 @@ defmodule Giraphe do
 
       -o: output file (must end in .png or .svg)
       -x: export routes to path
+      -h: discover hosts and export to file (takes a long time!)
 
       -c: Specify file containing credentials
         <credentials_path>: path to file containing credentials
@@ -192,9 +198,6 @@ defmodule Giraphe do
     |> Enum.join("\n")
   end
 
-  defp export_routes(routers, nil),
-    do: routers
-
   defp export_routes(routers, export_path) do
     Enum.map routers, fn router ->
         path = Path.join [export_path, "#{router.name}.txt"]
@@ -204,10 +207,8 @@ defmodule Giraphe do
       do
         :ok = Logger.error("Failed to export '#{inspect router.routes}'")
 
-        raise("Unable to export routes to #{inspect path}: #{inspect error}")
+        raise "Unable to export routes to #{inspect path}: #{inspect error}"
       end
-
-      router
     end
   end
 
@@ -277,7 +278,7 @@ defmodule Giraphe do
     do
       :ok = Logger.error("Failed to export '#{notation}'")
 
-      raise("Unable to export GraphML to #{inspect export_path}: #{inspect error}")
+      raise "Unable to export GraphML to #{inspect export_path}: #{inspect error}"
     end
   end
 
@@ -300,34 +301,87 @@ defmodule Giraphe do
       |> Graph.L2.graph_devices(template_file)
       |> Render.render_graph(output_file)
 
-      Utility.status "Done!"
+      :ok = Utility.status "Done!"
     else
       usage "No valid gateway address found."
     end
   end
 
+  defp discover_routers(targets) do
+    targets
+    |> Enum.filter(&Utility.is_host_address/1)
+    |> Discover.L3.discover
+  end
+
+  defp group_routers_by_incident_subnet(routers) do
+    routers
+    |> Enum.flat_map(fn router ->
+      Enum.map router.addresses, fn address ->
+        subnet = NetAddr.first_address address
+
+        {subnet, router}
+      end
+    end)
+    |> Enum.group_by(
+      fn {subnet, _} -> subnet end,
+      fn {_, router} -> router end
+    )
+  end
+
+  defp discover_hosts(routers) do
+    routers
+    |> group_routers_by_incident_subnet
+    |> Stream.filter(fn {subnet, _} ->
+      Utility.is_not_host_address subnet
+    end)
+    |> Enum.flat_map(fn {subnet, incident_routers} ->
+      Enum.find_value incident_routers,
+        &Utility.enumerate_hosts(subnet, &1.polladdr)
+    end)
+  end
+
+  defp export_hosts(hosts, hosts_file) do
+    string =
+      hosts
+      |> Enum.map(& "#{&1}\n")
+      |> Enum.join
+
+    with {:error, error} <- File.write(hosts_file, string)
+    do
+      :ok = Logger.error "Failed to export '#{inspect hosts}'"
+
+      raise "Unable to export routes to #{inspect hosts_file}: #{inspect error}"
+    end
+  end
+
   defp graph_l3(targets) do
+    routers    = discover_routers targets
+    incidences = Graph.L3.abduce_incidences routers
+
     output_file = get_session_parameter :output_file
     export_path = get_session_parameter :export_path
 
-    routers =
-      targets
-      |> Enum.filter(&Utility.is_host_address/1)
-      |> Discover.L3.discover
-      |> export_routes(export_path)
+    _ =
+      if export_path do
+        :ok = Utility.status "Exporting routes to #{inspect export_path}"
 
-    incidences = Graph.L3.abduce_incidences routers
+        export_routes(routers, export_path)
+      end
 
     _ = [
       {:dot,     (Path.rootname(output_file) <> ".dot")},
       {:graphml, (Path.rootname(output_file) <> ".graphml")},
 
     ] |> Enum.map(fn {format, path} ->
+      :ok = Utility.status "Exporting #{format} to #{path}"
+
       export_l3_notation(format, incidences, routers, path)
     end)
 
     template =
       Application.get_env(:giraphe, :l3_graph_template)
+
+    :ok = Utility.status "Generating graph"
 
     incidences
     |> Enum.map(fn
@@ -340,7 +394,18 @@ defmodule Giraphe do
     |> evaluate_l3_template(routers, template)
     |> Render.render_graph(output_file)
 
-    Utility.status "Done!"
+    hosts_file = get_session_parameter :hosts_file
+
+    _ =
+      if hosts_file do
+        :ok = Utility.status "Discovering hosts... (This may take a while.)"
+
+        routers
+        |> discover_hosts
+        |> export_hosts(hosts_file)
+      end
+
+    :ok = Utility.status "Done!"
   end
 
   def main(argv) do
