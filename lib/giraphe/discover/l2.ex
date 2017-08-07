@@ -45,17 +45,9 @@ defmodule Giraphe.Discover.L2 do
     |> Enum.filter(&Utility.is_not_default_address/1)
     |> Enum.sort
     |> Enum.reverse
-    |> Utility.find_prefix_containing_address(gateway_address)
-  end
-
-  defp retrieve_arp_entries(subnet, gateway_address) do
-    Utility.status "Retrieving ARP entries for '#{subnet}'..."
-
-    gateway_address
-    |> Giraphe.IO.get_target_arp_cache
-    |> Enum.filter(fn {netaddr, _} ->
-      NetAddr.contains?(subnet, netaddr)
-    end)
+    |> Utility.find_prefix_containing_address(
+      gateway_address
+    )
   end
 
   @doc """
@@ -71,35 +63,31 @@ defmodule Giraphe.Discover.L2 do
     subnet = get_subnet_by_gateway_address gateway_address
 
     if subnet do
-      Utility.status "Found subnet '#{subnet}' for gateway '#{gateway_address}'."
+      :ok = Utility.status "Found subnet '#{subnet}' for gateway '#{gateway_address}'."
 
       discover(gateway_address, subnet)
     else
-      :ok = Logger.error "Unable to find subnet for gateway '#{gateway_address}'."
-
-      exit {:shutdown, 1}
+      raise "Unable to find subnet for gateay #{inspect gateway_address}"
     end
   end
 
   def discover(gateway_address, subnet) do
-    Utility.status "Inducing ARP entries on '#{subnet}'..."
-    :ok = Giraphe.IO.ping_subnet subnet
-
     arp_entries =
-      retrieve_arp_entries(subnet, gateway_address)
+      Utility.farm_arp_entries(subnet, gateway_address)
 
     hosts =
-      Enum.map_join(
-        arp_entries,
-        ", ",
-        &NetAddr.address(elem(&1, 0))
-      )
+      arp_entries
+      |> Enum.map(&NetAddr.address elem(&1, 0))
+      |> Enum.join(", ")
 
-    Utility.status "Found the following hosts: #{hosts}."
+    :ok = Utility.status "Found the following hosts: #{hosts}."
 
-    ip_to_mac = Enum.into(arp_entries, %{})
+    {_, gateway_mac} =
+      Enum.find arp_entries, fn {netaddr, _} ->
+        netaddr == gateway_address
+      end
 
-    fetch_switches(arp_entries, ip_to_mac[gateway_address])
+    fetch_switches(arp_entries, gateway_mac)
   end
 end
 

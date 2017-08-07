@@ -12,9 +12,10 @@ defmodule Giraphe.Utility do
   end
 
   def status(message) do
-    if not quiet?() do
-      IO.puts :stderr, message
-    end
+    if not quiet?(),
+      do: :ok = IO.puts(:stderr, message)
+
+    :ok
   end
 
   def find_prefix_containing_address(prefixes, address) do
@@ -153,5 +154,41 @@ defmodule Giraphe.Utility do
     zipped
     |> Enum.unzip
     |> elem(e)
+  end
+
+  @type gateway_address :: NetAddr.t
+  @type subnet          :: NetAddr.t
+  @type netaddress      :: NetAddr.t
+  @type physaddress     :: NetAddr.MAC_48.t
+  @type arp_entry       :: {netaddress, physaddress}
+
+  defp retrieve_arp_entries(subnet, gateway_address) do
+    :ok = status "Retrieving ARP entries from #{gateway_address} for subnet #{subnet}"
+
+    gateway_address
+    |> Giraphe.IO.get_target_arp_cache
+    |> Enum.filter(fn {netaddress, _} ->
+      NetAddr.contains?(subnet, netaddress)
+    end)
+  end
+
+  @spec farm_arp_entries(subnet, gateway_address)
+    :: [arp_entry]
+  def farm_arp_entries(subnet, gateway_address) do
+    :ok = status "Inducing ARP entries in #{gateway_address} for subnet #{subnet}"
+
+    :ok = Giraphe.IO.ping_subnet subnet
+
+    retrieve_arp_entries(subnet, gateway_address)
+  end
+
+  @spec enumerate_hosts(subnet, gateway_address)
+    :: [Giraphe.Host.t]
+  def enumerate_hosts(subnet, gateway_address) do
+    subnet
+    |> farm_arp_entries(gateway_address)
+    |> Enum.map(fn {netaddress, physaddress} ->
+      %Giraphe.Host{ip: netaddress, mac: physaddress}
+    end)
   end
 end

@@ -140,10 +140,10 @@ defmodule Giraphe.Discover.L3 do
         end)
       end)
 
-    new_names = Enum.map(new_routers, &(&1.name))
+    new_names = Enum.map(new_routers, & &1.name)
 
-    Utility.status "New routers discovered: " <> Enum.join(new_names, ", ")
-    Utility.status "Next targets: " <> Enum.join(next_targets, ", ")
+    :ok = Utility.status "New routers discovered: " <> Enum.join(new_names, ", ")
+    :ok = Utility.status "Next targets: " <> Enum.join(next_targets, ", ")
 
     _discover(next_targets, all_routers)
   end
@@ -174,7 +174,7 @@ defmodule Giraphe.Discover.L3 do
     do: discover [get_default_gateway()]
 
   def discover(targets) do
-    Utility.status "Seeding targets " <> Enum.join(targets, ", ")
+    :ok = Utility.status "Seeding targets " <> Enum.join(targets, ", ")
 
     targets
     |> _discover([])

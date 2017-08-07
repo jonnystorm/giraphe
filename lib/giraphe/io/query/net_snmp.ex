@@ -182,10 +182,24 @@ defmodule Giraphe.IO.Query.NetSNMP do
 
     with [%{} | _] = rows <- snmptable(object, target)
     do
-      Enum.map rows, fn row ->
-        { NetAddr.ip(row.netaddress),
-          NetAddr.mac_48(row.physaddress)
-        }
+      Enum.reduce rows, [], fn(row, acc) ->
+        netaddress  = NetAddr.ip row.netaddress
+        physaddress = NetAddr.mac_48 row.physaddress
+
+        case {netaddress, physaddress} do
+          {{:error, _}, _} ->
+            :ok = Logger.warn "Received bad ARP entry from #{target}: #{row.netaddress} => #{row.physaddress}"
+
+            acc
+
+          {_, {:error, _}} ->
+            :ok = Logger.debug "Received incomplete ARP entry from #{target}: #{row.netaddress} => #{row.physaddress}"
+
+            acc
+
+          arp_entry ->
+            [arp_entry|acc]
+        end
       end
     end
   end
