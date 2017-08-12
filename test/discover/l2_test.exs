@@ -471,7 +471,8 @@ defmodule Giraphe.Discover.L2Test do
         },
       ]
 
-    switches = discover NetAddr.ip("192.0.2.1"), nil
+    switches =
+      discover_switches(NetAddr.ip("192.0.2.1"), nil)
 
     assert switches == expected_switches
   end

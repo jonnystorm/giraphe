@@ -121,10 +121,10 @@ defmodule Giraphe.Discover.L3 do
     |> Enum.dedup
   end
 
-  defp _discover([], routers),
+  defp _discover_routers([], routers),
     do: routers
 
-  defp _discover(targets, routers) do
+  defp _discover_routers(targets, routers) do
     new_routers =
       targets
       |> fetch_routers
@@ -145,7 +145,7 @@ defmodule Giraphe.Discover.L3 do
     :ok = Utility.status "New routers discovered: " <> Enum.join(new_names, ", ")
     :ok = Utility.status "Next targets: " <> Enum.join(next_targets, ", ")
 
-    _discover(next_targets, all_routers)
+    _discover_routers(next_targets, all_routers)
   end
 
   defp get_default_gateway do
@@ -163,21 +163,59 @@ defmodule Giraphe.Discover.L3 do
     NetAddr.ip default_gateway
   end
 
+  @type target  :: NetAddr.t
+  @type targets :: [target]
+  @type router  :: Giraphe.Router.t
+  @type routers :: [router]
+
   @doc """
   Discovers routers by polling `targets`.
 
   Additional routers are discovered by polling next-hops
   found in routing tables.
   """
-  @spec discover([NetAddr.t]) :: [Giraphe.Router.t]
-  def discover([]),
-    do: discover [get_default_gateway()]
+  @spec discover_routers(targets)
+    :: routers
+  def discover_routers([]),
+    do: discover_routers [get_default_gateway()]
 
-  def discover(targets) do
+  def discover_routers(targets) do
     :ok = Utility.status "Seeding targets " <> Enum.join(targets, ", ")
 
     targets
-    |> _discover([])
+    |> _discover_routers([])
     |> Enum.sort_by(& &1.polladdr)
+  end
+
+  defp group_routers_by_incident_subnet(routers) do
+    routers
+    |> Enum.flat_map(fn router ->
+      Enum.map router.addresses, fn address ->
+        subnet = NetAddr.first_address address
+
+        {subnet, router}
+      end
+    end)
+    |> Enum.group_by(
+      fn {subnet, _} -> subnet end,
+      fn {_, router} -> router end
+    )
+  end
+
+  @type host  :: Giraphe.Host.t
+  @type hosts :: [host]
+
+  @spec discover_hosts(routers)
+    :: hosts
+  def discover_hosts(routers) do
+    routers
+    |> group_routers_by_incident_subnet
+    |> Stream.filter(fn {subnet, _} ->
+      Utility.is_not_host_address subnet
+    end)
+    |> Enum.flat_map(fn {subnet, incident_routers} ->
+      Enum.find_value incident_routers,
+        &Giraphe.IO.enumerate_hosts(subnet, &1.polladdr)
+    end)
   end
 end

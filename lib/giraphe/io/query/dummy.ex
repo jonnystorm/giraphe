@@ -70,6 +70,18 @@ defmodule Giraphe.IO.Query.Dummy do
   defp _query_addresses("203.0.113.9"),
     do: ["203.0.113.9/31"]
 
+  defp _query_addresses("203.0.113.10") do
+    [ "203.0.113.10/32",
+      "203.0.113.12/31",
+    ]
+  end
+
+  defp _query_addresses("203.0.113.11") do
+    [ "203.0.113.11/32",
+      "203.0.113.13/31",
+    ]
+  end
+
   defp _query_addresses(_target),
     do: []
 
@@ -352,6 +364,7 @@ defmodule Giraphe.IO.Query.Dummy do
   defp _query_routes("192.0.2.1") do
     [{"192.0.2.0/24", "0.0.0.0"}]
   end
+
   defp _query_routes(target)
       when target in [
         "192.0.2.2",
@@ -373,6 +386,7 @@ defmodule Giraphe.IO.Query.Dummy do
       {"198.51.100.40/29", "192.0.2.3"}
     ]
   end
+
   defp _query_routes("192.0.2.7") do
     [ {    "192.0.2.2/31", "192.0.2.6"},
       {    "192.0.2.4/31", "192.0.2.6"},
@@ -388,6 +402,7 @@ defmodule Giraphe.IO.Query.Dummy do
       {"198.51.100.40/29", "192.0.2.6"}
     ]
   end
+
   defp _query_routes(target)
       when target in [
         "192.0.2.3",
@@ -408,6 +423,7 @@ defmodule Giraphe.IO.Query.Dummy do
       {"198.51.100.40/29", "192.0.2.9"}
     ]
   end
+
   defp _query_routes("192.0.2.9") do
     [ {    "192.0.2.2/31", "192.0.2.8"},
       {    "192.0.2.4/31", "0.0.0.0"},
@@ -423,6 +439,7 @@ defmodule Giraphe.IO.Query.Dummy do
       {"198.51.100.40/29", "192.0.2.14"}
     ]
   end
+
   defp _query_routes("203.0.113.1") do
     [ {        "0.0.0.0/0", "203.0.113.16"},
       {   "203.0.113.1/32", "0.0.0.0"},
@@ -434,6 +451,7 @@ defmodule Giraphe.IO.Query.Dummy do
       {  "203.0.113.16/31", "0.0.0.0"}
     ]
   end
+
   defp _query_routes("203.0.113.2") do
     [ {        "0.0.0.0/0", "203.0.113.1"},
       {   "203.0.113.1/32", "203.0.113.1"},
@@ -443,6 +461,7 @@ defmodule Giraphe.IO.Query.Dummy do
       {   "203.0.113.5/32", "203.0.113.5"}
     ]
   end
+
   defp _query_routes("203.0.113.3") do
     [ {        "0.0.0.0/0", "203.0.113.1"},
       {   "203.0.113.1/32", "203.0.113.1"},
@@ -452,6 +471,7 @@ defmodule Giraphe.IO.Query.Dummy do
       {   "203.0.113.5/32", "203.0.113.4"}
     ]
   end
+
   defp _query_routes("203.0.113.4") do
     [ {        "0.0.0.0/0", "203.0.113.3"},
       {   "203.0.113.1/32", "203.0.113.3"},
@@ -461,6 +481,7 @@ defmodule Giraphe.IO.Query.Dummy do
       {   "203.0.113.5/32", "203.0.113.5"}
     ]
   end
+
   defp _query_routes("203.0.113.5") do
     [ {        "0.0.0.0/0", "203.0.113.2"},
       {        "0.0.0.0/0", "203.0.113.4"},
@@ -472,6 +493,7 @@ defmodule Giraphe.IO.Query.Dummy do
       {   "203.0.113.5/32", "0.0.0.0"}
     ]
   end
+
   defp _query_routes("203.0.113.9") do
     [ {        "0.0.0.0/0", "203.0.113.8"},
       # '?' appears when column indices are missing. This is
@@ -479,6 +501,21 @@ defmodule Giraphe.IO.Query.Dummy do
       {   "203.0.113.8/31", "?"},
     ]
   end
+
+  defp _query_routes("203.0.113.10") do
+    [ {"203.0.113.10/32", "0.0.0.0"},
+      {"203.0.113.11/32", "203.0.113.13"},
+      {"203.0.113.12/31", "0.0.0.0"},
+    ]
+  end
+
+  defp _query_routes("203.0.113.11") do
+    [ {"203.0.113.10/32", "203.0.113.12"},
+      {"203.0.113.11/32", "0.0.0.0"},
+      {"203.0.113.12/31", "0.0.0.0"},
+    ]
+  end
+
   defp _query_routes(_target) do
     []
   end

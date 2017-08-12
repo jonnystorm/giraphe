@@ -74,13 +74,14 @@ defmodule Giraphe.Graph.L2 do
   defp unique_adjacencies_by_topologically_closest_switches(
     adjacencies
   ) do
-    # Downstream switches usually have many switches upstream
-    # of them. For each downstream switch, we only want the
-    # directly connected upstream switch.
+    # Downstream switches usually have many switches
+    # upstream of them. For each downstream switch, we only
+    # want the directly connected upstream switch.
     #
     # The adjacency whose upstream switch has the fewest FDB
     # entries must contain the topologically closest pair of
     # switches.
+    #
     adjacencies
     |> Enum.group_by(fn {d = _downstream_switch, _} -> d end)
     |> Enum.map(fn {_, adjacencies_of_downstream_switch} ->
@@ -100,8 +101,8 @@ defmodule Giraphe.Graph.L2 do
         physaddr_in_fdb?(upstream.fdb, downstream.physaddr)
     do
       {downstream_switch, upstream_switch}
-
-    end |> unique_adjacencies_by_topologically_closest_switches
+    end
+    |> unique_adjacencies_by_topologically_closest_switches
   end
 
   defp filter_switch_fdb(switch, fun) do
@@ -122,7 +123,7 @@ defmodule Giraphe.Graph.L2 do
     end
   end
 
-  defp intersect_switch_fdb_entries_with_physaddrs(
+  defp intersect_fdb_entries_with_physaddrs(
     switch,
     physaddrs
   ) do
@@ -141,27 +142,17 @@ defmodule Giraphe.Graph.L2 do
     graph_devices(switches, current_time_utc, template)
   end
 
-  defp generate_graph(
-    template_path,
-    switches,
-    adjacencies,
-    timestamp
+  defp prepare_switches_for_adjacency_abduction(
+    switches
   ) do
-    EEx.eval_file template_path,
-      [ timestamp: timestamp,
-        switches: switches,
-        edges: adjacencies,
-      ]
-  end
+    physaddrs = Enum.map switches, & &1.physaddr
 
-  defp prepare_switch_for_adjacency_abduction(
-    switch,
-    physaddrs = _physaddrs_of_all_known_switches
-  ) do
-    switch
-    |> remove_switch_fdb_entries_by_port(switch.uplink)
-    |> intersect_switch_fdb_entries_with_physaddrs(physaddrs)
-    |> Utility.trim_domain_from_device_sysname
+    Enum.map switches, fn switch ->
+      switch
+      |> remove_switch_fdb_entries_by_port(switch.uplink)
+      |> intersect_fdb_entries_with_physaddrs(physaddrs)
+      |> Utility.trim_domain_from_device_sysname
+    end
   end
 
   @doc """
@@ -170,15 +161,12 @@ defmodule Giraphe.Graph.L2 do
   def graph_devices(switches, timestamp, template) do
     :ok = Logger.info("Graphing switches '#{inspect switches}'...")
 
-    physaddrs = Enum.map(switches, & &1.physaddr)
-    switches  = Enum.map switches, fn switch ->
-      switch
-      |> prepare_switch_for_adjacency_abduction(physaddrs)
-    end
+    prepped_switches =
+      prepare_switches_for_adjacency_abduction switches
 
     adjacencies =
       try do
-        switches
+        prepped_switches
         |> abduce_adjacencies
         |> sort_adjacencies_by_upstream_polladdr_and_downlink
       rescue
@@ -188,7 +176,11 @@ defmodule Giraphe.Graph.L2 do
           []
       end
 
-    template
-    |> generate_graph(switches, adjacencies, timestamp)
+    Utility.evaluate_l2_template(
+      adjacencies,
+      prepped_switches,
+      template,
+      timestamp
+    )
   end
 end

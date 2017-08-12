@@ -119,12 +119,11 @@ defmodule Giraphe.Discover.L3Test do
       ]
 
     routers =
-      discover(
-        [ NetAddr.ip("198.51.100.1"),
-          NetAddr.ip("192.0.2.4"),
-          NetAddr.ip("198.51.100.1/29"),
-        ]
-      )
+      discover_routers [
+        NetAddr.ip("198.51.100.1"),
+        NetAddr.ip("192.0.2.4"),
+        NetAddr.ip("198.51.100.1/29"),
+      ]
 
     assert routers == expected_routers
   end
@@ -292,12 +291,20 @@ defmodule Giraphe.Discover.L3Test do
         },
       ]
 
-    routers = discover [NetAddr.ip("203.0.113.1")]
+    routers = discover_routers [NetAddr.ip("203.0.113.1")]
 
     assert routers == expected_routers
   end
 
-  test "Router has connected route for polling address when no SNMP route entries exist" do
+  test """
+    Router has connected route for polling address when no
+    SNMP route entries exist
+  """ do
+    # The router at the given polling address must at least
+    # have a connected route for the subnet on which the
+    # polling address resides. Therefore, we return a router
+    # with the connected route as its only route.
+    #
     expected_routers =
       [ %Giraphe.Router{
           name: "203.0.113.6",
@@ -311,10 +318,21 @@ defmodule Giraphe.Discover.L3Test do
         },
       ]
 
-    assert discover([NetAddr.ip("203.0.113.6/31")]) == expected_routers
+    routers =
+      discover_routers [NetAddr.ip("203.0.113.6/31")]
+
+    assert routers == expected_routers
   end
 
-  test "Router with no SNMP route entries has connected routes for all addresses" do
+  test """
+    Router with no SNMP route entries has connected routes
+    for all addresses
+  """ do
+    # The router with the given addresses must at least
+    # have connected routes for the subnets on which the
+    # addresses respectively reside. Therefore, return a
+    # router with the connected routes as its only routes.
+    #
     expected_routers =
       [ %Giraphe.Router{
           name: "203.0.113.7",
@@ -330,7 +348,9 @@ defmodule Giraphe.Discover.L3Test do
         },
       ]
 
-    assert discover([NetAddr.ip("203.0.113.7")]) == expected_routers
+    routers = discover_routers [NetAddr.ip("203.0.113.7")]
+
+    assert routers == expected_routers
   end
 
   test "Router with bad NetAddrs in routes explodes" do
@@ -342,7 +362,50 @@ defmodule Giraphe.Discover.L3Test do
     # Later calls to `NetAddr` functions therefore raise.
     #
     assert_raise Protocol.UndefinedError, fn ->
-      discover [NetAddr.ip("203.0.113.9")]
+      discover_routers [NetAddr.ip("203.0.113.9")]
     end
+  end
+
+  test "When a nexthop does not respond to polling, if that
+        nexthop is an address of a known router, do not
+        create a new router for the nexthop but use the
+        existing router, instead."
+  do
+    expected_routers =
+      [ %Giraphe.Router{
+          name: "203.0.113.10",
+          polladdr: NetAddr.ip("203.0.113.10"),
+          addresses: [
+            NetAddr.ip("203.0.113.10"),
+            NetAddr.ip("203.0.113.12/31"),
+          ],
+          routes: [
+            {NetAddr.ip("203.0.113.10"),    NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("203.0.113.11"), NetAddr.ip("203.0.113.13")},
+            {NetAddr.ip("203.0.113.12/31"), NetAddr.ip("0.0.0.0")},
+          ]
+        },
+        %Giraphe.Router{
+          name: "203.0.113.11",
+          polladdr: NetAddr.ip("203.0.113.11"),
+          addresses: [
+            NetAddr.ip("203.0.113.11"),
+            NetAddr.ip("203.0.113.13/31"),
+          ],
+          routes: [
+            {NetAddr.ip("203.0.113.10"), NetAddr.ip("203.0.113.12")},
+            {NetAddr.ip("203.0.113.11"),    NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("203.0.113.12/31"), NetAddr.ip("0.0.0.0")},
+          ]
+        },
+      ]
+
+    routers =
+      discover_routers [
+        NetAddr.ip("203.0.113.10"),
+        NetAddr.ip("203.0.113.11"),
+      ]
+
+    assert routers == expected_routers
   end
 end

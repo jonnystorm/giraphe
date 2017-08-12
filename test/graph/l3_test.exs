@@ -125,16 +125,18 @@ defmodule Giraphe.Graph.L3Test do
     routers = get_test_network1()
     timestamp = "1970-01-01 00:00:00Z"
     expected = File.read!("test/fixtures/example_l3_graph.dot")
+    template  = File.read! @dot_template
 
-    assert graph_devices(routers, timestamp, @dot_template) == expected
+    assert graph_devices(routers, timestamp, template) == expected
   end
 
   test "Generates GraphML from routers" do
     routers = get_test_network1()
     timestamp = "1970-01-01 00:00:00Z"
     expected = File.read!("test/fixtures/example_l3_graph.graphml")
+    template  = File.read! @graphml_template
 
-    assert graph_devices(routers, timestamp, @graphml_template) == expected
+    assert graph_devices(routers, timestamp, template) == expected
   end
 
   test "Generates dot from other routers" do
@@ -192,24 +194,24 @@ defmodule Giraphe.Graph.L3Test do
             %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32},
           ],
           routes: [
-           { %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0},
-             %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}
-           },
-           { %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32},
-             %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}
-           },
-           { %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32},
-             %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}
-           },
-           { %NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32},
-             %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}
-           },
-           { %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32},
-             %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}
-           },
-           { %NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32},
-             %NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32}
-           },
+            { %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 0},
+              %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}
+            },
+            { %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32},
+              %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}
+            },
+            { %NetAddr.IPv4{address: <<198, 51, 100, 2>>, length: 32},
+              %NetAddr.IPv4{address: <<0, 0, 0, 0>>, length: 32}
+            },
+            { %NetAddr.IPv4{address: <<198, 51, 100, 3>>, length: 32},
+              %NetAddr.IPv4{address: <<198, 51, 100, 1>>, length: 32}
+            },
+            { %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32},
+              %NetAddr.IPv4{address: <<198, 51, 100, 4>>, length: 32}
+            },
+            { %NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32},
+              %NetAddr.IPv4{address: <<198, 51, 100, 5>>, length: 32}
+            },
           ],
         },
         %Giraphe.Router{
@@ -302,8 +304,9 @@ defmodule Giraphe.Graph.L3Test do
       ]
 
     timestamp = "1970-01-01 00:00:00Z"
+    template  = File.read! @test_template
 
-    assert graph_devices(routers, timestamp, @test_template) ==
+    assert graph_devices(routers, timestamp, template) ==
       """
       graph G {
         label="#{timestamp}"
@@ -342,9 +345,11 @@ defmodule Giraphe.Graph.L3Test do
       """
   end
 
-  test "Outputs no edge when a router is assigned multiple addresses (aliases)
-        from the same subnet but has no neighbors on that subnet"
-  do
+  test """
+    Outputs no edge when a router is assigned multiple
+    addresses (aliases, secondaries) on the same subnet but
+    has no adjacent routers on that subnet
+  """ do
     routers =
       [ %Giraphe.Router{
           name: "192.0.2.1",
@@ -360,8 +365,9 @@ defmodule Giraphe.Graph.L3Test do
       ]
 
     timestamp = "1970-01-01 00:00:00Z"
+    template  = File.read! @test_template
 
-    assert graph_devices(routers, timestamp, @test_template) ==
+    assert graph_devices(routers, timestamp, template) ==
       """
       graph G {
         label="#{timestamp}"
@@ -387,8 +393,9 @@ defmodule Giraphe.Graph.L3Test do
       ]
 
     timestamp = "1970-01-01 00:00:00Z"
+    template  = File.read! @test_template
 
-    assert graph_devices(routers, timestamp, @test_template) ==
+    assert graph_devices(routers, timestamp, template) ==
       """
       graph G {
         label="#{timestamp}"
@@ -401,7 +408,10 @@ defmodule Giraphe.Graph.L3Test do
       """
   end
 
-  test "(VRF) Addresses without corresponding non-summary connected routes do not induce incidences" do
+  test """
+    (VRF) Addresses without corresponding non-summary
+    connected routes do not produce incidences
+  """ do
     routers =
       [ %Giraphe.Router{
           name: "192.0.2.1",
@@ -432,8 +442,9 @@ defmodule Giraphe.Graph.L3Test do
       ]
 
     timestamp = "1970-01-01 00:00:00Z"
+    template  = File.read! @test_template
 
-    assert graph_devices(routers, timestamp, @test_template) ==
+    assert graph_devices(routers, timestamp, template) ==
       """
       graph G {
         label="#{timestamp}"
@@ -447,7 +458,10 @@ defmodule Giraphe.Graph.L3Test do
       """
   end
 
-  test "Router address that is not a next-hop for other routers does not induce incidences" do
+  test """
+    Router address that is not a next-hop for other routers
+    does not produce incidences
+  """ do
     routers =
       [ %Giraphe.Router{
           name: "192.0.2.1",
@@ -472,8 +486,9 @@ defmodule Giraphe.Graph.L3Test do
       ]
 
     timestamp = "1970-01-01 00:00:00Z"
+    template  = File.read! @test_template
 
-    assert graph_devices(routers, timestamp, @test_template) ==
+    assert graph_devices(routers, timestamp, template) ==
       """
       graph G {
         label="#{timestamp}"

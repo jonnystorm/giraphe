@@ -17,15 +17,15 @@ defmodule Giraphe.Switch do
   ]
 
   @type name     :: String.t
-  @type netaddr  :: NetAddr.t
-  @type physaddr :: netaddr
+  @type physaddr :: NetAddr.t
+  @type polladdr :: NetAddr.t
   @type portname :: String.t
 
-  @type t :: %Giraphe.Switch{
+  @type t :: %__MODULE__{
         name: name,
     physaddr: physaddr,
          fdb: [{portname, physaddr}],
-    polladdr: netaddr,
+    polladdr: polladdr,
       uplink: portname
   }
 end
