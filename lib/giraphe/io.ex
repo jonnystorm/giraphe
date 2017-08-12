@@ -21,14 +21,10 @@ defmodule Giraphe.IO do
     end
   end
 
-  defp query(object, target, default_fun) do
+  defp query(object, target, fun) do
     object
     |> Giraphe.IO.Query.query(target)
-    |> get_query_output(default_fun)
-  end
-
-  def credentials do
-    Application.get_env(:giraphe, :credentials)
+    |> get_query_output(fun)
   end
 
   defp find_connected_route_containing_address(
@@ -55,7 +51,7 @@ defmodule Giraphe.IO do
       target_addresses = get_target_addresses target
 
       # Cisco Nexus may have routes that don't correspond to
-      # addresses
+      # addresses. In this case, use addresses for routes.
       #
       addresses =
         if length(routes) <= length(target_addresses) do
@@ -179,4 +175,101 @@ defmodule Giraphe.IO do
 
   def is_snmp_agent(_),
     do: false
+
+  defp routes_to_string(routes) do
+    routes
+    |> Stream.map(fn {destination, next_hop} ->
+      "#{destination} => #{NetAddr.address(next_hop)}"
+    end)
+    |> Enum.join("\n")
+  end
+
+  def export_routes(routers, export_path) do
+    _ = File.mkdir_p export_path
+
+    Enum.map routers, fn router ->
+      path   = Path.join [export_path, "#{router.name}.txt"]
+      string = routes_to_string router.routes
+
+      with {:error, error} <- File.write(path, string)
+      do
+        :ok = Logger.error("Failed to export '#{inspect router.routes}'")
+
+        raise "Unable to export routes to #{inspect path}: #{inspect error}"
+      end
+    end
+  end
+
+  def export_l3_notation(
+    format,
+    incidences,
+    routers,
+    export_path
+  ) do
+    template_path =
+      case format do
+        :dot     -> "priv/templates/l3_graph.dot.eex"
+        :graphml -> "priv/templates/l3_graph.graphml.eex"
+      end
+
+    template = File.read! template_path
+
+    notation =
+      Utility.evaluate_l3_template(incidences, routers, template)
+
+    with {:error, error}
+           <- File.write(export_path, notation)
+    do
+      :ok = Logger.error("Failed to export '#{notation}'")
+
+      raise "Unable to export GraphML to #{inspect export_path}: #{inspect error}"
+    end
+  end
+
+  defp retrieve_arp_entries(subnet, gateway_address) do
+    :ok = Utility.status "Retrieving ARP entries from #{gateway_address} for subnet #{subnet}"
+
+    gateway_address
+    |> get_target_arp_cache
+    |> Enum.filter(fn {netaddress, _} ->
+      NetAddr.contains?(subnet, netaddress)
+    end)
+  end
+
+  defp farm_arp_entries(subnet, gateway_address) do
+    :ok = Utility.status "Inducing ARP entries in #{gateway_address} for subnet #{subnet}"
+
+    :ok = ping_subnet subnet
+
+    retrieve_arp_entries(subnet, gateway_address)
+  end
+
+  @type subnet          :: NetAddr.t
+  @type gateway_address :: NetAddr.t
+  @type host            :: Giraphe.Host.t
+  @type hosts           :: [host]
+
+  @spec enumerate_hosts(subnet, gateway_address)
+    :: hosts
+  def enumerate_hosts(subnet, gateway_address) do
+    subnet
+    |> farm_arp_entries(gateway_address)
+    |> Enum.map(fn {netaddress, physaddress} ->
+      %Giraphe.Host{ip: netaddress, mac: physaddress}
+    end)
+  end
+
+  def export_hosts(hosts, hosts_file) do
+    string =
+      hosts
+      |> Enum.map(& "#{&1}\n")
+      |> Enum.join
+
+    with {:error, error} <- File.write(hosts_file, string)
+    do
+      :ok = Logger.error "Failed to export '#{inspect hosts}'"
+
+      raise "Unable to export routes to #{inspect hosts_file}: #{inspect error}"
+    end
+  end
 end

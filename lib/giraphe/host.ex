@@ -12,7 +12,7 @@ defmodule Giraphe.Host do
   @type ip  :: NetAddr.t
   @type mac :: NetAddr.MAC_48.t
 
-  @type t :: %Giraphe.Host{ip: ip, mac: mac}
+  @type t :: %__MODULE__{ip: ip, mac: mac}
 end
 
 defimpl String.Chars, for: Giraphe.Host do

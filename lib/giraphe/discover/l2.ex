@@ -23,12 +23,12 @@ defmodule Giraphe.Discover.L2 do
     end
   end
 
-  defp fetch_switches(targets, gateway_mac) do
+  defp fetch_switches(hosts, gateway_mac) do
     :ok = Logger.debug "Fetching switches..."
 
-    targets
-    |> Stream.map(fn {target, physaddr} ->
-      Giraphe.IO.get_switch(target, physaddr, gateway_mac)
+    hosts
+    |> Stream.map(fn host ->
+      Giraphe.IO.get_switch(host.ip, host.mac, gateway_mac)
     end)
     |> find_switches_with_non_empty_fdbs
     |> Enum.sort_by(& &1.polladdr)
@@ -57,37 +57,36 @@ defmodule Giraphe.Discover.L2 do
   Ping scans the corresponding subnet to induce ARP entries,
   then polls each IP for forwarding information.
   """
-  @spec discover(NetAddr.t, NetAddr.t | nil)
+  @spec discover_switches(NetAddr.t, NetAddr.t | nil)
     :: [Giraphe.Switch.t]
-  def discover(gateway_address, nil) do
+  def discover_switches(gateway_address, nil) do
     subnet = get_subnet_by_gateway_address gateway_address
 
     if subnet do
       :ok = Utility.status "Found subnet '#{subnet}' for gateway '#{gateway_address}'."
 
-      discover(gateway_address, subnet)
+      discover_switches(gateway_address, subnet)
     else
-      raise "Unable to find subnet for gateay #{inspect gateway_address}"
+      raise "Unable to find subnet for gateway #{inspect gateway_address}"
     end
   end
 
-  def discover(gateway_address, subnet) do
-    arp_entries =
-      Utility.farm_arp_entries(subnet, gateway_address)
-
+  def discover_switches(gateway_address, subnet) do
     hosts =
-      arp_entries
-      |> Enum.map(&NetAddr.address elem(&1, 0))
+      Giraphe.IO.enumerate_hosts(subnet, gateway_address)
+
+    host_ips =
+      hosts
+      |> Enum.map(&NetAddr.address &1.ip)
       |> Enum.join(", ")
 
-    :ok = Utility.status "Found the following hosts: #{hosts}."
+    :ok = Utility.status "Found the following hosts: #{host_ips}."
 
-    {_, gateway_mac} =
-      Enum.find arp_entries, fn {netaddr, _} ->
-        netaddr == gateway_address
-      end
+    gateway =
+      Enum.find hosts,
+        & &1.ip == gateway_address
 
-    fetch_switches(arp_entries, gateway_mac)
+    fetch_switches(hosts, gateway.mac)
   end
 end
 

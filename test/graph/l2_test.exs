@@ -477,22 +477,24 @@ defmodule Giraphe.Graph.L2Test do
   test "Generates dot from switches" do
     switches = get_test_network1()
     expected = File.read!("test/fixtures/example_l2_graph.dot")
+    template = File.read! @dot_template
 
     assert graph_devices(
       switches,
       "1970-01-01 00:00:00Z",
-      @dot_template
+      template
     ) == expected
   end
 
   test "Generates GraphML from switches" do
     switches = get_test_network1()
     expected = File.read!("test/fixtures/example_l2_graph.graphml")
+    template = File.read! @graphml_template
 
     assert graph_devices(
       switches,
       "1970-01-01 00:00:00Z",
-      @graphml_template
+      template
     ) == expected
   end
 
@@ -558,7 +560,9 @@ defmodule Giraphe.Graph.L2Test do
         }
       ]
 
-    assert graph_devices(switches, "1970-01-01 00:00:00Z", @test_template) ==
+    template = File.read! @test_template
+
+    assert graph_devices(switches, "1970-01-01 00:00:00Z", template) ==
       """
       digraph G {
         label="1970-01-01 00:00:00Z"

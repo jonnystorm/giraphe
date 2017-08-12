@@ -20,7 +20,7 @@ defmodule Giraphe.Router do
   @type next_hop    :: netaddr
   @type route       :: {destination, next_hop}
 
-  @type t :: %Giraphe.Router{
+  @type t :: %__MODULE__{
          name: name,
      polladdr: netaddr,
     addresses: [netaddr],

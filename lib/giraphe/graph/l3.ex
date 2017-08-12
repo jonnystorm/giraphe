@@ -76,9 +76,16 @@ defmodule Giraphe.Graph.L3 do
     _make_point_to_point_incidence(router, next_hop, false)
   end
 
-  defp router_is_not_an_island?(router) do
-    Utility.find_non_connected_routes(router.routes) != []
+  defp router_is_an_island?(router) do
+    # A router that is an "island" knows only about itself.
+    # Could also be called "solipsistic router" if you were
+    # feeling glib.
+    #
+    Utility.find_non_connected_routes(router.routes) == []
   end
+
+  defp router_is_not_an_island?(router),
+    do: ! router_is_an_island?(router)
 
   defp address_is_a_known_next_hop?(next_hops, address) do
     Map.has_key?(next_hops, NetAddr.address(address))
@@ -114,24 +121,35 @@ defmodule Giraphe.Graph.L3 do
           |> make_point_to_point_incidence(nh, routers[nh])
         end)
 
-      # TODO: clarify this heuristic
-      addresses = Enum.filter router.addresses, fn a ->
-        router_has_connected_route_for_address?(router, a)
-        && ( router_is_not_an_island?(router)
-             || address_is_a_known_next_hop?(next_hops, a)
-           )
-      end
+      # TODO: Clarify this heuristic.
+      #
+      # This heuristic can also be improved. Those addresses
+      # for which we have non-connected routes elsewhere,
+      # with next-hops matching this router, should be kept.
+      # In other words, if other routers on the network
+      # corroborate this router's addresses, then we have
+      # sufficient evidence to believe this router has the
+      # addresses it alleges. We need not only acknowledge
+      # addresses that are themselves next-hops.
+      #
+      addresses =
+        Enum.filter router.addresses, fn a ->
+          router_has_connected_route_for_address?(router, a)
+          && ( router_is_not_an_island?(router)
+               || address_is_a_known_next_hop?(next_hops, a)
+             )
+        end
 
       router.polladdr
       |> List.duplicate(length addresses)
       |> Stream.zip(addresses)
-      |> Stream.map(fn {r, s} ->
-        {r, NetAddr.first_address(s)}
+      |> Stream.map(fn {polladdr, subnet} ->
+        {polladdr, NetAddr.first_address(subnet)}
       end)
       |> Stream.dedup
       |> Stream.concat(point_to_point_incidences)
-      |> Enum.map(fn {r, s} ->
-        {NetAddr.address(r), s}
+      |> Enum.map(fn {polladdr, subnet} ->
+        {NetAddr.address(polladdr), subnet}
       end)
     end)
     |> group_incidences_by_subnet
@@ -141,13 +159,13 @@ defmodule Giraphe.Graph.L3 do
     |> Enum.dedup
   end
 
-  def graph_devices(routers, timestamp, template_path) do
+  def graph_devices(routers, timestamp, template) do
     incidences = abduce_incidences routers
 
-    Giraphe.evaluate_l3_template(
+    Utility.evaluate_l3_template(
       incidences,
       routers,
-      template_path,
+      template,
       timestamp
     )
   end

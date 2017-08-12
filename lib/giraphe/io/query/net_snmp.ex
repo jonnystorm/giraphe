@@ -4,12 +4,15 @@
 
 defmodule Giraphe.IO.Query.NetSNMP do
   @moduledoc """
-  A net_snmp_ex implementation of the `Giraphe.IO.Querier` behaviour.
+  A net_snmp_ex implementation of the `Giraphe.IO.Querier`
+  behaviour.
   """
 
   @behaviour Giraphe.IO.Query
 
   require Logger
+
+  alias Giraphe.Utility
 
   defp get_agent(target),
     do: URI.parse "snmp://#{target}"
@@ -27,7 +30,7 @@ defmodule Giraphe.IO.Query.NetSNMP do
   end
 
   defp try_credentials(fun) do
-    Giraphe.IO.credentials
+    Utility.credentials
     |> Keyword.get_values(:snmp)
     |> Enum.map(&NetSNMP.credential/1)
     |> _try_credentials(fun, [])
