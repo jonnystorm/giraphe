@@ -33,7 +33,7 @@ defmodule Giraphe.IO do
   ) do
     Enum.find routes, fn {destination, next_hop} ->
       NetAddr.contains?(destination, address)
-      && Utility.next_hop_is_self(next_hop)
+      && Utility.address_is_self(next_hop)
     end
   end
 
@@ -67,7 +67,7 @@ defmodule Giraphe.IO do
         if length(routes) <= length(addresses) do
           Enum.map addresses, fn address ->
             { NetAddr.first_address(address),
-              address_to_next_hop_self(address)
+              address_to_self_address(address)
             }
           end
         else
@@ -91,7 +91,7 @@ defmodule Giraphe.IO do
          polladdr: target,
         addresses: [target],
            routes: [
-            {target, address_to_next_hop_self(target)},
+            {target, address_to_self_address(target)},
           ]
       }
     end
@@ -146,17 +146,51 @@ defmodule Giraphe.IO do
   def get_target_fdb(target),
     do: query(:fdb, target, fn(_, _) -> [] end)
 
-  defp address_to_next_hop_self(address) do
+  defp address_to_self_address(address) do
     0
     |> List.duplicate(NetAddr.address_size(address))
     |> :binary.list_to_bin
     |> NetAddr.netaddr
   end
 
+  defp aggregate_local_connected_route_pairs(routes) do
+    # HP Comware splits connected routes as follows.
+    #
+    #     192.0.2.0/24 => 192.0.2.1
+    #     192.0.2.1/32 => 127.0.0.1
+    #
+    # Instead, we want
+    #
+    #     192.0.2.0/24 => 0.0.0.0
+    #
+    addresses =
+      routes
+      |> Stream.filter(fn {_, next_hop} ->
+        Utility.address_is_localhost(next_hop)
+      end)
+      |> Enum.map(fn {destination, _} -> destination end)
+
+    routes
+    |> Stream.filter(fn {_, next_hop} ->
+      Utility.address_is_not_localhost(next_hop)
+    end)
+    |> Enum.map(fn {destination, next_hop} ->
+      new_next_hop =
+        if next_hop in addresses do
+          address_to_self_address(next_hop)
+        else
+          next_hop
+        end
+
+      {destination, new_next_hop}
+    end)
+  end
+
   def get_target_routes(target) do
     :routes
     |> query(target, fn(_, _) -> [] end)
     |> Enum.sort
+    |> aggregate_local_connected_route_pairs
   end
 
   def get_target_sysname(target) do

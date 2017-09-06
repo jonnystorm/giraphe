@@ -103,7 +103,7 @@ defmodule Giraphe.Discover.L3 do
         next_hop <-
           Utility.get_next_hops_from_routes(router.routes),
 
-        Utility.next_hop_is_not_self(next_hop)
+        Utility.address_is_not_self(next_hop)
     do
       Utility.refine_address_length(
         next_hop,

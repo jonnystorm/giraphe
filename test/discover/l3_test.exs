@@ -380,7 +380,7 @@ defmodule Giraphe.Discover.L3Test do
             NetAddr.ip("203.0.113.12/31"),
           ],
           routes: [
-            {NetAddr.ip("203.0.113.10"),    NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("203.0.113.10"), NetAddr.ip("0.0.0.0")},
             {NetAddr.ip("203.0.113.11"), NetAddr.ip("203.0.113.13")},
             {NetAddr.ip("203.0.113.12/31"), NetAddr.ip("0.0.0.0")},
           ]
@@ -394,7 +394,7 @@ defmodule Giraphe.Discover.L3Test do
           ],
           routes: [
             {NetAddr.ip("203.0.113.10"), NetAddr.ip("203.0.113.12")},
-            {NetAddr.ip("203.0.113.11"),    NetAddr.ip("0.0.0.0")},
+            {NetAddr.ip("203.0.113.11"), NetAddr.ip("0.0.0.0")},
             {NetAddr.ip("203.0.113.12/31"), NetAddr.ip("0.0.0.0")},
           ]
         },
@@ -405,6 +405,31 @@ defmodule Giraphe.Discover.L3Test do
         NetAddr.ip("203.0.113.10"),
         NetAddr.ip("203.0.113.11"),
       ]
+
+    assert routers == expected_routers
+  end
+
+  test """
+    Routes with localhost next-hops do not generate
+    localhost targets. Their respective connected routes
+    likewise do not create loops, and local/connected route
+    pairs are aggregated into a single connected route with
+    next-hop self (0.0.0.0).
+  """ do
+    expected_routers =
+      [ %Giraphe.Router{
+          name: "203.0.113.14",
+          polladdr: NetAddr.ip("203.0.113.14/31"),
+          addresses: [
+            NetAddr.ip("203.0.113.14/31"),
+          ],
+          routes: [
+            {NetAddr.ip("203.0.113.14/31"), NetAddr.ip("0.0.0.0")},
+          ]
+        },
+      ]
+
+    routers = discover_routers [NetAddr.ip("203.0.113.14")]
 
     assert routers == expected_routers
   end

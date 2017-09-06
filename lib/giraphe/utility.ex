@@ -87,7 +87,7 @@ defmodule Giraphe.Utility do
   @spec is_connected_route(route)
     :: boolean
   def is_connected_route({_destination, next_hop}),
-    do: next_hop_is_self next_hop
+    do: address_is_self next_hop
 
   def is_connected_route(_),
     do: false
@@ -114,18 +114,31 @@ defmodule Giraphe.Utility do
     && (prefix != NetAddr.ip("::/0"))
   end
 
-  @spec next_hop_is_self(address)
+  @spec address_is_self(address)
     :: boolean
-  def next_hop_is_self(address) do
+  def address_is_self(address) do
     (   NetAddr.ip("0.0.0.0") == address)
     || (NetAddr.ip("::")      == address)
   end
 
-  @spec next_hop_is_not_self(address)
+  @spec address_is_not_self(address)
     :: boolean
-  def next_hop_is_not_self(address) do
-    ! next_hop_is_self(address)
+  def address_is_not_self(address) do
+    ! address_is_self(address)
   end
+
+  @spec address_is_localhost(address)
+    :: boolean
+  def address_is_localhost(address) do
+    localhost = NetAddr.ip("127.0.0.0/8")
+
+    NetAddr.contains?(localhost, address)
+  end
+
+  @spec address_is_not_localhost(address)
+    :: boolean
+  def address_is_not_localhost(address),
+    do: ! address_is_localhost(address)
 
   defp _lookup_route_recursive([], _address),
     do: nil
@@ -134,7 +147,7 @@ defmodule Giraphe.Utility do
     with {destination, next_hop} <-
            find_route_containing_address(routes, address)
     do
-      if next_hop_is_self(next_hop)
+      if address_is_self(next_hop)
          or destination == address
       do
         destination
