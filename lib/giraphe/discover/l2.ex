@@ -38,7 +38,7 @@ defmodule Giraphe.Discover.L2 do
     gateway_address
     |> Giraphe.IO.get_target_routes
     |> Enum.filter(fn {_, next_hop} ->
-      Utility.next_hop_is_self next_hop
+      Utility.address_is_self next_hop
     end)
     |> Utility.get_destinations_from_routes
     |> Enum.filter(& &1 != gateway_address)

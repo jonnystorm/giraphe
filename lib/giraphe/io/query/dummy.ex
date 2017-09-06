@@ -82,6 +82,9 @@ defmodule Giraphe.IO.Query.Dummy do
     ]
   end
 
+  defp _query_addresses("203.0.113.14"),
+    do: ["203.0.113.14/31"]
+
   defp _query_addresses(_target),
     do: []
 
@@ -513,6 +516,12 @@ defmodule Giraphe.IO.Query.Dummy do
     [ {"203.0.113.10/32", "203.0.113.12"},
       {"203.0.113.11/32", "0.0.0.0"},
       {"203.0.113.12/31", "0.0.0.0"},
+    ]
+  end
+
+  defp _query_routes("203.0.113.14") do
+    [ {"203.0.113.14/31", "203.0.113.14"},
+      {"203.0.113.14/32", "127.0.0.1"},
     ]
   end
 
