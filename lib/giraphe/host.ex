@@ -15,6 +15,7 @@ defmodule Giraphe.Host do
   @type t :: %__MODULE__{ip: ip, mac: mac}
 end
 
+
 defimpl String.Chars, for: Giraphe.Host do
   import Kernel, except: [to_string: 1]
 

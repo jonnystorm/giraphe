@@ -7,7 +7,7 @@ defmodule Giraphe.Graph.L3 do
   A Layer 3 grapher implementation.
   """
 
-  alias Giraphe.Utility
+  alias Giraphe.{Router,Utility}
 
   defp group_incidences_by_subnet(incidences) do
     Enum.group_by incidences, &elem(&1, 1)
@@ -26,21 +26,15 @@ defmodule Giraphe.Graph.L3 do
 
   defp get_point_to_point_next_hops(routes) do
     routes
-      |> Enum.filter(fn
-        {nh, nh} ->
-          true
-        _ ->
-          false
-      end)
-      |> Enum.map(&elem(&1, 1))
-      |> Enum.sort
-      |> Enum.dedup
-  end
-
-  defp join_sorted(list, delimiter) do
-    list
-      |> Enum.sort
-      |> Enum.join(delimiter)
+    |> Enum.filter(fn
+      {nh, nh} ->
+        true
+      _ ->
+        false
+    end)
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.sort
+    |> Enum.dedup
   end
 
   defp _make_point_to_point_incidence(
@@ -48,13 +42,15 @@ defmodule Giraphe.Graph.L3 do
     next_hop,
     make_nexthop_incidence?
   ) do
-    pseudonode =
-      join_sorted([router.polladdr, next_hop], ":")
+    pseudoedge =
+      [router.polladdr, next_hop]
+      |> Enum.sort
+      |> Enum.join(":")
 
-    pseudoincidences = [{router.polladdr, pseudonode}]
+    pseudoincidences = [{router.polladdr, pseudoedge}]
 
     if make_nexthop_incidence? do
-      [{next_hop, pseudonode} | pseudoincidences]
+      [{next_hop, pseudoedge} | pseudoincidences]
     else
       pseudoincidences
     end
@@ -76,40 +72,27 @@ defmodule Giraphe.Graph.L3 do
     _make_point_to_point_incidence(router, next_hop, false)
   end
 
-  defp router_is_an_island?(router) do
-    # A router that is an "island" knows only about itself.
-    # Could also be called "solipsistic router" if you were
-    # feeling glib.
-    #
-    Utility.find_non_connected_routes(router.routes) == []
-  end
-
-  defp router_is_not_an_island?(router),
-    do: ! router_is_an_island?(router)
-
   defp address_is_a_known_next_hop?(next_hops, address) do
     Map.has_key?(next_hops, NetAddr.address(address))
   end
 
-  defp router_has_connected_route_for_address?(
-    router,
-    address
-  ) do
-    router.routes
-    |> Enum.reverse
-    |> Utility.find_route_containing_address(address)
-    |> Utility.is_connected_route
-  end
-
-  defp get_l3_incidences(routers) do
-    next_hops =
+  @doc """
+  Generate abstract graph representation from `routers`.
+  """
+  def abduce_incidences(routers) do
+    router_map =
       routers
+      |> Enum.map(& {&1.polladdr, &1})
+      |> Enum.into(%{})
+
+    next_hops =
+      router_map
       |> Map.values
       |> Enum.flat_map(& &1.routes)
       |> Enum.map(& {NetAddr.address(elem(&1, 1)), nil})
       |> Enum.into(%{})
 
-    routers
+    router_map
     |> Map.values
     |> Enum.sort_by(& &1.polladdr)
     |> Enum.flat_map(fn router ->
@@ -117,8 +100,10 @@ defmodule Giraphe.Graph.L3 do
         router.routes
         |> get_point_to_point_next_hops
         |> Enum.flat_map(fn nh ->
+          nh_router = router_map[nh]
+
           router
-          |> make_point_to_point_incidence(nh, routers[nh])
+          |> make_point_to_point_incidence(nh, nh_router)
         end)
 
       # TODO: Clarify this heuristic.
@@ -134,8 +119,8 @@ defmodule Giraphe.Graph.L3 do
       #
       addresses =
         Enum.filter router.addresses, fn a ->
-          router_has_connected_route_for_address?(router, a)
-          && ( router_is_not_an_island?(router)
+          Router.has_connected_route_for_address?(router, a)
+          && ( Router.is_not_an_island?(router)
                || address_is_a_known_next_hop?(next_hops, a)
              )
         end
@@ -168,15 +153,5 @@ defmodule Giraphe.Graph.L3 do
       template,
       timestamp
     )
-  end
-
-  @doc """
-  Generate abstract graph representation from `routers`.
-  """
-  def abduce_incidences(routers) do
-    routers
-      |> Enum.map(& {&1.polladdr, &1})
-      |> Enum.into(%{})
-      |> get_l3_incidences
   end
 end

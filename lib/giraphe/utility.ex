@@ -52,13 +52,6 @@ defmodule Giraphe.Utility do
     end
   end
 
-  @spec find_non_connected_routes(routes)
-    :: routes
-  def find_non_connected_routes(routes) do
-    Enum.filter routes,
-      & !is_connected_route(&1)
-  end
-
   @type destinations :: [destination]
 
   @spec get_destinations_from_routes(routes)
@@ -86,11 +79,15 @@ defmodule Giraphe.Utility do
 
   @spec is_connected_route(route)
     :: boolean
-  def is_connected_route({_destination, next_hop}),
-    do: address_is_self next_hop
+  def is_connected_route(route) do
+    case route do
+      {_destination, next_hop} ->
+        next_hop |> address_is_self
 
-  def is_connected_route(_),
-    do: false
+      _ ->
+        false
+    end
+  end
 
   @spec is_host_address(address)
     :: boolean
@@ -224,9 +221,16 @@ defmodule Giraphe.Utility do
     do: address
   end
 
+  @type polladdr
+    :: NetAddr.IPv4.t
+     | NetAddr.IPv6.t
+
   @type device
-    :: Giraphe.Router.t
-     | Giraphe.Switch.t
+    :: %{
+      any => any,
+      name: nil | String.t,
+      polladdr: polladdr,
+    }
 
   @spec trim_domain_from_device_sysname(device)
     :: device
@@ -270,19 +274,14 @@ defmodule Giraphe.Utility do
   end
 
   defp router_to_node(router) do
-    %{name: name} =
-      trim_domain_from_device_sysname router
+    node_id = NetAddr.address router.polladdr
 
-    %{name: name,
-      id: NetAddr.address(router.polladdr)
-    }
+    router
+    |> trim_domain_from_device_sysname
+    |> Map.put(:id, node_id)
   end
 
-  def evaluate_l3_template(
-    incidences,
-    routers,
-    template
-  ) do
+  def evaluate_l3_template(incidences, routers, template) do
     current_datetime_utc = "#{DateTime.utc_now}"
 
     evaluate_l3_template(
@@ -299,7 +298,7 @@ defmodule Giraphe.Utility do
     template,
     timestamp
   ) do
-    routers =
+    nodes =
       routers
       |> Enum.map(&router_to_node/1)
       |> Enum.sort_by(& &1.id)
@@ -319,7 +318,7 @@ defmodule Giraphe.Utility do
 
     EEx.eval_string template,
       [ timestamp: timestamp,
-        routers: routers,
+        routers: nodes,
         edges: edges,
         incidences: incidences,
       ]

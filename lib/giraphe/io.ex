@@ -5,7 +5,13 @@
 defmodule Giraphe.IO do
   @moduledoc false
 
-  alias Giraphe.Utility
+  alias Giraphe.{
+    Host,
+    Render,
+    Router,
+    Switch,
+    Utility
+  }
 
   require Logger
 
@@ -78,7 +84,7 @@ defmodule Giraphe.IO do
         target
         |> Utility.refine_address_length(addresses, routes)
 
-      %Giraphe.Router{
+      %Router{
              name: get_target_sysname(target),
          polladdr: polladdr,
         addresses: addresses,
@@ -86,7 +92,7 @@ defmodule Giraphe.IO do
       }
 
     else
-      %Giraphe.Router{
+      %Router{
              name: NetAddr.address(target),
          polladdr: target,
         addresses: [target],
@@ -108,9 +114,18 @@ defmodule Giraphe.IO do
     end)
   end
 
-  def get_switch(target, physaddr, gateway_mac) do
+  @type target
+    :: NetAddr.IPv4.t
+     | NetAddr.IPv6.t
+
+  @type physaddr    :: NetAddr.MAC_48.t
+  @type gateway_mac :: physaddr
+
+  @spec fetch_switch(target, physaddr, gateway_mac)
+    :: Switch.t
+  def fetch_switch(target, physaddr, gateway_mac) do
     switch =
-      %Giraphe.Switch{polladdr: target, physaddr: physaddr}
+      %Switch{polladdr: target, physaddr: physaddr}
 
     if is_snmp_agent(target) do
       switch =
@@ -249,7 +264,8 @@ defmodule Giraphe.IO do
     template = File.read! template_path
 
     notation =
-      Utility.evaluate_l3_template(incidences, routers, template)
+      incidences
+      |> Utility.evaluate_l3_template(routers, template)
 
     with {:error, error}
            <- File.write(export_path, notation)
@@ -280,7 +296,7 @@ defmodule Giraphe.IO do
 
   @type subnet          :: NetAddr.t
   @type gateway_address :: NetAddr.t
-  @type host            :: Giraphe.Host.t
+  @type host            :: Host.t
   @type hosts           :: [host]
 
   @spec enumerate_hosts(subnet, gateway_address)
@@ -289,7 +305,7 @@ defmodule Giraphe.IO do
     subnet
     |> farm_arp_entries(gateway_address)
     |> Enum.map(fn {netaddress, physaddress} ->
-      %Giraphe.Host{ip: netaddress, mac: physaddress}
+      %Host{ip: netaddress, mac: physaddress}
     end)
   end
 
@@ -304,6 +320,32 @@ defmodule Giraphe.IO do
       :ok = Logger.error "Failed to export '#{inspect hosts}'"
 
       raise "Unable to export routes to #{inspect hosts_file}: #{inspect error}"
+    end
+  end
+
+  def render_l3_graph(
+    incidences,
+    routers,
+    template,
+    output_file
+  ) do
+    :ok = Utility.status "Rendering graph"
+
+    format =
+      output_file
+      |> Path.extname
+      |> String.trim_leading(".")
+
+    graph =
+      incidences
+      |> Utility.evaluate_l3_template(routers, template)
+      |> Render.GraphViz.render_graph(format)
+
+    with {:error, error} <- File.write(output_file, graph)
+    do
+      :ok = Logger.error "Failed while writing graph to #{inspect output_file}"
+
+      raise "Unable to write graph to #{inspect output_file}: #{inspect error}"
     end
   end
 end

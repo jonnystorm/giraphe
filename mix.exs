@@ -3,7 +3,7 @@ defmodule Giraphe.Mixfile do
 
   def project do
     [ app: :giraphe,
-      version: "0.0.36",
+      version: "0.1.0",
       name: "giraphe",
       source_url: "https://github.com/jonnystorm/giraphe",
       elixir: "~> 1.3",
@@ -57,10 +57,8 @@ defmodule Giraphe.Mixfile do
       ],
       env: [
         quiet: false,
-        l2_grapher: Giraphe.Graph.L2,
-        l3_grapher: Giraphe.Graph.L3,
-        l2_graph_template: "priv/templates/l2_graph.dot.eex",
-        l3_graph_template: "priv/templates/l3_graph.dot.eex",
+        l2_template: "priv/templates/l2_graph.dot.eex",
+        l3_template: "priv/templates/l3_graph.dot.eex",
         renderer: Giraphe.Render.GraphViz,
         querier: Giraphe.IO.Query.NetSNMP,
         host_scanner: Giraphe.IO.HostScan.Nmap,
@@ -71,8 +69,7 @@ defmodule Giraphe.Mixfile do
   end
 
   defp deps do
-    [ {:credo, "~> 0.5", only: [:dev, :test]},
-      {:netaddr_ex, git: "https://github.com/jonnystorm/netaddr-elixir.git"},
+    [ {:netaddr_ex, git: "https://github.com/jonnystorm/netaddr-elixir.git"},
       {:net_snmp_ex, git: "https://github.com/jonnystorm/net-snmp-elixir.git"},
       {:ex_doc, "~> 0.14", only: :dev}
     ]

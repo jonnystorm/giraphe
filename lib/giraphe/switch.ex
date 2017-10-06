@@ -17,18 +17,23 @@ defmodule Giraphe.Switch do
   ]
 
   @type name     :: String.t
-  @type physaddr :: NetAddr.t
-  @type polladdr :: NetAddr.t
-  @type portname :: String.t
+  @type physaddr :: NetAddr.MAC_48.t
+  @type polladdr
+    :: NetAddr.IPv4.t
+     | NetAddr.IPv6.t
+
+  @type portname  :: String.t
+  @type fdb_entry :: {portname, physaddr}
 
   @type t :: %__MODULE__{
         name: name,
-    physaddr: physaddr,
-         fdb: [{portname, physaddr}],
     polladdr: polladdr,
-      uplink: portname
+    physaddr: physaddr,
+         fdb: [fdb_entry, ...],
+      uplink: portname,
   }
 end
+
 
 defimpl String.Chars, for: Giraphe.Switch do
   import Kernel, except: [to_string: 1]

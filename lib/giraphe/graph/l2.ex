@@ -7,7 +7,7 @@ defmodule Giraphe.Graph.L2 do
   A Layer 2 grapher implementation.
   """
 
-  alias Giraphe.Utility
+  alias Giraphe.{Switch, Utility}
 
   require Logger
 
@@ -48,19 +48,18 @@ defmodule Giraphe.Graph.L2 do
         downlink = downlinks[adjacency]
 
         upstream_polladdr =
-          NetAddr.address(upstream_switch.polladdr)
+          NetAddr.address upstream_switch.polladdr
 
-        pad_and_concat([upstream_polladdr, downlink], lengths)
+        [upstream_polladdr, downlink]
+        |> pad_and_concat(lengths)
     end
   end
 
   defp get_adjacency_downlink(
-    { downstream = _downstream_switch,
-        upstream = _upstream_switch
+    { down = _downstream_switch,
+        up = _upstream_switch
     }
-  ) do
-    get_fdb_port_by_physaddr(upstream.fdb, downstream.physaddr)
-  end
+  ), do: get_fdb_port_by_physaddr(up.fdb, down.physaddr)
 
   defp get_fdb_port_by_physaddr(fdb, physaddr) do
     Enum.find_value fdb, fn
@@ -96,11 +95,11 @@ defmodule Giraphe.Graph.L2 do
     do: get_fdb_port_by_physaddr(fdb, physaddr) != nil
 
   defp abduce_adjacencies(switches) do
-    for downstream = downstream_switch <- switches,
-          upstream =   upstream_switch <- switches,
-        physaddr_in_fdb?(upstream.fdb, downstream.physaddr)
+    for down = _downstream_switch <- switches,
+          up =   _upstream_switch <- switches,
+        physaddr_in_fdb?(up.fdb, down.physaddr)
     do
-      {downstream_switch, upstream_switch}
+      {down, up}
     end
     |> unique_adjacencies_by_topologically_closest_switches
   end
@@ -133,18 +132,7 @@ defmodule Giraphe.Graph.L2 do
     end
   end
 
-  @doc """
-  Generate graph representation from `switches`.
-  """
-  def graph_devices(switches, template) do
-    current_time_utc = "#{DateTime.utc_now}"
-
-    graph_devices(switches, current_time_utc, template)
-  end
-
-  defp prepare_switches_for_adjacency_abduction(
-    switches
-  ) do
+  defp prepare_switches_for_adjacency_abduction(switches) do
     physaddrs = Enum.map switches, & &1.physaddr
 
     Enum.map switches, fn switch ->
@@ -155,11 +143,31 @@ defmodule Giraphe.Graph.L2 do
     end
   end
 
+  @type switches :: [Switch.t]
+  @type template :: String.t
+  @type graph    :: String.t
+
   @doc """
-  Generate graph representation from `switches` with timestamp.
+  Generate graph representation from `switches`.
   """
+  @spec graph_devices(switches, template)
+    :: graph
+  def graph_devices(switches, template) do
+    current_time_utc = "#{DateTime.utc_now}"
+
+    graph_devices(switches, current_time_utc, template)
+  end
+
+  @type timestamp :: String.t
+
+  @doc """
+  Generate graph representation from `switches` with
+  timestamp.
+  """
+  @spec graph_devices(switches, timestamp, template)
+    :: graph
   def graph_devices(switches, timestamp, template) do
-    :ok = Logger.info("Graphing switches '#{inspect switches}'...")
+    :ok = Logger.debug("Graphing switches '#{inspect switches}'...")
 
     prepped_switches =
       prepare_switches_for_adjacency_abduction switches
@@ -176,11 +184,24 @@ defmodule Giraphe.Graph.L2 do
           []
       end
 
-    Utility.evaluate_l2_template(
+    evaluate_l2_template(
       adjacencies,
       prepped_switches,
       template,
       timestamp
     )
+  end
+
+  defp evaluate_l2_template(
+    adjacencies,
+    switches,
+    template,
+    timestamp
+  ) do
+    EEx.eval_string template,
+      [ timestamp: timestamp,
+        switches: switches,
+        edges: adjacencies,
+      ]
   end
 end

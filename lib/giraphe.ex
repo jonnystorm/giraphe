@@ -31,7 +31,7 @@ defmodule Giraphe do
   defp arg_to_atom("authPriv"),     do: :auth_priv
   defp arg_to_atom("md5"),  do: :md5
   defp arg_to_atom("sha"),  do: :sha
-  defp arg_to_atom("dsa"),  do: :dsa
+  defp arg_to_atom("des"),  do: :des
   defp arg_to_atom("aes"),  do: :aes
   defp arg_to_atom(other),  do: other
 
@@ -79,14 +79,16 @@ defmodule Giraphe do
         usage()
 
       {:error, _} ->
-        usage "Unable to read credentials file: '#{switches[:credentials]}'"
+        usage "Unable to read credentials file: '#{switches[:credentials]}'."
 
       _ ->
-        usage "Unable to parse credentials file: '#{switches[:credentials]}'"
+        usage "Unable to parse credentials file: '#{switches[:credentials]}'."
     end
 
     if path = switches[:output_file] do
       set_session_parameter(:output_file, Path.expand(path))
+    else
+      usage "Please specify an output file using `-o`."
     end
 
     if path = switches[:export_path] do
@@ -192,11 +194,28 @@ defmodule Giraphe do
     usage()
   end
 
-  defp graph_l2(gateway_address, subnet) do
+  defp fetch_template(type) when type in [:l2, :l3] do
+    name =
+      case type do
+        :l2 -> :l2_template
+        :l3 -> :l3_template
+      end
+
+    :giraphe
+    |> Application.get_env(name)
+    |> File.read!
+  end
+
+  defp l2_template,
+    do: fetch_template :l2
+
+  defp l3_template,
+    do: fetch_template :l3
+
+  defp generate_l2_graph(gateway_address, subnet) do
     if Utility.is_host_address gateway_address do
-      output_file = get_session_parameter :output_file
-      template =
-        File.read! "priv/templates/l2_graph.dot.eex"
+      output_file = output_file()
+      template = l2_template()
 
       gateway_address
       |> Discover.L2.discover_switches(subnet)
@@ -215,22 +234,29 @@ defmodule Giraphe do
     |> Discover.L3.discover_routers
   end
 
-  defp graph_l3(targets) do
-    routers    = discover_routers targets
-    incidences = Graph.L3.abduce_incidences routers
+  defp enumerate_hosts(routers, hosts_file) do
+    if hosts_file do
+      :ok = Utility.status "Discovering hosts... (This may take a while.)"
 
-    output_file = get_session_parameter :output_file
-    export_path = get_session_parameter :export_path
+      routers
+      |> Giraphe.Discover.L3.discover_hosts
+      |> Giraphe.IO.export_hosts(hosts_file)
+    end
+  end
 
-    _ =
-      if export_path do
-        :ok = Utility.status "Exporting routes to #{inspect export_path}"
+  defp hosts_file,
+    do: get_session_parameter :hosts_file
 
-        Giraphe.IO.export_routes(routers, export_path)
-      end
+  defp export_routes(routers, export_path) do
+    if export_path do
+      :ok = Utility.status "Exporting routes to #{inspect export_path}"
 
-    _ = [
-      {:dot,     Path.rootname(output_file) <> ".dot"},
+      Giraphe.IO.export_routes(routers, export_path)
+    end
+  end
+
+  defp export_notations(incidences, routers, output_file) do
+    [ {:dot,     Path.rootname(output_file) <> ".dot"},
       {:graphml, Path.rootname(output_file) <> ".graphml"},
 
     ] |> Enum.map(fn {format, path} ->
@@ -243,35 +269,31 @@ defmodule Giraphe do
         path
       )
     end)
+  end
 
-    template =
-      :giraphe
-      |> Application.get_env(:l3_graph_template)
-      |> File.read!
+  defp output_file,
+    do: get_session_parameter :output_file
 
-    :ok = Utility.status "Generating graph"
+  defp export_path,
+    do: get_session_parameter :export_path
 
-    incidences
-    |> Enum.map(fn
-      {router, <<_::binary>> = edge} ->
-        {router, edge}
-
-      {router, edge} ->
-        {router, NetAddr.prefix(edge)}
-    end)
-    |> Utility.evaluate_l3_template(routers, template)
-    |> Render.render_graph(output_file)
-
-    hosts_file = get_session_parameter :hosts_file
+  defp generate_l3_graph(targets) do
+    routers = discover_routers targets
+    incidences = Graph.L3.abduce_incidences routers
+    output_file = output_file()
+    template = l3_template()
 
     _ =
-      if hosts_file do
-        :ok = Utility.status "Discovering hosts... (This may take a while.)"
+      Giraphe.IO.render_l3_graph(
+        incidences,
+        routers,
+        template,
+        output_file
+      )
 
-        routers
-        |> Giraphe.Discover.L3.discover_hosts
-        |> Giraphe.IO.export_hosts(hosts_file)
-      end
+    _ = export_notations(incidences, routers, output_file)
+    _ = export_routes(routers, export_path())
+    _ = enumerate_hosts(routers, hosts_file())
 
     :ok = Utility.status "Done!"
   end
@@ -288,12 +310,12 @@ defmodule Giraphe do
 
         gateway_string
         |> NetAddr.ip
-        |> graph_l2(subnet)
+        |> generate_l2_graph(subnet)
 
       ["-3" | target_strings] ->
         target_strings
         |> parse_ip_args
-        |> graph_l3
+        |> generate_l3_graph
 
       _ ->
         usage()
