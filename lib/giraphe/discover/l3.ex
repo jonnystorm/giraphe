@@ -10,6 +10,7 @@ defmodule Giraphe.Discover.L3 do
   # TODO: Replace route tuple with struct to ease future
   # additions
 
+  alias Giraphe.{Host, Router}
   alias Giraphe.Utility
 
   require Logger
@@ -165,7 +166,7 @@ defmodule Giraphe.Discover.L3 do
 
   @type target  :: NetAddr.t
   @type targets :: [target]
-  @type router  :: Giraphe.Router.t
+  @type router  :: Router.t
   @type routers :: [router]
 
   @doc """
@@ -202,7 +203,7 @@ defmodule Giraphe.Discover.L3 do
     )
   end
 
-  @type host  :: Giraphe.Host.t
+  @type host  :: Host.t
   @type hosts :: [host]
 
   @spec discover_hosts(routers)

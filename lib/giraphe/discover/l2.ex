@@ -10,6 +10,7 @@ defmodule Giraphe.Discover.L2 do
   # TODO: Replace FDB entry tuples with structs to ease
   # future additions
 
+  alias Giraphe.Switch
   alias Giraphe.Utility
 
   require Logger
@@ -28,7 +29,8 @@ defmodule Giraphe.Discover.L2 do
 
     hosts
     |> Stream.map(fn host ->
-      Giraphe.IO.get_switch(host.ip, host.mac, gateway_mac)
+      host.ip
+      |> Giraphe.IO.fetch_switch(host.mac, gateway_mac)
     end)
     |> find_switches_with_non_empty_fdbs
     |> Enum.sort_by(& &1.polladdr)
@@ -58,7 +60,7 @@ defmodule Giraphe.Discover.L2 do
   then polls each IP for forwarding information.
   """
   @spec discover_switches(NetAddr.t, NetAddr.t | nil)
-    :: [Giraphe.Switch.t]
+    :: [Switch.t]
   def discover_switches(gateway_address, nil) do
     subnet = get_subnet_by_gateway_address gateway_address
 
