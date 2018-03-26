@@ -57,7 +57,8 @@ defmodule Giraphe.IO do
       target_addresses = get_target_addresses target
 
       # Cisco Nexus may have routes that don't correspond to
-      # addresses. In this case, use addresses for routes.
+      # addresses. Also, ASAs provide no routes. In either
+      # case, use addresses for routes.
       #
       addresses =
         if length(routes) <= length(target_addresses) do
@@ -202,8 +203,17 @@ defmodule Giraphe.IO do
   end
 
   def get_target_routes(target) do
+    # Some devices return a localhost route:
+    #
+    #   127.0.0.0/8 => 0.0.0.0
+    #
+    # Hence we filter out such destinations.
+    #
     :routes
     |> query(target, fn(_, _) -> [] end)
+    |> Enum.filter(fn {destination, _} ->
+      not Utility.address_is_localhost(destination)
+    end)
     |> Enum.sort
     |> aggregate_local_connected_route_pairs
   end
@@ -302,11 +312,26 @@ defmodule Giraphe.IO do
   @spec enumerate_hosts(subnet, gateway_address)
     :: hosts
   def enumerate_hosts(subnet, gateway_address) do
-    subnet
-    |> farm_arp_entries(gateway_address)
-    |> Enum.map(fn {netaddress, physaddress} ->
-      %Host{ip: netaddress, mac: physaddress}
-    end)
+    hosts =
+      subnet
+      |> farm_arp_entries(gateway_address)
+      |> Enum.map(fn {netaddress, physaddress} ->
+        %Host{ip: netaddress, mac: physaddress}
+      end)
+
+    gateway_host =
+      Enum.find(hosts, & &1.ip == gateway_address)
+
+    if is_nil gateway_host do
+      [ %Host{
+          ip: gateway_address,
+          mac: NetAddr.mac_48("00:00:00:00:00:00"),
+        }
+        | hosts
+      ]
+    else
+      hosts
+    end
   end
 
   def export_hosts(hosts, hosts_file) do

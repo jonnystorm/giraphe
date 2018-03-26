@@ -218,7 +218,7 @@ defmodule Giraphe.IO.Query.NetSNMP do
           true
       end)
       |> Stream.flat_map(&get_fdb_by_vlan_id(target, &1))
-      |> Enum.partition(fn
+      |> Enum.split_with(fn
         {:error, _} ->
           false
         _ ->
