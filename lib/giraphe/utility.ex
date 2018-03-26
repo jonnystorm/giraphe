@@ -127,9 +127,9 @@ defmodule Giraphe.Utility do
   @spec address_is_localhost(address)
     :: boolean
   def address_is_localhost(address) do
-    localhost = NetAddr.ip("127.0.0.0/8")
-
-    NetAddr.contains?(localhost, address)
+    "127.0.0.0/8"
+    |> NetAddr.ip
+    |> NetAddr.contains?(address)
   end
 
   @spec address_is_not_localhost(address)
@@ -225,9 +225,8 @@ defmodule Giraphe.Utility do
     :: NetAddr.IPv4.t
      | NetAddr.IPv6.t
 
-  @type device
-    :: %{
-      any => any,
+  @type device ::
+    %{any => any,
       name: nil | String.t,
       polladdr: polladdr,
     }

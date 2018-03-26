@@ -131,7 +131,7 @@ defmodule Giraphe.Discover.L3 do
       |> fetch_routers
       |> filter_new_routers
 
-    all_routers = Enum.concat(routers, new_routers)
+    all_routers  = Enum.concat(routers, new_routers)
     next_targets =
       new_routers
       |> get_next_targets_from_routers
