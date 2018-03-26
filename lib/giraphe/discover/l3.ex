@@ -214,9 +214,34 @@ defmodule Giraphe.Discover.L3 do
     |> Stream.filter(fn {subnet, _} ->
       Utility.is_not_host_address subnet
     end)
-    |> Enum.flat_map(fn {subnet, incident_routers} ->
-      Enum.find_value incident_routers,
-        &Giraphe.IO.enumerate_hosts(subnet, &1.polladdr)
+    |> Stream.flat_map(fn {subnet, incident_routers} ->
+      hosts =
+        Enum.flat_map incident_routers,
+          &Giraphe.IO.enumerate_hosts(subnet, &1.polladdr)
+
+      Enum.reduce incident_routers, hosts, fn(r, acc) ->
+        address =
+          Enum.find r.addresses,
+            &NetAddr.contains?(subnet, &1)
+
+        gateway_host =
+          Enum.find acc,
+            &(NetAddr.address(&1.ip) ==
+              NetAddr.address(address)
+            )
+
+        if is_nil gateway_host do
+          [ %Host{
+              ip: address,
+              mac: NetAddr.mac_48("00:00:00:00:00:00"),
+            }
+            | acc
+          ]
+        else
+          acc
+        end
+      end
     end)
+    |> Enum.uniq_by(fn %{ip: ip} -> ip end)
   end
 end
