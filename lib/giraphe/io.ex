@@ -53,8 +53,20 @@ defmodule Giraphe.IO do
 
   def get_router(target) do
     if is_snmp_agent(target) do
-      routes           = get_target_routes    target
-      target_addresses = get_target_addresses target
+      sysname          = get_target_sysname   target
+      target_addresses =
+        if sysname do
+          get_target_addresses target
+        else
+          [target]
+        end
+
+      routes =
+        if sysname do
+          get_target_routes target
+        else
+          []
+        end
 
       # Cisco Nexus may have routes that don't correspond to
       # addresses. Also, ASAs provide no routes. In either
@@ -306,33 +318,18 @@ defmodule Giraphe.IO do
   end
 
   @type subnet          :: NetAddr.t
-  @type gateway_address :: NetAddr.t
+  @type polling_address :: NetAddr.t
   @type host            :: Host.t
   @type hosts           :: [host]
 
-  @spec enumerate_hosts(subnet, gateway_address)
+  @spec enumerate_hosts(subnet, polling_address)
     :: hosts
-  def enumerate_hosts(subnet, gateway_address) do
-    hosts =
-      subnet
-      |> farm_arp_entries(gateway_address)
-      |> Enum.map(fn {netaddress, physaddress} ->
-        %Host{ip: netaddress, mac: physaddress}
-      end)
-
-    gateway_host =
-      Enum.find(hosts, & &1.ip == gateway_address)
-
-    if is_nil gateway_host do
-      [ %Host{
-          ip: gateway_address,
-          mac: NetAddr.mac_48("00:00:00:00:00:00"),
-        }
-        | hosts
-      ]
-    else
-      hosts
-    end
+  def enumerate_hosts(subnet, polling_address) do
+    subnet
+    |> farm_arp_entries(polling_address)
+    |> Enum.map(fn {netaddress, physaddress} ->
+      %Host{ip: netaddress, mac: physaddress}
+    end)
   end
 
   def export_hosts(hosts, hosts_file) do
