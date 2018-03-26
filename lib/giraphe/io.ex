@@ -247,8 +247,9 @@ defmodule Giraphe.IO do
     _ = File.mkdir_p export_path
 
     Enum.map routers, fn router ->
-      path   = Path.join [export_path, "#{router.name}.txt"]
-      string = routes_to_string router.routes
+      basename = NetAddr.address router.polladdr
+      path     = Path.join [export_path, "#{basename}.txt"]
+      string   = routes_to_string router.routes
 
       with {:error, error} <- File.write(path, string)
       do
