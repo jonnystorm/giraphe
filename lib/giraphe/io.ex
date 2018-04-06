@@ -250,17 +250,19 @@ defmodule Giraphe.IO do
   defp routes_to_string(routes) do
     routes
     |> Stream.map(fn {destination, next_hop} ->
-      "#{destination} => #{NetAddr.address(next_hop)}"
+      prefix = NetAddr.prefix destination
+
+      "#{prefix} => #{NetAddr.address(next_hop)}"
     end)
     |> Enum.join("\n")
   end
 
-  def export_routes(routers, export_path) do
-    _ = File.mkdir_p export_path
+  def export_routes(routers, path) do
+    _ = File.mkdir_p path
 
     Enum.map routers, fn router ->
       basename = NetAddr.address router.polladdr
-      path     = Path.join [export_path, "#{basename}.txt"]
+      path     = Path.join [path, "#{basename}.txt"]
       string   = routes_to_string router.routes
 
       with {:error, error} <- File.write(path, string)
@@ -272,30 +274,53 @@ defmodule Giraphe.IO do
     end
   end
 
+  def export_routers(routers, routers_file) do
+    string =
+      routers
+      |> Enum.map(fn router ->
+        polladdr  = NetAddr.address router.polladdr
+        hostname  = router.name
+        addresses =
+          router.addresses
+          |> Stream.map(&to_string/1)
+          |> Enum.join(", ")
+
+        "#{polladdr} (#{hostname}) {#{addresses}}\n"
+      end)
+      |> Enum.join
+
+    with {:error, error}
+           <- File.write(routers_file, string)
+    do
+      :ok = Logger.error "Failed to export routers '#{inspect routers}'"
+
+      raise "Unable to export routers to #{inspect routers_file}: #{inspect error}"
+    end
+  end
+
   def export_l3_notation(
     format,
     incidences,
     routers,
-    export_path
+    path
   ) do
-    template_path =
+    template =
       case format do
         :dot     -> "priv/templates/l3_graph.dot.eex"
         :graphml -> "priv/templates/l3_graph.graphml.eex"
-      end
 
-    template = File.read! template_path
+      end |> File.read!
 
     notation =
       incidences
       |> Utility.evaluate_l3_template(routers, template)
 
     with {:error, error}
-           <- File.write(export_path, notation)
+           <- File.write(path, notation)
     do
       :ok = Logger.error("Failed to export '#{notation}'")
 
-      raise "Unable to export GraphML to #{inspect export_path}: #{inspect error}"
+      raise "Unable to export GraphML to #{inspect path}: #{inspect error}"
     end
   end
 
