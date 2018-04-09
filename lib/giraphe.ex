@@ -42,15 +42,15 @@ defmodule Giraphe do
 
   defp parse_credentials(text) do
     text
-      |> String.split("\n")
-      |> Enum.map(&args_to_atoms/1)
-      |> Enum.filter(& length(&1) >= 1)
-      |> Enum.group_by(
-        fn [type|_] -> type end,
-        fn [type|credential] -> {type, credential} end
-      )
-      |> Map.values
-      |> Enum.concat
+    |> String.split("\n")
+    |> Enum.map(&args_to_atoms/1)
+    |> Enum.filter(& length(&1) >= 1)
+    |> Enum.group_by(
+      fn [type|_] -> type end,
+      fn [type|credential] -> {type, credential} end
+    )
+    |> Map.values
+    |> Enum.concat
   end
 
   defp handle_switches(switches) do
@@ -180,7 +180,7 @@ defmodule Giraphe do
           snmp v2c 'r34D0n1Y!'
           snmp v3 noAuthNoPriv 'admin'
           snmp v3 authNoPriv 'admin' md5 '$3cR3t!'
-          snmp v3 authPriv 'admin' sha '$3crR3t!' aes 'pR1v473!'
+          snmp v3 authPriv 'admin' sha '$3cR3t!' aes 'pR1v473!'
 
       -2: generate layer-2 topology
          <gateway_ip>: IP address of target subnet gateway

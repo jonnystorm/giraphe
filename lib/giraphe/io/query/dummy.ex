@@ -590,6 +590,6 @@ defmodule Giraphe.IO.Query.Dummy do
     end
   end
   def query(:sysname, target) do
-    {:error, target, :sysname, :etimedout}
+    {:ok, target, :sysname, NetAddr.address(target)}
   end
 end
