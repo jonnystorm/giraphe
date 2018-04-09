@@ -53,52 +53,54 @@ defmodule Giraphe.IO do
 
   def get_router(target) do
     if is_snmp_agent(target) do
-      sysname          = get_target_sysname   target
-      target_addresses =
-        if sysname do
-          get_target_addresses target
-        else
-          [target]
-        end
+      sysname = get_target_sysname target
 
-      routes =
-        if sysname do
-          get_target_routes target
-        else
-          []
-        end
+      target_addresses =
+        if sysname,
+          do: get_target_addresses(target),
+        else: [target]
+
+      routes0 =
+        if sysname,
+          do: get_target_routes(target),
+        else: []
 
       # Cisco Nexus may have routes that don't correspond to
       # addresses. Also, ASAs provide no routes. In either
       # case, use addresses for routes.
       #
       addresses =
-        if length(routes) <= length(target_addresses) do
+        if length(routes0) <= length(target_addresses) do
           target_addresses
         else
           find_addresses_with_matching_connected_routes(
             target_addresses,
-            routes
+            routes0
           )
         end
 
       routes =
-        if length(routes) <= length(addresses) do
+        if length(routes0) <= length(addresses) do
           Enum.map addresses, fn address ->
             { NetAddr.first_address(address),
               address_to_self_address(address)
             }
           end
         else
-          routes
+          routes0
         end
 
       polladdr =
         target
         |> Utility.refine_address_length(addresses, routes)
 
+      name =
+        if sysname,
+          do: sysname,
+        else: NetAddr.address(target)
+
       %Router{
-             name: get_target_sysname(target),
+             name: name,
          polladdr: polladdr,
         addresses: addresses,
            routes: routes
@@ -234,7 +236,7 @@ defmodule Giraphe.IO do
     query(
       :sysname,
       target,
-      fn(t, _) -> NetAddr.address(t) end
+      fn(_, _) -> nil end
     )
   end
 
