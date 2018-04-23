@@ -9,12 +9,14 @@ defmodule Giraphe.Router do
 
   defstruct [
     :name,
+    :sysdescr,
     :polladdr,
     :addresses,
     :routes,
   ]
 
   @type name        :: String.t
+  @type sysdescr    :: String.t
   @type netaddr     :: NetAddr.t
   @type destination :: netaddr
   @type next_hop    :: netaddr
@@ -22,6 +24,7 @@ defmodule Giraphe.Router do
 
   @type t :: %__MODULE__{
          name: name,
+     sysdescr: sysdescr,
      polladdr: netaddr,
     addresses: [netaddr],
        routes: [route]
@@ -58,16 +61,23 @@ defimpl String.Chars, for: Giraphe.Router do
   import Kernel, except: [to_string: 1]
 
   def to_string(router) do
-    addresses = Enum.join(router.addresses, ", ")
+    polladdr  = NetAddr.address router.polladdr
+    addresses =
+      Enum.map router.addresses,
+        &Kernel.to_string/1
 
-    routes =
-      router.routes
-      |> Stream.map(fn {destination, next_hop} ->
-        "#{destination} => #{next_hop}"
-      end)
-      |> Enum.join(",\n    ")
+    routes    =
+      Enum.map router.routes, fn {dest, nh} ->
+        %{"destination" => NetAddr.prefix(dest),
+          "nexthop"     => NetAddr.address(nh),
+        }
+      end
 
-    "#{router.name}: #{router.polladdr} (#{addresses})
-    #{routes}\n"
+    %{"pollingAddress" => polladdr,
+      "sysName"        => router.name,
+      "sysDescr"       => router.sysdescr,
+      "addresses"      => addresses,
+      "routes"         => routes,
+    } |> Poison.encode!
   end
 end

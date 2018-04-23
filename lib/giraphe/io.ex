@@ -53,7 +53,12 @@ defmodule Giraphe.IO do
 
   def get_router(target) do
     if is_snmp_agent(target) do
-      sysname = get_target_sysname target
+      sysname  = get_target_sysname  target
+
+      sysdescr =
+        if sysname,
+          do: get_target_sysdescr(target),
+        else: ""
 
       target_addresses =
         if sysname,
@@ -101,6 +106,7 @@ defmodule Giraphe.IO do
 
       %Router{
              name: name,
+         sysdescr: sysdescr,
          polladdr: polladdr,
         addresses: addresses,
            routes: routes
@@ -109,6 +115,7 @@ defmodule Giraphe.IO do
     else
       %Router{
              name: NetAddr.address(target),
+         sysdescr: "",
          polladdr: target,
         addresses: [target],
            routes: [
@@ -240,6 +247,14 @@ defmodule Giraphe.IO do
     )
   end
 
+  def get_target_sysdescr(target) do
+    query(
+      :sysdescr,
+      target,
+      fn(_, _) -> nil end
+    )
+  end
+
   def ping_subnet(subnet),
     do: Giraphe.IO.HostScan.scan subnet
 
@@ -249,50 +264,14 @@ defmodule Giraphe.IO do
   def is_snmp_agent(_),
     do: false
 
-  defp routes_to_string(routes) do
-    routes
-    |> Stream.map(fn {destination, next_hop} ->
-      prefix = NetAddr.prefix destination
-
-      "#{prefix} => #{NetAddr.address(next_hop)}"
-    end)
-    |> Enum.join("\n")
-  end
-
-  def export_routes(routers, path) do
-    _ = File.mkdir_p path
-
-    Enum.map routers, fn router ->
-      basename = NetAddr.address router.polladdr
-      path     = Path.join [path, "#{basename}.txt"]
-      string   = routes_to_string router.routes
-
-      with {:error, error} <- File.write(path, string)
-      do
-        :ok = Logger.error("Failed to export '#{inspect router.routes}'")
-
-        raise "Unable to export routes to #{inspect path}: #{inspect error}"
-      end
-    end
-  end
-
   def export_routers(routers, routers_file) do
     string =
       routers
-      |> Enum.map(fn router ->
-        polladdr  = NetAddr.address router.polladdr
-        hostname  = router.name
-        addresses =
-          router.addresses
-          |> Stream.map(&to_string/1)
-          |> Enum.join(", ")
-
-        "#{polladdr} (#{hostname}) {#{addresses}}\n"
-      end)
-      |> Enum.join
+      |> Enum.map(&to_string/1)
+      |> Enum.join(",")
 
     with {:error, error}
-           <- File.write(routers_file, string)
+           <- File.write(routers_file, "[#{string}]")
     do
       :ok = Logger.error "Failed to export routers '#{inspect routers}'"
 

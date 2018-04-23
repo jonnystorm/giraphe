@@ -13,6 +13,7 @@ defmodule Giraphe.IO.Query do
      | :fdb
      | :routes
      | :sysname
+     | :sysdescr
 
   @callback query(
     object :: query_object,
