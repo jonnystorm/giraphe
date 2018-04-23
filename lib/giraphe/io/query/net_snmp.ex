@@ -73,6 +73,9 @@ defmodule Giraphe.IO.Query.NetSNMP do
   defp sysname_object,
     do: SNMPMIB.object("1.3.6.1.2.1.1.5.0", :string, nil)
 
+  defp sysdescr_object,
+    do: SNMPMIB.object("1.3.6.1.2.1.1.1.0", :string, nil)
+
   defp vtp_vlan_table_object do
     SNMPMIB.object("1.3.6.1.4.1.9.9.46.1.3.1", :any, nil)
   end
@@ -296,6 +299,13 @@ defmodule Giraphe.IO.Query.NetSNMP do
 
     with [ok: %{value: sysname}] <- snmpget(object, target),
     do: sysname
+  end
+
+  defp _query(:sysdescr, target) do
+    object = sysdescr_object()
+
+    with [ok: %{value: sysdescr}] <- snmpget(object, target),
+    do: sysdescr
   end
 
   defp _query(:vlans, target) do

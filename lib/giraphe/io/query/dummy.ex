@@ -592,4 +592,7 @@ defmodule Giraphe.IO.Query.Dummy do
   def query(:sysname, target) do
     {:ok, target, :sysname, NetAddr.address(target)}
   end
+  def query(:sysdescr, target) do
+    {:ok, target, :sysdescr, nil}
+  end
 end

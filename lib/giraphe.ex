@@ -91,10 +91,6 @@ defmodule Giraphe do
       usage "Please specify an output file using `-o`."
     end
 
-    if path = switches[:route_export_path] do
-      set_session_parameter(:route_export_path, Path.expand(path))
-    end
-
     if path = switches[:routers_file] do
       set_session_parameter(:routers_file, Path.expand(path))
     end
@@ -126,7 +122,6 @@ defmodule Giraphe do
           info:  :boolean,
           debug: :boolean,
           output_file: :string,
-          route_export_path: :string,
           credentials: :string,
         ],
         aliases: [
@@ -134,7 +129,6 @@ defmodule Giraphe do
            v: :info,
           vv: :debug,
            o: :output_file,
-           x: :route_export_path,
            r: :routers_file,
            h: :hosts_file,
            c: :credentials,
@@ -162,14 +156,13 @@ defmodule Giraphe do
     IO.puts(:stderr,
     """
     Usage: giraphe [-qv] -c <credentials_path> -o <output_file>
-                   [-x <route_export_path>] [-r <routers_file>] [-h <hosts_file>]
+                   [-r <routers_file>] [-h <hosts_file>]
                    [-2 <gateway_ip> [<subnet_cidr>]] [-3 [<router_ip> ...]]
 
       -q: quiet
       -v: verbose ('-vv' is more verbose)
 
       -o: output file (must end in .png or .svg)
-      -x: export routes to path
       -r: export routers to file
       -h: discover hosts and export to file (slow!)
 
@@ -264,14 +257,6 @@ defmodule Giraphe do
     end
   end
 
-  defp export_routes(routers, path) do
-    if path do
-      :ok = Utility.status "Exporting routes to #{inspect path}"
-
-      Giraphe.IO.export_routes(routers, path)
-    end
-  end
-
   defp enumerate_hosts(routers, path) do
     if path do
       :ok = Utility.status "Discovering hosts... (This may take a while.)"
@@ -285,9 +270,6 @@ defmodule Giraphe do
   defp output_file,
     do: get_session_parameter :output_file
 
-  defp route_export_path,
-    do: get_session_parameter :route_export_path
-
   defp hosts_file,
     do: get_session_parameter :hosts_file
 
@@ -295,10 +277,10 @@ defmodule Giraphe do
     do: get_session_parameter :routers_file
 
   defp generate_l3_graph(targets) do
-    routers = discover_routers targets
-    incidences = Graph.L3.abduce_incidences routers
+    routers     = discover_routers targets
+    incidences  = Graph.L3.abduce_incidences routers
     output_file = output_file()
-    template = l3_template()
+    template    = l3_template()
 
     _ =
       Giraphe.IO.render_l3_graph(
@@ -310,7 +292,6 @@ defmodule Giraphe do
 
     _ = export_notations(incidences, routers, output_file)
     _ = export_routers(routers, routers_file())
-    _ = export_routes(routers, route_export_path())
     _ = enumerate_hosts(routers, hosts_file())
 
     :ok = Utility.status "Done!"

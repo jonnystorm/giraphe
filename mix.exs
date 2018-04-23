@@ -3,7 +3,7 @@ defmodule Giraphe.Mixfile do
 
   def project do
     [ app: :giraphe,
-      version: "0.1.0",
+      version: "0.1.1",
       name: "giraphe",
       source_url: "https://github.com/jonnystorm/giraphe",
       elixir: "~> 1.3",
@@ -23,6 +23,7 @@ defmodule Giraphe.Mixfile do
           :netaddr_ex,
           :snmp_mib_ex,
           :net_snmp_ex,
+          :poison,
         ],
         ignore_warnings: "dialyzer.ignore",
         flags: [
@@ -54,6 +55,7 @@ defmodule Giraphe.Mixfile do
         :eex,
         :netaddr_ex,
         :net_snmp_ex,
+        :poison,
       ],
       env: [
         quiet: false,
@@ -71,6 +73,7 @@ defmodule Giraphe.Mixfile do
   defp deps do
     [ {:netaddr_ex, git: "https://github.com/jonnystorm/netaddr-elixir.git"},
       {:net_snmp_ex, git: "https://github.com/jonnystorm/net-snmp-elixir.git"},
+      {:poison, "~> 3.1"},
       {:ex_doc, "~> 0.14", only: :dev}
     ]
   end
