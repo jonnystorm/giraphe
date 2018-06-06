@@ -169,9 +169,14 @@ defmodule Giraphe.IO do
   end
 
   def get_target_addresses(target) do
-    :addresses
-    |> query(target, fn(t, _) -> [t] end)
-    |> Enum.sort
+    addresses =
+      :addresses
+      |> query(target, fn(t, _) -> [t] end)
+      |> Enum.sort
+
+    if length(addresses) == 0,
+      do: [target],
+    else: addresses
   end
 
   def get_target_arp_cache(target) do
