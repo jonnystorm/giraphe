@@ -99,6 +99,10 @@ defmodule Giraphe do
       set_session_parameter(:hosts_file, Path.expand(path))
     end
 
+    if path = switches[:ignore_file] do
+      set_session_parameter(:ignore_file, Path.expand(path))
+    end
+
     if switches[:info] do
       :ok = Logger.configure([level: :info])
     end
@@ -131,6 +135,7 @@ defmodule Giraphe do
            o: :output_file,
            r: :routers_file,
            h: :hosts_file,
+           i: :ignore_file,
            c: :credentials,
         ]
       )
@@ -156,7 +161,7 @@ defmodule Giraphe do
     IO.puts(:stderr,
     """
     Usage: giraphe [-qv] -c <credentials_path> -o <output_file>
-                   [-r <routers_file>] [-h <hosts_file>]
+                   [-r <routers_file>] [-h <hosts_file>] [-i <ignore_file>]
                    [-2 <gateway_ip> [<subnet_cidr>]] [-3 [<router_ip> ...]]
 
       -q: quiet
@@ -165,6 +170,7 @@ defmodule Giraphe do
       -o: output file (must end in .png or .svg)
       -r: export routers to file
       -h: discover hosts and export to file (slow!)
+      -i: do not discover hosts for CIDRs listed in file
 
       -c: Specify file containing credentials
         <credentials_path>: path to file containing credentials
@@ -257,12 +263,23 @@ defmodule Giraphe do
     end
   end
 
-  defp enumerate_hosts(routers, path) do
+  defp enumerate_hosts(routers, path, ignored_path) do
+    ignored_subnets =
+      if ignored_path do
+        ignored_path
+        |> File.read!
+        |> String.split
+        |> Enum.filter(& !String.starts_with?(&1, "#"))
+        |> Enum.map(& NetAddr.ip/1)
+      else
+        []
+      end
+
     if path do
       :ok = Utility.status "Discovering hosts... (This may take a while.)"
 
       routers
-      |> Giraphe.Discover.L3.discover_hosts
+      |> Giraphe.Discover.L3.discover_hosts(ignored_subnets)
       |> Giraphe.IO.export_hosts(path)
     end
   end
@@ -272,6 +289,9 @@ defmodule Giraphe do
 
   defp hosts_file,
     do: get_session_parameter :hosts_file
+
+  defp ignore_file,
+    do: get_session_parameter :ignore_file
 
   defp routers_file,
     do: get_session_parameter :routers_file
@@ -292,7 +312,7 @@ defmodule Giraphe do
 
     _ = export_notations(incidences, routers, output_file)
     _ = export_routers(routers, routers_file())
-    _ = enumerate_hosts(routers, hosts_file())
+    _ = enumerate_hosts(routers, hosts_file(), ignore_file())
 
     :ok = Utility.status "Done!"
   end

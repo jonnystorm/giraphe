@@ -208,11 +208,14 @@ defmodule Giraphe.Discover.L3 do
 
   @spec discover_hosts(routers)
     :: hosts
-  def discover_hosts(routers) do
+  def discover_hosts(routers, ignored_subnets \\ []) do
     routers
     |> group_routers_by_incident_subnet
     |> Stream.filter(fn {subnet, _} ->
       Utility.is_not_host_address subnet
+    end)
+    |> Stream.filter(fn {subnet, _} ->
+      not subnet in ignored_subnets
     end)
     |> Stream.flat_map(fn {subnet, incident_routers} ->
       hosts =
