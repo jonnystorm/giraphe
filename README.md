@@ -1,10 +1,10 @@
-<a href="https://github.com/jonnystorm/giraphe"><img src="https://raw.githubusercontent.com/jonnystorm/giraphe/master/giraphe-title.png" height="300px" /></a>
+<a href="https://gitlab.com/jonnystorm/giraphe"><img src="https://gitlab.com/jonnystorm/giraphe/raw/master/giraphe-title.png" height="300px" /></a>
 
-[![Build Status](https://travis-ci.org/jonnystorm/giraphe.svg?branch=master)](https://travis-ci.org/jonnystorm/giraphe)
+[![Build Status](https://gitlab.com/jonnystorm/giraphe/badges/master/pipeline.svg)](https://gitlab.com/jonnystorm/giraphe/commits/master)
 
 Discover and visualize layer-2 and layer-3 network topology.
 
-See the [API documentation](https://jonnystorm.github.io/giraphe).
+See the [API documentation](https://jonnystorm.gitlab.io/giraphe).
 
 ## Installation
 
@@ -19,7 +19,7 @@ To use giraphe as an escript:
   4. Clone the giraphe repository
 
   ```sh
-  git clone https://github.com/jonnystorm/giraphe.git
+  git clone https://gitlab.com/jonnystorm/giraphe.git
   ```
 
   5. Add nmap command to sudoers
@@ -38,29 +38,30 @@ To use giraphe as an escript:
   $ cd giraphe
   $ ./giraphe
   Usage: giraphe [-qv] -c <credentials_path> -o <output_file>
-                 [-x <export_path>] [-h <hosts_file>]
+                 [-r <routers_file>] [-h <hosts_file>] [-i <ignore_file>]
                  [-2 <gateway_ip> [<subnet_cidr>]] [-3 [<router_ip> ...]]
-
+  
     -q: quiet
     -v: verbose ('-vv' is more verbose)
-
+  
     -o: output file (must end in .png or .svg)
-    -x: export routes to path
-    -h: discover hosts and export to file (takes a long time!)
-
+    -r: export routers to file
+    -h: discover hosts and export to file (slow!)
+    -i: do not discover hosts for CIDRs listed in file
+  
     -c: Specify file containing credentials
       <credentials_path>: path to file containing credentials
-
+  
       Valid lines in this file will look like one of the following:
         snmp v2c 'r34D0n1Y!'
         snmp v3 noAuthNoPriv 'admin'
         snmp v3 authNoPriv 'admin' md5 '$3cR3t!'
-        snmp v3 authPriv 'admin' sha '$3crR3t!' aes 'pR1v473!'
-
+        snmp v3 authPriv 'admin' sha '$3cR3t!' aes 'pR1v473!'
+  
     -2: generate layer-2 topology
        <gateway_ip>: IP address of target subnet gateway
       <subnet_cidr>: Specifies switch subnet to graph
-
+  
     -3: generate layer-3 topology
       <router_ip>: IP address of seed target router; with no seed specified,
                    this machines's default gateway is used
@@ -73,7 +74,7 @@ To use giraphe as a library:
 
   ```elixir
   def deps do
-    [{:giraphe, git: "https://github.com/jonnystorm/giraphe.git"}]
+    [{:giraphe, git: "https://gitlab.com/jonnystorm/giraphe.git"}]
   end
   ```
 
