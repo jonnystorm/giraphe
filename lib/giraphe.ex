@@ -36,8 +36,10 @@ defmodule Giraphe do
   defp arg_to_atom(other),  do: other
 
   defp args_to_atoms(string) do
-    for arg <- String.split(string),
-      do: arg_to_atom(arg)
+    string
+    |> String.split
+    |> Enum.map(& String.replace(&1, "\\u00a0", " "))
+    |> Enum.map(& arg_to_atom/1)
   end
 
   defp parse_credentials(text) do
