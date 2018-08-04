@@ -215,7 +215,7 @@ defmodule Giraphe.Discover.L3 do
       Utility.is_not_host_address subnet
     end)
     |> Stream.filter(fn {subnet, _} ->
-      not subnet in ignored_subnets
+      subnet not in ignored_subnets
     end)
     |> Stream.flat_map(fn {subnet, incident_routers} ->
       hosts =
