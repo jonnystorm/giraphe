@@ -4,13 +4,14 @@
 
 Discover and visualize layer-2 and layer-3 network topology.
 
-See the [API documentation](https://jonnystorm.gitlab.io/giraphe).
+See the
+[API documentation](https://jonnystorm.gitlab.io/giraphe).
 
 ## Installation
 
 To use giraphe as an escript:
 
-  1. Install Erlang/OTP 19
+  1. Install Erlang/OTP
 
   2. Install GraphViz
 
@@ -74,7 +75,8 @@ To use giraphe as a library:
 
   ```elixir
   def deps do
-    [{:giraphe, git: "https://gitlab.com/jonnystorm/giraphe.git"}]
+    [ {:giraphe, git: "https://gitlab.com/jonnystorm/giraphe.git"},
+    ]
   end
   ```
 
@@ -82,7 +84,10 @@ To use giraphe as a library:
 
   ```elixir
   def application do
-    [applications: [:giraphe]]
+    [ applications: [
+        :giraphe,
+      ],
+    ]
   end
   ```
 

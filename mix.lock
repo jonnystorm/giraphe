@@ -1,8 +1,13 @@
-%{"earmark": {:hex, :earmark, "1.2.3", "206eb2e2ac1a794aa5256f3982de7a76bf4579ff91cb28d0e17ea2c9491e46a4", [:mix], [], "hexpm"},
-  "ex_doc": {:hex, :ex_doc, "0.16.4", "4bf6b82d4f0a643b500366ed7134896e8cccdbab4d1a7a35524951b25b1ec9f0", [:mix], [{:earmark, "~> 1.1", [hex: :earmark, repo: "hexpm", optional: false]}], "hexpm"},
-  "jds_math_ex": {:git, "https://github.com/jonnystorm/jds-math-elixir", "5efa7697f0ca93dd4929eb8ddcd757659e9a7aad", []},
-  "linear_ex": {:git, "https://github.com/jonnystorm/linear-elixir", "c7132141cc060a22a38d89bea1c272145b07d206", []},
-  "net_snmp_ex": {:git, "https://github.com/jonnystorm/net-snmp-elixir.git", "eae26d777fb84bdc53787841c39cc07b9e5b8395", []},
-  "netaddr_ex": {:git, "https://github.com/jonnystorm/netaddr-elixir.git", "ba9efc1c4b504310f87aeb0e160320127b85f9be", []},
+%{
+  "earmark": {:hex, :earmark, "1.2.5", "4d21980d5d2862a2e13ec3c49ad9ad783ffc7ca5769cf6ff891a4553fbaae761", [:mix], [], "hexpm"},
+  "ex_doc": {:hex, :ex_doc, "0.19.0", "e22b6434373b4870ea77b24df069dbac7002c1f483615e9ebfc0c37497e1c75c", [:mix], [{:earmark, "~> 1.1", [hex: :earmark, repo: "hexpm", optional: false]}, {:makeup_elixir, "~> 0.7", [hex: :makeup_elixir, repo: "hexpm", optional: false]}], "hexpm"},
+  "jds_math_ex": {:git, "https://gitlab.com/jonnystorm/jds-math-elixir", "048b5d4570c05649b121cba6a35b1e446bf9a811", []},
+  "linear_ex": {:git, "https://gitlab.com/jonnystorm/linear-elixir", "aab56a160b74731b621876865dde9b4191227f41", []},
+  "makeup": {:hex, :makeup, "0.5.1", "966c5c2296da272d42f1de178c1d135e432662eca795d6dc12e5e8787514edf7", [:mix], [{:nimble_parsec, "~> 0.2.2", [hex: :nimble_parsec, repo: "hexpm", optional: false]}], "hexpm"},
+  "makeup_elixir": {:hex, :makeup_elixir, "0.8.0", "1204a2f5b4f181775a0e456154830524cf2207cf4f9112215c05e0b76e4eca8b", [:mix], [{:makeup, "~> 0.5.0", [hex: :makeup, repo: "hexpm", optional: false]}, {:nimble_parsec, "~> 0.2.2", [hex: :nimble_parsec, repo: "hexpm", optional: false]}], "hexpm"},
+  "net_snmp_ex": {:git, "https://gitlab.com/jonnystorm/net-snmp-elixir.git", "7a32a18a1b6285dbdc185e7f17a8866dc2f3a638", []},
+  "netaddr_ex": {:git, "https://gitlab.com/jonnystorm/netaddr-elixir.git", "3324d368ddb729d3c5135d7c3c9f117a003c1b82", []},
+  "nimble_parsec": {:hex, :nimble_parsec, "0.2.2", "d526b23bdceb04c7ad15b33c57c4526bf5f50aaa70c7c141b4b4624555c68259", [:mix], [], "hexpm"},
   "poison": {:hex, :poison, "3.1.0", "d9eb636610e096f86f25d9a46f35a9facac35609a7591b3be3326e99a0484665", [:mix], [], "hexpm"},
-  "snmp_mib_ex": {:git, "https://github.com/jonnystorm/snmp-mib-elixir", "5df5999333e97ece702045b2d1de47025daa15a8", []}}
+  "snmp_mib_ex": {:git, "https://gitlab.com/jonnystorm/snmp-mib-elixir", "ab8d31187cacd1f573a0b574c18397f80e2d8207", []},
+}
