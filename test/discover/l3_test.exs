@@ -276,14 +276,14 @@ defmodule Giraphe.Discover.L3Test do
   end
 
   test "Router with bad NetAddrs in routes explodes" do
-    # Route churn can cause next-hops to change, which
-    # causes SNMP table column indices to change, which
-    # `snmptable` interprets as missing values, which
-    # it then replaces with '?', which
-    # `ip/1` rejects, returning `{:error, :einval}`.
+    # Route churn can cause next-hops to change,
+    # which cause SNMP table column indices to change,
+    # which `snmptable` interprets as missing values,
+    # which it then replaces with '?',
+    # which `ip/1` rejects, returning `{:error, :einval}`.
     # Later calls to `NetAddr` functions therefore raise.
     #
-    assert_raise Protocol.UndefinedError, fn ->
+    assert_raise FunctionClauseError, fn ->
       discover_routers [ip("203.0.113.9")]
     end
   end

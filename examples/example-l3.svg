@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 385.0942)">
 <title>G</title>
 <polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-385.0942 424.7622,-385.0942 424.7622,4 -4,4"/>
-<text text-anchor="middle" x="76" y="-365.8942" font-family="sans bold" font-size="14.00" fill="#000000">1970&#45;01&#45;01 00:00:00Z</text>
+<text text-anchor="middle" x="96.5" y="-365.8942" font-family="sans bold" font-size="14.00" fill="#000000">1970&#45;01&#45;01 00:00:00Z</text>
 <!-- 192.0.2.14&#45;&#45;192.0.2.12/30 -->
 <g id="edge1" class="edge">
 <title>192.0.2.14&#45;&#45;192.0.2.12/30</title>
