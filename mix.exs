@@ -71,12 +71,10 @@ defmodule Giraphe.Mixfile do
   end
 
   defp deps do
-    [ { :netaddr_ex,
-        git: "https://gitlab.com/jonnystorm/netaddr-elixir.git"
-      },
-      { :net_snmp_ex,
+    [ { :net_snmp_ex,
         git: "https://gitlab.com/jonnystorm/net-snmp-elixir.git"
       },
+      {:netaddr_ex, "~> 1.0.5"},
       {:poison, "~> 3.1"},
       {:ex_doc, "~> 0.14", only: :dev}
     ]
