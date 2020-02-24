@@ -31,7 +31,7 @@ mix:
     - wget -O $PLT_LOCATION https://gitlab.com/jonnystorm/gitlab-elixir-plts/raw/master/$PLT_FILENAME
     - mix do deps.get, deps.compile
     - mix test
-    - mix dialyzer --halt-exit-status
+    - mix dialyzer
 
 pages:
   stage: deploy

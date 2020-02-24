@@ -9,7 +9,7 @@ function run
       --include integrated \
       --include expensive &&
     mix dialyzer.build &&
-    mix dialyzer --halt-exit-status
+    mix dialyzer
 
   env MIX_ENV=prod mix escript.build
 }

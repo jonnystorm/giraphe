@@ -94,7 +94,7 @@ defmodule Giraphe.Graph.L2 do
   defp physaddr_in_fdb?(fdb, physaddr),
     do: get_fdb_port_by_physaddr(fdb, physaddr) != nil
 
-  defp abduce_adjacencies(switches) do
+  defp _abduce_adjacencies(switches) do
     for down = _downstream_switch <- switches,
           up =   _upstream_switch <- switches,
         physaddr_in_fdb?(up.fdb, down.physaddr)
@@ -143,65 +143,29 @@ defmodule Giraphe.Graph.L2 do
     end
   end
 
-  @type switches :: [Switch.t]
-  @type template :: String.t
-  @type graph    :: String.t
+  @type switches    :: [Switch.t, ...]
+  @type adjacencies :: [{Switch.t, Switch.t}, ...]
 
   @doc """
   Generate graph representation from `switches`.
   """
-  @spec graph_devices(switches, template)
-    :: graph
-  def graph_devices(switches, template) do
-    current_time_utc = "#{DateTime.utc_now}"
-
-    graph_devices(switches, current_time_utc, template)
-  end
-
-  @type timestamp :: String.t
-
-  @doc """
-  Generate graph representation from `switches` with
-  timestamp.
-  """
-  @spec graph_devices(switches, timestamp, template)
-    :: graph
-  def graph_devices(switches, timestamp, template) do
-    :ok = Logger.debug("Graphing switches '#{inspect switches}'...")
+  @spec abduce_adjacencies(switches)
+    :: adjacencies
+  def abduce_adjacencies(switches) do
+    :ok = Logger.debug("Graphing switches '#{inspect(switches)}'...")
 
     prepped_switches =
-      prepare_switches_for_adjacency_abduction switches
+      prepare_switches_for_adjacency_abduction(switches)
 
-    adjacencies =
-      try do
-        prepped_switches
-        |> abduce_adjacencies
-        |> sort_adjacencies_by_upstream_polladdr_and_downlink
-      rescue
-        _ in Enum.EmptyError ->
-          :ok = Logger.error("No switch adjacencies found")
+    try do
+      prepped_switches
+      |> _abduce_adjacencies
+      |> sort_adjacencies_by_upstream_polladdr_and_downlink
+    rescue
+      _ in Enum.EmptyError ->
+        :ok = Logger.error("No switch adjacencies found")
 
-          []
-      end
-
-    evaluate_l2_template(
-      adjacencies,
-      prepped_switches,
-      template,
-      timestamp
-    )
-  end
-
-  defp evaluate_l2_template(
-    adjacencies,
-    switches,
-    template,
-    timestamp
-  ) do
-    EEx.eval_string template,
-      [ timestamp: timestamp,
-        switches: switches,
-        edges: adjacencies,
-      ]
+        []
+    end
   end
 end

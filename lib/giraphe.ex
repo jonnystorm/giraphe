@@ -7,7 +7,7 @@ defmodule Giraphe do
   Giraphe escript module.
   """
 
-  alias Giraphe.{Discover, Graph, Render, Utility}
+  alias Giraphe.{Discover, Graph, Utility}
 
   require Logger
 
@@ -214,20 +214,27 @@ defmodule Giraphe do
   end
 
   defp l2_template,
-    do: fetch_template :l2
+    do: fetch_template(:l2)
 
   defp l3_template,
-    do: fetch_template :l3
+    do: fetch_template(:l3)
 
   defp generate_l2_graph(gateway_address, subnet) do
     if Utility.is_host_address gateway_address do
       output_file = output_file()
       template    = l2_template()
+      switches    =
+        gateway_address
+        |> Discover.L2.discover_switches(subnet)
 
-      gateway_address
-      |> Discover.L2.discover_switches(subnet)
-      |> Graph.L2.graph_devices(template)
-      |> Render.render_graph(output_file)
+      _ =
+        switches
+        |> Graph.L2.abduce_adjacencies
+        |> Giraphe.IO.render_l2_graph(
+          switches,
+          template,
+          output_file
+        )
 
       :ok = Utility.status "Done!"
     else
@@ -287,20 +294,20 @@ defmodule Giraphe do
   end
 
   defp output_file,
-    do: get_session_parameter :output_file
+    do: get_session_parameter(:output_file)
 
   defp hosts_file,
-    do: get_session_parameter :hosts_file
+    do: get_session_parameter(:hosts_file)
 
   defp ignore_file,
-    do: get_session_parameter :ignore_file
+    do: get_session_parameter(:ignore_file)
 
   defp routers_file,
-    do: get_session_parameter :routers_file
+    do: get_session_parameter(:routers_file)
 
   defp generate_l3_graph(targets) do
-    routers     = discover_routers targets
-    incidences  = Graph.L3.abduce_incidences routers
+    routers     = discover_routers(targets)
+    incidences  = Graph.L3.abduce_incidences(routers)
     output_file = output_file()
     template    = l3_template()
 

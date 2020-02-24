@@ -357,6 +357,32 @@ defmodule Giraphe.IO do
     end
   end
 
+  def render_l2_graph(
+    adjacencies,
+    switches,
+    template,
+    output_file
+  ) do
+    :ok = Utility.status("Rendering graph")
+
+    format =
+      output_file
+      |> Path.extname
+      |> String.trim_leading(".")
+
+    graph =
+      adjacencies
+      |> Utility.evaluate_l2_template(switches, template)
+      |> Render.GraphViz.render_graph(format)
+
+    with {:error, error} <- File.write(output_file, graph)
+    do
+      :ok = Logger.error "Failed while writing graph to #{inspect output_file}"
+
+      raise "Unable to write graph to #{inspect output_file}: #{inspect error}"
+    end
+  end
+
   def render_l3_graph(
     incidences,
     routers,

@@ -3,11 +3,17 @@ digraph G {
 
 <%=
 for s <- switches do
+  fdb =
+    s.fdb
+    |> Enum.map(fn {a, b, c} -> {{a, b}, c} end)
+    |> Enum.into(%{})
+    |> Map.keys
+
   height =
-    if length(s.fdb) == 0 do
+    if length(fdb) == 0 do
       "0.25"
     else
-      "#{length(s.fdb) * 0.5}"
+      "#{length(fdb) * 0.5}"
     end
 
   """

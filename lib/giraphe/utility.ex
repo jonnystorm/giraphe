@@ -262,20 +262,45 @@ defmodule Giraphe.Utility do
   def evaluate_l2_template(
     adjacencies,
     switches,
+    template
+  ) do
+    current_datetime_utc = "#{DateTime.utc_now}"
+
+    evaluate_l2_template(
+      adjacencies,
+      switches,
+      template,
+      current_datetime_utc
+    )
+  end
+
+  def evaluate_l2_template(
+    adjacencies,
+    switches,
     template,
     timestamp
   ) do
-    EEx.eval_string template,
-      [ timestamp: timestamp,
-        switches: switches,
-        edges: adjacencies,
-      ]
+    nodes  = Enum.map(switches, &device_to_node/1)
+    result =
+      EEx.eval_string(
+        template,
+        [ timestamp: timestamp,
+          switches: nodes,
+          edges: adjacencies,
+        ]
+      )
+
+    if is_binary(result) do
+      result
+    else
+      ""
+    end
   end
 
-  defp router_to_node(router) do
-    node_id = NetAddr.address router.polladdr
+  defp device_to_node(device) do
+    node_id = NetAddr.address(device.polladdr)
 
-    router
+    device
     |> trim_domain_from_device_sysname
     |> Map.put(:id, node_id)
   end
@@ -299,7 +324,7 @@ defmodule Giraphe.Utility do
   ) do
     nodes =
       routers
-      |> Enum.map(&router_to_node/1)
+      |> Enum.map(&device_to_node/1)
       |> Enum.sort_by(& &1.id)
 
     edges =
@@ -315,11 +340,20 @@ defmodule Giraphe.Utility do
       end)
       |> Enum.dedup
 
-    EEx.eval_string template,
-      [ timestamp: timestamp,
-        routers: nodes,
-        edges: edges,
-        incidences: incidences,
-      ]
+    result =
+      EEx.eval_string(
+        template,
+        [ timestamp: timestamp,
+          routers: nodes,
+          edges: edges,
+          incidences: incidences,
+        ]
+      )
+
+    if is_binary(result) do
+      result
+    else
+      ""
+    end
   end
 end

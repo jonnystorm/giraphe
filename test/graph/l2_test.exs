@@ -10,6 +10,7 @@ defmodule Giraphe.Graph.L2Test do
     only: [ip: 1, mac_48: 1]
 
   alias Giraphe.Switch
+  alias Giraphe.Utility
 
   @test_template    "priv/templates/l2_test_graph.dot.eex"
   @dot_template     "priv/templates/l2_graph.dot.eex"
@@ -485,11 +486,16 @@ defmodule Giraphe.Graph.L2Test do
 
     template = File.read! @dot_template
 
-    assert graph_devices(
-      switches,
-      "1970-01-01 00:00:00Z",
-      template
-    ) == expected
+    dot =
+      switches
+      |> abduce_adjacencies
+      |> Utility.evaluate_l2_template(
+        switches,
+        template,
+        "1970-01-01 00:00:00Z"
+      )
+
+    assert dot == expected
   end
 
   test "Generates GraphML from switches" do
@@ -499,11 +505,16 @@ defmodule Giraphe.Graph.L2Test do
 
     template = File.read! @graphml_template
 
-    assert graph_devices(
-      switches,
-      "1970-01-01 00:00:00Z",
-      template
-    ) == expected
+    dot =
+      switches
+      |> abduce_adjacencies
+      |> Utility.evaluate_l2_template(
+        switches,
+        template,
+        "1970-01-01 00:00:00Z"
+      )
+
+    assert dot == expected
   end
 
   test "Generates dot from different switches" do
@@ -569,9 +580,15 @@ defmodule Giraphe.Graph.L2Test do
       ]
 
     template = File.read! @test_template
+
     dot =
       switches
-      |> graph_devices("1970-01-01 00:00:00Z", template)
+      |> abduce_adjacencies
+      |> Utility.evaluate_l2_template(
+        switches,
+        template,
+        "1970-01-01 00:00:00Z"
+      )
 
     assert dot ==
       """
@@ -579,8 +596,8 @@ defmodule Giraphe.Graph.L2Test do
         label="1970-01-01 00:00:00Z"
 
         "192.168.97.1" [label="AnSwitch" height=1.0];
-        "192.168.97.3" [label="AnOtherSwitch" height=0.25];
-        "192.168.97.4" [label="OneMoreSwitch" height=0.5];
+        "192.168.97.3" [label="AnOtherSwitch" height=0.5];
+        "192.168.97.4" [label="OneMoreSwitch" height=1.0];
 
         "192.168.97.1" -> "192.168.97.3" [taillabel="Po5" headlabel="Po5"];
         "192.168.97.1" -> "192.168.97.4" [taillabel="Po69" headlabel="Po3"];

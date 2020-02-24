@@ -9,10 +9,12 @@
 
     <node id="n192.0.2.3">
       <desc>192.0.2.3</desc>
+      <port name="Gi1/24"/>
       <port name="Gi1/1"/>
     </node>
     <node id="n192.0.2.7">
       <desc>192.0.2.7</desc>
+      <port name="Gi1/24"/>
       <port name="Gi1/1"/>
       <port name="Gi1/2"/>
       <port name="Gi1/3"/>
@@ -36,18 +38,23 @@
     </node>
     <node id="n192.0.2.10">
       <desc>192.0.2.10</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.20">
       <desc>192.0.2.20</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.30">
       <desc>192.0.2.30</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.40">
       <desc>192.0.2.40</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.50">
       <desc>192.0.2.50</desc>
+      <port name="Gi1/24"/>
       <port name="Gi1/1"/>
       <port name="Gi1/2"/>
       <port name="Gi1/3"/>
@@ -56,18 +63,23 @@
     </node>
     <node id="n192.0.2.51">
       <desc>192.0.2.51</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.52">
       <desc>192.0.2.52</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.53">
       <desc>192.0.2.53</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.54">
       <desc>192.0.2.54</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.55">
       <desc>192.0.2.55</desc>
+      <port name="Gi1/24"/>
       <port name="Gi1/1"/>
       <port name="Gi1/2"/>
       <port name="Gi1/3"/>
@@ -75,30 +87,39 @@
     </node>
     <node id="n192.0.2.56">
       <desc>192.0.2.56</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.57">
       <desc>192.0.2.57</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.58">
       <desc>192.0.2.58</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.59">
       <desc>192.0.2.59</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.60">
       <desc>192.0.2.60</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.70">
       <desc>192.0.2.70</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.80">
       <desc>192.0.2.80</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.90">
       <desc>192.0.2.90</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.100">
       <desc>192.0.2.100</desc>
+      <port name="Gi1/24"/>
       <port name="Gi1/1"/>
       <port name="Gi1/2"/>
       <port name="Gi1/3"/>
@@ -111,60 +132,79 @@
     </node>
     <node id="n192.0.2.101">
       <desc>192.0.2.101</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.102">
       <desc>192.0.2.102</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.103">
       <desc>192.0.2.103</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.104">
       <desc>192.0.2.104</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.105">
       <desc>192.0.2.105</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.106">
       <desc>192.0.2.106</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.107">
       <desc>192.0.2.107</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.108">
       <desc>192.0.2.108</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.109">
       <desc>192.0.2.109</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.110">
       <desc>192.0.2.110</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.120">
       <desc>192.0.2.120</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.130">
       <desc>192.0.2.130</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.140">
       <desc>192.0.2.140</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.150">
       <desc>192.0.2.150</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.160">
       <desc>192.0.2.160</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.170">
       <desc>192.0.2.170</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.180">
       <desc>192.0.2.180</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.190">
       <desc>192.0.2.190</desc>
+      <port name="Gi1/24"/>
     </node>
     <node id="n192.0.2.200">
       <desc>192.0.2.200</desc>
+      <port name="Gi1/24"/>
     </node>
 
 

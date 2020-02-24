@@ -7,13 +7,11 @@ defmodule Giraphe.Render.GraphViz do
   A renderer implementation for GraphViz
   """
 
-  @behaviour Giraphe.Render
-
   require Logger
 
-  defp execute_dot(format, notation) do
-    dot  = String.replace(notation, "'", "\"")
-    int  = System.unique_integer [:positive]
+  defp execute_dot(format, dot0) do
+    dot  = String.replace(dot0, "'", "\"")
+    int  = System.unique_integer([:positive])
     temp = Path.join(System.tmp_dir!, to_string(int))
     args = "-T#{format} -o #{temp}"
 
@@ -29,6 +27,8 @@ defmodule Giraphe.Render.GraphViz do
     File.read! temp
   end
 
-  def render_graph(notation, format),
-    do: execute_dot(format, notation)
+  def render_graph(dot, format)
+      when is_binary(dot)
+       and format in ~w(png svg),
+    do: execute_dot(format, dot)
 end
