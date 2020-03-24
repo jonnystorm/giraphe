@@ -53,7 +53,7 @@ defmodule Giraphe.IO do
 
   def get_router(target) do
     if is_snmp_agent(target) do
-      sysname  = get_target_sysname  target
+      sysname = get_target_sysname(target)
 
       sysdescr =
         if sysname,
@@ -70,9 +70,13 @@ defmodule Giraphe.IO do
           do: get_target_routes(target),
         else: []
 
-      # Cisco Nexus may have routes that don't correspond to
-      # addresses. Also, ASAs provide no routes. In either
-      # case, use addresses for routes.
+      # Cisco NXOS returns each connected route with a
+      # next-hop equal to the primary IP address of the
+      # corresponding interface, and local routes
+      # each have a next-hop equal to the same. Numerous
+      # firewalls, such as Cisco ASA, provide no routes,
+      # at all. In either case, we use addresses to
+      # generate connected routes.
       #
       addresses =
         if length(routes0) <= length(target_addresses) do
@@ -86,11 +90,11 @@ defmodule Giraphe.IO do
 
       routes =
         if length(routes0) <= length(addresses) do
-          Enum.map addresses, fn address ->
+          Enum.map(addresses, fn address ->
             { NetAddr.first_address(address),
               address_to_self_address(address)
             }
-          end
+          end)
         else
           routes0
         end

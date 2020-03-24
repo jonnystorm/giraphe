@@ -36,7 +36,7 @@ defmodule Giraphe.IO.HostScan.Nmap do
 
     case System.cmd("sudo", args, stderr_to_stdout: true) do
       {output, 0} ->
-        Regex.match?(~r|Ports: #{port}/open/|, output)
+        Regex.match?(~r|Ports: #{port}/open|, output)
 
       {error, _} ->
         raise "Unable to scan target '#{target}' for SNMP: '#{error}'."
