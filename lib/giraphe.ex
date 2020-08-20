@@ -329,6 +329,9 @@ defmodule Giraphe do
   def main(argv) do
     _ = init_session_parameters()
 
+    if is_nil(Utility.which_dot()),
+      do: exit(1)
+
     case parse_args argv do
       [] ->
         usage()

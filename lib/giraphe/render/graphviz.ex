@@ -9,11 +9,17 @@ defmodule Giraphe.Render.GraphViz do
 
   require Logger
 
+  alias Giraphe.Utility
+
   defp execute_dot(format, dot0) do
     dot  = String.replace(dot0, "'", "\"")
     int  = System.unique_integer([:positive])
     temp = Path.join(System.tmp_dir!, to_string(int))
     args = "-T#{format} -o #{temp}"
+
+    if is_nil(Utility.which_dot()) do
+      exit(1)
+    end
 
     _ =
       """

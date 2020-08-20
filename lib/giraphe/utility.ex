@@ -356,4 +356,21 @@ defmodule Giraphe.Utility do
       ""
     end
   end
+
+  def which_dot do
+    out =
+      "which dot 2>/dev/null"
+      |> String.to_charlist
+      |> :os.cmd
+      |> List.to_string
+
+    case out do
+      "" ->
+        :ok = Logger.error("No GraphViz installation found, or 'dot' is not in PATH")
+        nil
+
+      _  ->
+        out
+    end
+  end
 end
