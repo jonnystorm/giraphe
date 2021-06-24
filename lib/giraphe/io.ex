@@ -88,16 +88,28 @@ defmodule Giraphe.IO do
           )
         end
 
-      routes =
-        if length(routes0) <= length(addresses) do
-          Enum.map(addresses, fn address ->
-            { NetAddr.first_address(address),
-              address_to_self_address(address)
-            }
-          end)
+      # It may be the case that pfSense has no routes in
+      # common with its addresses. In that case, we
+      # ignore the lack of overlapping connected routes.
+      # Again, we will generate connected routes for these
+      # addresses.
+      addresses =
+        if length(addresses) == 0 do
+          target_addresses
         else
-          routes0
+          addresses
         end
+
+      routes =
+        addresses
+        |> Enum.map(fn address ->
+          { NetAddr.first_address(address),
+            address_to_self_address(address)
+          }
+        end)
+        |> Enum.concat(routes0)
+        |> Enum.sort
+        |> Enum.uniq
 
       polladdr =
         target

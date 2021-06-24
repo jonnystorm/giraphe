@@ -209,7 +209,7 @@ defmodule Giraphe.Utility do
     #
     with nil <-
            set_address_length_to_matching_address_length(
-             addresses,
+             Enum.reverse(Enum.sort(addresses)),
              address
            ),
 
