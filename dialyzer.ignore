@@ -1,2 +1,3 @@
 Function usage/0 has no local return
 Function usage/1 has no local return
+The pattern 'false' can never match the type 'true'

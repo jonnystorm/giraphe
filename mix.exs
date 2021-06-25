@@ -3,7 +3,7 @@ defmodule Giraphe.Mixfile do
 
   def project do
     [ app: :giraphe,
-      version: "0.1.2",
+      version: "0.2.0",
       name: "giraphe",
       source_url: "https://gitlab.com/jonnystorm/giraphe",
       elixir: "~> 1.3",
@@ -74,9 +74,9 @@ defmodule Giraphe.Mixfile do
     [ { :net_snmp_ex,
         git: "https://gitlab.com/jonnystorm/net-snmp-elixir.git"
       },
-      {:netaddr_ex, "~> 1.0.5"},
+      {:netaddr_ex, "~> 1.3.1"},
       {:poison, "~> 3.1"},
-      {:ex_doc, "~> 0.14", only: :dev}
+      {:ex_doc, "~> 0.24", only: :dev}
     ]
   end
 end
